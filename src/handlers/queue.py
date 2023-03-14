@@ -1,9 +1,9 @@
 from pyxavi.config import Config
 from pyxavi.storage import Storage
-from ..objects.status_post import StatusPost
+from ..objects.queue_item import QueueItem
 import logging
 
-class StatusPostQueue:
+class Queue:
 
     _queue = []
 
@@ -13,7 +13,7 @@ class StatusPostQueue:
         self._queue_manager = Storage(self._config.get("status_posts_queue_storage.file"))
         self._queue = self._queue_manager.get("queue", [])
 
-    def append(self, item: StatusPost) -> None:
+    def append(self, item: QueueItem) -> None:
         self._queue.append(item)
     
     def sort_by_date(self) -> None:

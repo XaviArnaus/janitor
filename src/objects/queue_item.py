@@ -1,39 +1,34 @@
 from __future__ import annotations
-from status_post import StatusPost
-from queue_item_action import QueueItemAction
+from message import Message
+from message_media import MessageMedia
 from datetime import datetime
 
 class QueueItem:
 
-    status: StatusPost  # Used to define the StatusPost to publish
-    status_id: int  # Used to define the StatusPost to reblog.
-    action: QueueItemAction
+    message: Message
+    media: list[MessageMedia]
     published_at: datetime
 
     def __init__(self,
-                 status: StatusPost = None,
-                 status_id: int = None,
-                 action: QueueItemAction = None,
+                 message: Message = None,
+                 media: list[MessageMedia] = None,
                  published_at: datetime = None
                  ) -> None:
         
-        self.status = status
-        self.status_id = status_id
-        self.action = action
+        self.message = message
+        self.media - media
         self.published_at = published_at if published_at else datetime.now()
     
     def to_dict(self) -> dict:
         return {
-            "status": self.status.to_dict(),
-            "status_id": self.status_id,
-            "action": self.action,
+            "message": self.message.to_dict(),
+            "media": map(lambda x: x.to_dict(), self.media),
             "published_at": datetime.timestamp(self.published_at)
         }
     
     def from_dict(queue_item_dict: dict) -> QueueItem:
         return QueueItem(
-            StatusPost.from_dict(queue_item_dict["status"]),
-            queue_item_dict["status_id"],
-            QueueItemAction.valid_or_raise(queue_item_dict["action"]),
+            Message.from_dict(queue_item_dict["message"]),
+            map(lambda x: MessageMedia.from_dict(x), queue_item_dict["media"]),
             datetime.fromtimestamp(queue_item_dict["published_at"])
         )

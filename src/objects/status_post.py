@@ -1,6 +1,6 @@
 from __future__ import annotations
 from status_post_visibility import StatusPostVisibility
-from content_type import ContentType
+from status_post_content_type import StatusPostContentType
 from datetime import datetime
 
 
@@ -21,13 +21,13 @@ class StatusPost:
     spoiler_text: str = None
     language: str = None
     idempotency_key: str = None
-    content_type: ContentType = None
+    content_type: StatusPostContentType = None
     scheduled_at: datetime = None
     poll: any = None    # Poll not supported. It should be here a Poll object
     quote_id: int = None
 
     def __init__(self,
-                 status, 
+                 status: str = None, 
                  in_reply_to_id: int = None, 
                  media_ids: list[int] = None,
                  sensitive: bool = False, 
@@ -35,7 +35,7 @@ class StatusPost:
                  spoiler_text: str = None, 
                  language: str = None, 
                  idempotency_key: str = None, 
-                 content_type: ContentType = None, 
+                 content_type: StatusPostContentType = None, 
                  scheduled_at: datetime = None, 
                  poll: any = None, 
                  quote_id: int = None) -> None:
@@ -79,7 +79,7 @@ class StatusPost:
             status_post_dict["spoiler_text"],
             status_post_dict["language"],
             status_post_dict["idempotency_key"],
-            ContentType.valid_or_raise(status_post_dict["content_type"]),
+            StatusPostContentType.valid_or_raise(status_post_dict["content_type"]),
             datetime.fromtimestamp(status_post_dict["scheduled_at"]),
             status_post_dict["poll"],
             status_post_dict["quote_id"],

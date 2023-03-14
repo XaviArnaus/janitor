@@ -1,6 +1,7 @@
 from pyxavi.config import Config
 from pyxavi.logger import Logger
-from main import Main
+from src.lib.system_info import SystemInfo
+from pyxavi.debugger import dd
 
 class Runner:
     '''
@@ -15,9 +16,18 @@ class Runner:
 
     def run(self):
         self._logger.info("Run app")
-        echo = Main(self._config)
-        echo.run()
+        sys_data = self._collect_data()
+        dd(sys_data)
         self._logger.info("End.")
+
+    def _collect_data(self) -> dict:
+        sys_info = SystemInfo(self._config)
+        return {
+            **sys_info.get_cpu_data(),
+            **sys_info.get_mem_data(),
+            **sys_info.get_disk_data(),
+            **sys_info.get_temp_data(),
+        }
 
 if __name__ == '__main__':
     Runner().init().run()

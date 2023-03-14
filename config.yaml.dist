@@ -13,6 +13,34 @@ app:
     email: "bot+syscheck@my-fancy.site"
     password: "SuperSecureP4ss"
 
+run_control:
+  # [Bool] Performs a dry run: the queue is untouched and no re-toot is really done
+  # Check the logs/stdout to see the results
+  dry_run: True
+
+# Sysntem Information config
+system_info:
+  # Levels above (greater than) which an alarm should be triggered
+  thresholds:
+    # [Float] CPU percent
+    cpu: 80.0
+    # [Float] Memory percent
+    memory: 80.0
+    # [Float] Disk percent
+    disk: 80.0
+  # [Bool] Making (or not) values human readable
+  human_readable: True
+
+# Status posts config
+status_post:
+  # [Integer] Status max length
+  max_length: 5000
+  # [String] Status Post content type: "text/plain" | "text/markdown" | "text/html" | "text/bbcode"
+  # Only vaild for Pleroma and Akkoma instances. Mastodon instances will ignore it
+  content_type: "text/markdown"
+  # [String] Status Post visibility: "direct" | "private" | "unlisted" | "public"
+  visibility: "public"
+
 # Logging config
 logger:
   # [Integer] Log level: NOTSET=0 | DEBUG=10 | INFO=20 | WARN=30 | ERROR=40 | CRITICAL=50
@@ -36,6 +64,3 @@ status_posts_queue_storage:
 publisher:
 # [String] Where to download the media to
   media_storage: "storage/media/"
-  # [Bool] Performs a dry run: the queue is untouched and no re-toot is really done
-  # Check the logs/stdout to see the results
-  dry_run: True

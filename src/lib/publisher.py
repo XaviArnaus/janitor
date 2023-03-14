@@ -1,9 +1,9 @@
 from pyxavi.config import Config
 from pyxavi.media import Media
-from lib.queue import Queue
-from lib.formater import Formater
+from ..objects.queue_item import QueueItem
+from .queue import Queue
+from .formater import Formater
 from mastodon import Mastodon 
-from objects.queue_item import QueueItem
 import logging
 
 class Publisher:

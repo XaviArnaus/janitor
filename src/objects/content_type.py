@@ -1,8 +1,8 @@
 from __future__ import annotations
-from enum import Enum
+from strenum import LowercaseStrEnum
 
 
-class ContentType(Enum):
+class ContentType(LowercaseStrEnum):
     """
     Specific to “pleroma” feature set:: Specify content_type to set the content type of your post on Pleroma. It accepts:
 

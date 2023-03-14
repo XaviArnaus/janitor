@@ -2,3 +2,4 @@ Mastodon.py==1.8.0
 psutil==5.9.4
 strenum==v0.4.9
 git+https://github.com/XaviArnaus/pyxavi@v0.1.4
+git+https://git.mastodont.cat/spla/Akkoma.py

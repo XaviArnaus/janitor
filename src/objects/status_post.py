@@ -1,6 +1,6 @@
 from __future__ import annotations
-from status_post_visibility import StatusPostVisibility
-from status_post_content_type import StatusPostContentType
+from .status_post_visibility import StatusPostVisibility
+from .status_post_content_type import StatusPostContentType
 from datetime import datetime
 
 

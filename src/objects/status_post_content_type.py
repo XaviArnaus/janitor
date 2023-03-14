@@ -1,8 +1,8 @@
 from __future__ import annotations
-from enum import Enum
+from strenum import LowercaseStrEnum
 
 
-class StatusPostContentType(Enum):
+class StatusPostContentType(LowercaseStrEnum):
     """
     Specific to “pleroma” feature set:: Specify content_type to set the content type of your post on Pleroma. It accepts:
 

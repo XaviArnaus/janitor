@@ -1,8 +1,8 @@
 from __future__ import annotations
-from enum import Enum
+from strenum import LowercaseStrEnum
 
 
-class StatusPostVisibility(Enum):
+class StatusPostVisibility(LowercaseStrEnum):
     """
     The visibility parameter is a string value and accepts any of: 
     

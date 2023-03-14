@@ -3,8 +3,10 @@ from pyxavi.logger import Logger
 from src.lib.system_info import SystemInfo
 from src.lib.system_info_templater import SystemInfoTemplater
 from src.lib.queue import Queue
+from src.lib.publisher import Publisher
+# from src.lib.mastodon_helper import MastodonHelper
+from src.lib.akkoma_helper import AkkomaHelper
 from src.objects.queue_item import QueueItem
-from pyxavi.debugger import dd
 
 class RunApp:
     '''
@@ -20,18 +22,23 @@ class RunApp:
 
     def run(self):
         self._logger.info("Run app")
+
         # Get the data
         sys_data = self._collect_data()
+
         # Make it a message
         message = SystemInfoTemplater(self._config).process_report(sys_data)
-        print(message.summary)
-        print(message.text)
+
         # Add it into the queue and save
         self._logger.debug("Adding message into the queue")
         self._queue.append(QueueItem(message))
         self._queue.save()
-        # Publish the queue
 
+        # Publish the queue
+        akkoma = AkkomaHelper.get_instance(self._config)
+        publisher = Publisher(self._config, akkoma)
+        self._logger.info("Publishing the whole queue")
+        publisher.publish_all_from_queue()
 
         self._logger.info("End.")
 

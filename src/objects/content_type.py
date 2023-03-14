@@ -2,7 +2,7 @@ from __future__ import annotations
 from enum import Enum
 
 
-class StatusPostContentType(Enum):
+class ContentType(Enum):
     """
     Specific to “pleroma” feature set:: Specify content_type to set the content type of your post on Pleroma. It accepts:
 
@@ -16,13 +16,13 @@ class StatusPostContentType(Enum):
 
     PLAIN = "text/plain"
     MARKDOWN = "text/markdown"
-    HTML = "text/html"
+    HTML = "text/markhtmldown"
     BBCODE = "text/bbcode"
 
-    def valid_or_raise(self, value: str) -> StatusPostContentType:
+    def valid_or_raise(self, value: str) -> ContentType:
         valid_items = [self.PLAIN, self.MARKDOWN, self.HTML, self.BBCODE]
 
         if not value in valid_items:
-            raise RuntimeError(f"Value [{value}] is not a valid StatusPostContentType")
+            raise RuntimeError(f"Value [{value}] is not a valid ContentType")
         
         return value

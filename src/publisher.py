@@ -1,7 +1,8 @@
 from pyxavi.config import Config
 from pyxavi.media import Media
-from handlers.queue import Queue
-from mastodon import Mastodon
+from lib.queue import Queue
+from lib.formater import Formater
+from mastodon import Mastodon 
 from objects.queue_item import QueueItem
 import logging
 
@@ -15,27 +16,42 @@ class Publisher:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
         self._queue = Queue(config)
+        self._formater = Formater(config)
         self._mastodon = mastodon
 
     def publish_one(self, item: QueueItem) -> dict:
+        # Translate the Message to StatusPost
+        status_post = self._formater.build_status_post(item.message)
+
+        # Publish the StatusPost
         if not self._config.get("run_control.dry_run"):
-            posted_media = []
-            if "media" in item and item["media"]:
-                self._logger.info("Publising first %s media items", len(item["media"]))
-                for item in item["media"]:
-                    posted_result = self._post_media(
-                        item["url"],
-                        description=item["alt_text"] if "alt_text" in item else None
-                    )
-                    if posted_result:
-                        posted_media.append(posted_result["id"])
-                    else:
-                        self._logger.info("Could not publish %s", item["url"])
-            self._logger.info("Publishing new post %s", item["status"])
+            # posted_media = []
+            # if "media" in item and item["media"]:
+            #     self._logger.info("Publising first %s media items", len(item["media"]))
+            #     for item in item["media"]:
+            #         posted_result = self._post_media(
+            #             item["url"],
+            #             description=item["alt_text"] if "alt_text" in item else None
+            #         )
+            #         if posted_result:
+            #             posted_media.append(posted_result["id"])
+            #         else:
+            #             self._logger.info("Could not publish %s", item["url"])
+            self._logger.info("Publishing new post")
             return self._mastodon.status_post(
-                item["status"],
-                language=item["language"],
-                media_ids=posted_media if posted_media else None
+                status = status_post.status,
+                in_reply_to_id = status_post.in_reply_to_id,
+                media_ids = status_post.media_ids,
+                sensitive = status_post.sensitive,
+                visibility = status_post.visibility,
+                spoiler_text = status_post.spoiler_text,
+                language = status_post.language,
+                idempotency_key = status_post.idempotency_key,
+                content_type = status_post.content_type,
+                scheduled_at = status_post.scheduled_at,
+                poll = status_post.poll,
+                quote_id = status_post.quote_id,
+                # media_ids=posted_media if posted_media else None
             )
     
     def _post_media(self, media_file: str, description: str) -> dict:

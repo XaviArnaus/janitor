@@ -6,7 +6,7 @@ from objects.status_post_visibility import StatusPostVisibility
 from objects.status_post_content_type import StatusPostContentType
 import logging
 
-class Formatter:
+class Formater:
     """
     This class converts the object Message that we use arround in the whole application
     to the StatusPost that we use only at publishing stage.

@@ -3,7 +3,7 @@ from pyxavi.config import Config
 from src.mastodon_helper import MastodonHelper
 from src.publisher import Publisher
 
-class QueuePublisher:
+class PublishQueue:
     '''
     Runner that publishes the queue
     '''
@@ -30,4 +30,4 @@ class QueuePublisher:
             self._logger.exception(e)
 
 if __name__ == '__main__':
-    QueuePublisher().init().run()
+    PublishQueue().init().run()

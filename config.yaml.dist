@@ -20,14 +20,37 @@ run_control:
 
 # Sysntem Information config
 system_info:
+  # A string that will be used to display the metric itself
+  report_item_names_map:
+    cpu_percent: "CPU %"
+    cpu_count: "CPU count"
+    memory_total: "Memory Total"
+    memory_avail: "Memory Available"
+    memory_used: "Memory Used"
+    memory_free: "Memory Free"
+    memory_percent: "Memory %"
+    disk_usage_total: "Disk Total"
+    disk_usage_used: "Disk Used"
+    disk_usage_free: "Disk Free"
+    disk_usage_percent: "Disk %"
   # Levels above (greater than) which an alarm should be triggered
+  # Make the name of the parameter equal to any of the metric names in SystemInfo
   thresholds:
-    # [Float] CPU percent
-    cpu: 80.0
-    # [Float] Memory percent
-    memory: 80.0
-    # [Float] Disk percent
-    disk: 80.0
+    cpu_percent:
+      # [Float] CPU percent
+      value: 80.0
+      # [String] MessageType in case of crossing: "none" | "info" | "warning" | "error" | "alarm"
+      type: "warning"
+    memory_percent:
+      # [Float] Memory percent
+      value: 80.0
+      # [String] MessageType in case of crossing: "none" | "info" | "warning" | "error" | "alarm"
+      type: "warning"
+    disk_usage_percent:
+      # [Float] Disk percent
+      value: 80.0
+      # [String] MessageType in case of crossing: "none" | "info" | "warning" | "error" | "alarm"
+      type: "alarm"
   # [Bool] Making (or not) values human readable
   human_readable: True
 
@@ -57,7 +80,7 @@ logger:
   format: "[%(asctime)s] %(levelname)-8s %(name)-12s %(message)s"
 
 # Storage for the toots queue registry
-status_posts_queue_storage:
+queue_storage:
   # [String] Where to store it
   file: "storage/queue.yaml"
 

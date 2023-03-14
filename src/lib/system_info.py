@@ -5,8 +5,6 @@ import logging
 
 class SystemInfo:
 
-    SUFFIXES = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
-
     def __init__(self, config: Config) -> None:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
@@ -23,11 +21,11 @@ class SystemInfo:
         self._logger.info("Getting Memory data")
         memory = psutil.virtual_memory()
         return {
-            'mem_total': memory.total,
-            'mem_avail': memory.available,
-            'mem_used': memory.used,
-            'mem_free': memory.free,
-            'mem_percent': round(( memory.used / memory.total ) * 100, 2)
+            'memory_total': memory.total,
+            'memory_avail': memory.available,
+            'memory_used': memory.used,
+            'memory_free': memory.free,
+            'memory_percent': round(( memory.used / memory.total ) * 100, 2)
         }
     
     def get_disk_data(self) -> dict:

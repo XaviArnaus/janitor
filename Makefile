@@ -7,7 +7,7 @@ init:
 
 .PHONY: run
 run:
-	$(PYTHON) runner.py
+	$(PYTHON) run_app.py
 
 .PHONY: create_app
 create_app:
@@ -15,7 +15,7 @@ create_app:
 
 .PHONY: publish_queue
 publish_queue:
-	$(PYTHON) queue_publisher.py
+	$(PYTHON) publish_queue.py
 
 .PHONY: validate_config
 validate_config:

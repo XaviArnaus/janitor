@@ -15,18 +15,19 @@ class Message:
 
         self.summary = summary
         self.text = text
-        self.type = type
+        self.type = type if type else MessageType.NONE
 
     def to_dict(self) -> dict:
         return {
             "summary": self.summary,
             "text": self.text,
-            "type": self.type,
+            "type": str(self.type),
         }
     
     def from_dict(status_post_dict: dict) -> Message:
+        print(status_post_dict)
         return Message(
             status_post_dict["summary"],
             status_post_dict["text"],
-            MessageType.valid_or_raise(status_post_dict["type"]),
+            MessageType.valid_or_raise(value = status_post_dict["type"]),
         )

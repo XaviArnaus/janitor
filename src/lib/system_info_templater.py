@@ -1,6 +1,6 @@
 from pyxavi.config import Config
-from objects.message import Message
-from objects.message_type import MessageType
+from ..objects.message import Message
+from ..objects.message_type import MessageType
 from string import Template
 import logging
 
@@ -11,7 +11,7 @@ class SystemInfoTemplater:
     It also decides if the message should be an alarm based on the thresholds in the config
     """
 
-    TEMPLATES = {
+    MESSAGE_TEMPLATE = {
         MessageType.NONE: {
             "summary": None,
             "text": Template("$text")
@@ -33,14 +33,65 @@ class SystemInfoTemplater:
             "text": Template("$text")
         }
     }
+    REPORT_LINE_TEMPLATE_OK = Template("- **$title**: $value")
+    REPORT_LINE_TEMPLATE_ISSUE = Template("- **$title**: $value ❗️")
+    SUFFIXES = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+    
 
     def __init__(self, config: Config) -> None:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
 
-    def build_message(self, system_info_data: dict) -> Message:
-        thresholds = self._config.get("system_info.thresholds")
-        pass
+    def process_report(self, system_info_data: dict) -> Message:
+        thresholds = dict(self._config.get("system_info.thresholds"))
+        humansize_exceptions = list(self._config.get("system_info.human_readable_exceptions"))
+
+        report_lines = []
+        error_type = []
+        for name, value in system_info_data.items():
+            field_has_issue = False
+            self._logger.debug(f"Processing [{name}]")
+            # Check if we're monitoring this metric and if the condition applies
+            if name in thresholds.keys():
+                if "value" in thresholds[name] and value > thresholds[name]["value"]:
+                    self._logger.debug(f"The metric [{name}] is greater than the threshold")
+                    error_type.append(thresholds[name]["type"] if "type" in thresholds[name] else MessageType.WARNING)
+                    field_has_issue = True
+            # Create the string that will display the line
+            report_lines.append(
+                self._build_report_line(
+                    name,
+                    value if name in humansize_exceptions else self._humansize(value),
+                    field_has_issue
+                )
+            )
+
+        # Crunch errors to the highest
+        if(error_type):
+            error_type = list(map(lambda x: MessageType.priority().index(x), error_type))
+            error_level = MessageType.priority()[max(error_type)]
+        else:
+            error_level = MessageType.INFO
+
+        # Apply the template related to the MessageType
+        template = self.MESSAGE_TEMPLATE[error_level]
+        return Message(
+            summary = template["summary"].substitute(summary = "Report"),
+            text = template["text"].substitute(text = "\n".join(report_lines)),
+            type = error_level
+        )
+        
+    def _build_report_line(self, item_name: str, item_value: any, field_has_issue: bool = False) -> str:
+        title = self._config.get("system_info.report_item_names_map." + item_name, item_name)
+        self._logger.debug(f"Will receive the title [{title}]")
+        template = self.REPORT_LINE_TEMPLATE_OK
+        if field_has_issue:
+            template = self.REPORT_LINE_TEMPLATE_ISSUE
+        return template.substitute(
+            title = title,
+            value = item_value
+        )
+
 
     def _humansize(self, nbytes):
         """

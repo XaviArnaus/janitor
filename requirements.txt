@@ -1,0 +1,2 @@
+Mastodon.py==1.8.0
+git+https://github.com/XaviArnaus/pyxavi@v0.1.3

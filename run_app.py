@@ -15,6 +15,7 @@ class RunApp:
     def init(self):
         self._config = Config()
         self._logger = Logger(self._config).getLogger()
+        self._sys_info = SystemInfo(self._config)
         self._queue = Queue(self._config)
         self._logger.info("Init Runner")
 
@@ -26,8 +27,18 @@ class RunApp:
         # Get the data
         sys_data = self._collect_data()
 
+        # If there is no issue, just stop here.
+        if not self._sys_info.crossed_thressholds(sys_data):
+            self._logger.info("No issues found. Ending here.")
+            return False
+
         # Make it a message
-        message = SystemInfoTemplater(self._config).process_report(sys_data)
+        message = SystemInfoTemplater(self._config).process_report({
+            **{
+                "hostname": self._sys_info.get_hostname()
+            },
+            **sys_data
+        })
 
         # Add it into the queue and save
         self._logger.debug("Adding message into the queue")
@@ -43,15 +54,11 @@ class RunApp:
         self._logger.info("End.")
 
     def _collect_data(self) -> dict:
-        sys_info = SystemInfo(self._config)
         return {
-            **{
-                "hostname": sys_info.get_hostname()
-            },
-            **sys_info.get_cpu_data(),
-            **sys_info.get_mem_data(),
-            **sys_info.get_disk_data(),
-            **sys_info.get_temp_data(),
+            **self._sys_info.get_cpu_data(),
+            **self._sys_info.get_mem_data(),
+            **self._sys_info.get_disk_data(),
+            **self._sys_info.get_temp_data(),
         }
 
 if __name__ == '__main__':

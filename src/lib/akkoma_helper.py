@@ -4,6 +4,9 @@ import logging
 import os
 
 class AkkomaHelper:
+
+    FEATURE_SET_PLEROMA = "pleroma"
+
     def get_instance(config: Config) -> Akkoma:
         logger = logging.getLogger(config.get("logger.name"))
 
@@ -12,13 +15,15 @@ class AkkomaHelper:
         if (os.path.exists(config.get("app.user_credentials"))):
             logger.debug("Reusing stored User Credentials")
             akkoma = Akkoma(
-                access_token = config.get("app.user_credentials")
+                access_token = config.get("app.user_credentials"),
+                feature_set = AkkomaHelper.FEATURE_SET_PLEROMA
             )
         else:
             logger.debug("Using Client Credentials")
             akkoma = Akkoma(
                 client_id = config.get("app.client_credentials"),
-                api_base_url = config.get("app.api_base_url")
+                api_base_url = config.get("app.api_base_url"),
+                feature_set = AkkomaHelper.FEATURE_SET_PLEROMA
             )
 
             # Logging in is required for all individual runs

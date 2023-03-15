@@ -3,7 +3,8 @@ from pyxavi.media import Media
 from ..objects.queue_item import QueueItem
 from .queue import Queue
 from .formater import Formater
-from mastodon import Mastodon 
+# from mastodon import Mastodon 
+from akkoma import Akkoma as Mastodon
 import logging
 
 class Publisher:

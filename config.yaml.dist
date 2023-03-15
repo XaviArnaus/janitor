@@ -53,6 +53,7 @@ system_info:
       type: "alarm"
   # [Bool] Making (or not) values human readable
   human_readable: True
+  human_readable_exceptions: ["cpu_percent", "cpu_count", "memory_percent", "disk_usage_percent"]
 
 # Status posts config
 status_post:

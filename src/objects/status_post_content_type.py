@@ -19,8 +19,8 @@ class StatusPostContentType(LowercaseStrEnum):
     HTML = "text/html"
     BBCODE = "text/bbcode"
 
-    def valid_or_raise(self, value: str) -> StatusPostContentType:
-        valid_items = [self.PLAIN, self.MARKDOWN, self.HTML, self.BBCODE]
+    def valid_or_raise(value: str) -> StatusPostContentType:
+        valid_items = [StatusPostContentType.PLAIN, StatusPostContentType.MARKDOWN, StatusPostContentType.HTML, StatusPostContentType.BBCODE]
 
         if not value in valid_items:
             raise RuntimeError(f"Value [{value}] is not a valid StatusPostContentType")

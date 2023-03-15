@@ -29,8 +29,8 @@ class Formater:
             status_post.status = self._format_status(message.text if message.text else message.summary, message.type)
         
         # Now the rest of the details
-        status_post.content_type = StatusPostContentType.valid_or_raise(self._config.get("status_post.content_type"))
-        status_post.visibility = StatusPostVisibility.valid_or_raise(self._config.get("status_post.visibility"))
+        status_post.content_type = StatusPostContentType.valid_or_raise(value = self._config.get("status_post.content_type"))
+        status_post.visibility = StatusPostVisibility.valid_or_raise(value = self._config.get("status_post.visibility"))
 
         return status_post
     

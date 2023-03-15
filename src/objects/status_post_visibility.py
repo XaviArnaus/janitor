@@ -16,8 +16,8 @@ class StatusPostVisibility(LowercaseStrEnum):
     UNLISTED = "unlisted"
     PUBLIC = "public"
 
-    def valid_or_raise(self, value: str) -> StatusPostVisibility:
-        valid_items = [self.DIRECT, self.PRIVATE, self.UNLISTED, self.PUBLIC]
+    def valid_or_raise(value: str) -> StatusPostVisibility:
+        valid_items = [StatusPostVisibility.DIRECT, StatusPostVisibility.PRIVATE, StatusPostVisibility.UNLISTED, StatusPostVisibility.PUBLIC]
 
         if not value in valid_items:
             raise RuntimeError(f"Value [{value}] is not a valid StatusPostVisibility")

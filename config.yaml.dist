@@ -7,6 +7,8 @@ app:
   # This will be the name of the bot
   name: "SysCheck"
   api_base_url: "https://mastodon.social"
+  # [String] Type of instance: "mastodon" for Mastodon, "pleroma" for Pleroma / Akkoma
+  instance_type: "pleroma"
   client_credentials: "client.secret"
   user_credentials: "user.secret"
   user:

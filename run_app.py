@@ -4,8 +4,8 @@ from src.lib.system_info import SystemInfo
 from src.lib.system_info_templater import SystemInfoTemplater
 from src.lib.queue import Queue
 from src.lib.publisher import Publisher
-# from src.lib.mastodon_helper import MastodonHelper
-from src.lib.akkoma_helper import AkkomaHelper
+from src.lib.mastodon_helper import MastodonHelper
+#from src.lib.akkoma_helper import AkkomaHelper
 from src.objects.queue_item import QueueItem
 
 class RunApp:
@@ -35,7 +35,7 @@ class RunApp:
         self._queue.save()
 
         # Publish the queue
-        akkoma = AkkomaHelper.get_instance(self._config)
+        akkoma = MastodonHelper.get_instance(self._config)
         publisher = Publisher(self._config, akkoma)
         self._logger.info("Publishing the whole queue")
         publisher.publish_all_from_queue()

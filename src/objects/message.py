@@ -25,7 +25,6 @@ class Message:
         }
     
     def from_dict(status_post_dict: dict) -> Message:
-        print(status_post_dict)
         return Message(
             status_post_dict["summary"],
             status_post_dict["text"],

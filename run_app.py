@@ -45,6 +45,9 @@ class RunApp:
     def _collect_data(self) -> dict:
         sys_info = SystemInfo(self._config)
         return {
+            **{
+                "hostname": sys_info.get_hostname()
+            },
             **sys_info.get_cpu_data(),
             **sys_info.get_mem_data(),
             **sys_info.get_disk_data(),

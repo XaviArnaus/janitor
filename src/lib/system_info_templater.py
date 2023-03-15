@@ -45,6 +45,7 @@ class SystemInfoTemplater:
     def process_report(self, system_info_data: dict) -> Message:
         thresholds = dict(self._config.get("system_info.thresholds"))
         humansize_exceptions = list(self._config.get("system_info.human_readable_exceptions"))
+        hostname = system_info_data.pop("hostname") if "hostname" in system_info_data else "unknown host"
 
         report_lines = []
         error_type = []
@@ -76,7 +77,7 @@ class SystemInfoTemplater:
         # Apply the template related to the MessageType
         template = self.MESSAGE_TEMPLATE[error_level]
         return Message(
-            summary = template["summary"].substitute(summary = "Report"),
+            summary = template["summary"].substitute(summary = hostname),
             text = template["text"].substitute(text = "\n".join(report_lines)),
             type = error_level
         )

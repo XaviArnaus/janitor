@@ -1,5 +1,6 @@
 from pyxavi.config import Config
 import psutil
+import socket
 import logging
 
 
@@ -8,6 +9,10 @@ class SystemInfo:
     def __init__(self, config: Config) -> None:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
+    
+    def get_hostname(self) -> str:
+        self._logger.info("Getting hostname")
+        return socket.gethostname()
 
     def get_cpu_data(self) -> dict:
         self._logger.info("Getting CPU data")

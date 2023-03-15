@@ -11,7 +11,6 @@ class MessageType(LowercaseStrEnum):
 
     def valid_or_raise(value: str) -> MessageType:
         valid_items = list(map(lambda x: str(x), MessageType.priority()))
-        print(valid_items)
 
         if not value in valid_items:
             raise RuntimeError(f"Value [{value}] is not a valid MessageType")

@@ -11,11 +11,11 @@ class SystemInfo:
         self._logger = logging.getLogger(config.get("logger.name"))
     
     def get_hostname(self) -> str:
-        self._logger.info("Getting hostname")
+        self._logger.debug("Getting hostname")
         return socket.gethostname()
 
     def get_cpu_data(self) -> dict:
-        self._logger.info("Getting CPU data")
+        self._logger.debug("Getting CPU data")
         return {
             'cpu_percent': psutil.cpu_percent(1),
             'cpu_count': psutil.cpu_count(),
@@ -23,7 +23,7 @@ class SystemInfo:
         }
     
     def get_mem_data(self) -> dict:
-        self._logger.info("Getting Memory data")
+        self._logger.debug("Getting Memory data")
         memory = psutil.virtual_memory()
         return {
             'memory_total': memory.total,
@@ -34,7 +34,7 @@ class SystemInfo:
         }
     
     def get_disk_data(self) -> dict:
-        self._logger.info("Getting Disk ['/'] data")
+        self._logger.debug("Getting Disk ['/'] data")
         disk = psutil.disk_usage('/')
         return {
             'disk_usage_total': disk.total,
@@ -44,7 +44,7 @@ class SystemInfo:
         }
     
     def get_temp_data(self) -> dict:
-        self._logger.info("Getting Temperature data")
+        self._logger.debug("Getting Temperature data")
         return {
             # 'sensor_temperatures': psutil.sensors_temperatures()['cpu-thermal'][0].current,
         }

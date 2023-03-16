@@ -5,9 +5,9 @@ PIP = pip3
 init:
 	$(PIP) install -r requirements.txt
 
-.PHONY: run
-run:
-	$(PYTHON) run_app.py
+.PHONY: run_local
+run_local:
+	$(PYTHON) run_local.py
 
 .PHONY: create_app
 create_app:
@@ -16,6 +16,14 @@ create_app:
 .PHONY: publish_queue
 publish_queue:
 	$(PYTHON) publish_queue.py
+
+.PHONY: listen
+listen:
+	$(PYTHON) listen.py
+
+.PHONY: run_remote
+run_remote:
+	$(PYTHON) run_remote.py
 
 .PHONY: validate_config
 validate_config:

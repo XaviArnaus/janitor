@@ -5,32 +5,55 @@ from src.lib.system_info_templater import SystemInfoTemplater
 from src.lib.queue import Queue
 from src.lib.publisher import Publisher
 from src.lib.mastodon_helper import MastodonHelper
-#from src.lib.akkoma_helper import AkkomaHelper
 from src.objects.queue_item import QueueItem
+from flask import Flask
+from flask_restful import Resource, Api, reqparse
+from pyxavi.debugger import dd
 
-class RunApp:
+app = Flask(__name__)
+api = Api(app)
+parser = reqparse.RequestParser()
+parser.add_argument(
+    'sys_data',
+    type = dict,
+    # required = True,
+    # help = 'No sys_data provided',
+    # location = 'json'
+)
+
+class Listen(Resource):
     '''
-    Main runner of the app
+    Listener from remote requests to log
     '''
-    def init(self):
+    def __init__(self):
         self._config = Config()
         self._logger = Logger(self._config).getLogger()
         self._sys_info = SystemInfo(self._config)
         self._queue = Queue(self._config)
-        self._logger.info("Init Runner")
+        self._logger.info("Init Listener")
 
-        return self
+        super(Listen, self).__init__()
 
-    def run(self):
-        self._logger.info("Run app")
+    def post(self):
+        """
+        This is going to receive the POST request
+        """
+
+        self._logger.info("Run local app")
 
         # Get the data
-        sys_data = self._collect_data()
+        args = parser.parse_args()
+        dd(args)
+        if "sys_data" in args:
+            sys_data = args["sys_data"]
+            dd(sys_data)
+        else:
+            return { "error": "Expected dict under a \"sys_data\" variable was not present." }, 400
 
         # If there is no issue, just stop here.
         if not self._sys_info.crossed_thressholds(sys_data):
             self._logger.info("No issues found. Ending here.")
-            return False
+            return 200
 
         # Make it a message
         message = SystemInfoTemplater(self._config).process_report({
@@ -52,15 +75,9 @@ class RunApp:
         publisher.publish_all_from_queue()
 
         self._logger.info("End.")
-
-    def _collect_data(self) -> dict:
-        return {
-            **self._sys_info.get_cpu_data(),
-            **self._sys_info.get_mem_data(),
-            **self._sys_info.get_disk_data(),
-            **self._sys_info.get_temp_data(),
-        }
+        return 200
+    
+api.add_resource(Listen, '/sysinfo')
 
 if __name__ == '__main__':
-    RunApp().init().run()
-
+    app.run(debug=True)

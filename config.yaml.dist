@@ -14,6 +14,8 @@ app:
   user:
     email: "bot+syscheck@my-fancy.site"
     password: "SuperSecureP4ss"
+  # [String] URL (and maybe port) to send the POST request to.
+  remote_service_url: http://127.0.0.1:5000
 
 run_control:
   # [Bool] Performs a dry run: the queue is untouched and no re-toot is really done

@@ -19,7 +19,16 @@ publish_queue:
 
 .PHONY: listen
 listen:
-	$(PYTHON) listen.py
+	nohup $(PYTHON) listen.py > log/listen_in_background.log 2>&1 &
+
+.PHONY: background
+background:
+	ps aux | grep listen.py | grep -v grep
+	$(ps aux | grep "[l]isten.py" | awk '{print $2}'); do echo "$pid"; done
+
+.PHONY: kill
+kill:
+	pkill listen.py
 
 .PHONY: run_remote
 run_remote:

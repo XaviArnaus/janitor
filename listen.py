@@ -49,17 +49,12 @@ class Listen(Resource):
             return { "error": "Expected dict under a \"sys_data\" variable was not present." }, 400
 
         # If there is no issue, just stop here.
-        if not self._sys_info.crossed_thressholds(sys_data):
+        if not self._sys_info.crossed_thressholds(sys_data, ["hostname"]):
             self._logger.info("No issues found. Ending here.")
             return 200
 
         # Make it a message
-        message = SystemInfoTemplater(self._config).process_report({
-            **{
-                "hostname": self._sys_info.get_hostname()
-            },
-            **sys_data
-        })
+        message = SystemInfoTemplater(self._config).process_report(sys_data)
 
         # Add it into the queue and save
         self._logger.debug("Adding message into the queue")
@@ -78,4 +73,7 @@ class Listen(Resource):
 api.add_resource(Listen, '/sysinfo')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(
+        host = Config().get("app.service.listen.host"),
+        port = Config().get("app.service.listen.port")
+    )

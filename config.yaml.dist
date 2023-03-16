@@ -23,8 +23,18 @@ app:
       email: "bot+syscheck@my-fancy.site"
       # [String] Password to be used to log in
       password: "SuperSecureP4ss"
-  # [String] URL (and maybe port) to send the POST request to.
-  remote_service_url: http://127.0.0.1:5000
+  # Server and Client configuration
+  service:
+    # Configuration for the Server side
+    listen:
+      # [String] IP to listen to.
+      #   Set 127.0.0.1 to only listen to localhost, which is the most secure
+      #   Set 0.0.0.0 to have the server available externally as well
+      host: 0.0.0.0
+      # [String] Port to listen to.
+      port: 5000
+    # [String] URL (and maybe port) to send the POST request to.
+    remote_url: http://alderaan:5000
 
 run_control:
   # [Bool] Performs a dry run: the queue is untouched and no re-toot is really done

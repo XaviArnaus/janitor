@@ -27,17 +27,12 @@ class RunLocal:
         sys_data = self._collect_data()
 
         # If there is no issue, just stop here.
-        if not self._sys_info.crossed_thressholds(sys_data):
+        if not self._sys_info.crossed_thressholds(sys_data, ["hostname"]):
             self._logger.info("No issues found. Ending here.")
             return False
 
         # Make it a message
-        message = SystemInfoTemplater(self._config).process_report({
-            **{
-                "hostname": self._sys_info.get_hostname()
-            },
-            **sys_data
-        })
+        message = SystemInfoTemplater(self._config).process_report(sys_data)
 
         # Add it into the queue and save
         self._logger.debug("Adding message into the queue")
@@ -54,6 +49,9 @@ class RunLocal:
 
     def _collect_data(self) -> dict:
         return {
+            **{
+                "hostname": self._sys_info.get_hostname()
+            },
             **self._sys_info.get_cpu_data(),
             **self._sys_info.get_mem_data(),
             **self._sys_info.get_disk_data(),

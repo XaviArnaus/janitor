@@ -24,7 +24,7 @@ class RunRemote:
         sys_data = self._collect_data()
 
         # Send the data
-        remote_url = self._config.get("app.remote_service_url")
+        remote_url = self._config.get("app.service.remote_url")
         self._logger.info("Sending sys_data away")
         r = requests.post(f"{remote_url}/sysinfo", json={'sys_data': sys_data})
         if r.status_code == 200:
@@ -36,6 +36,9 @@ class RunRemote:
 
     def _collect_data(self) -> dict:
         return {
+            **{
+                "hostname": self._sys_info.get_hostname()
+            },
             **self._sys_info.get_cpu_data(),
             **self._sys_info.get_mem_data(),
             **self._sys_info.get_disk_data(),

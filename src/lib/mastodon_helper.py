@@ -22,16 +22,16 @@ class MastodonHelper:
 
         # All actions are done under a Mastodon API instance
         logger.info("Starting new Mastodon API instance")
-        if (os.path.exists(config.get("app.user_credentials"))):
+        if (os.path.exists(config.get("app.credentials.user_file"))):
             logger.debug("Reusing stored User Credentials")
             mastodon = Mastodon(
-                access_token = config.get("app.user_credentials"),
+                access_token = config.get("app.credentials.user_file"),
                 feature_set = MastodonHelper.FEATURE_SET_BY_INSTANCE_TYPE[instance_type]
             )
         else:
             logger.debug("Using Client Credentials")
             mastodon = Mastodon(
-                client_id = config.get("app.client_credentials"),
+                client_id = config.get("app.credentials.client_file"),
                 api_base_url = config.get("app.api_base_url"),
                 feature_set = MastodonHelper.FEATURE_SET_BY_INSTANCE_TYPE[instance_type]
             )
@@ -39,9 +39,9 @@ class MastodonHelper:
             # Logging in is required for all individual runs
             logger.debug("Logging in")
             mastodon.log_in(
-                config.get("app.user.email"),
-                config.get("app.user.password"),
-                to_file = config.get("app.user_credentials")
+                config.get("app.credentials.user.email"),
+                config.get("app.credentials.user.password"),
+                to_file = config.get("app.credentials.user_file")
             )
 
         return mastodon

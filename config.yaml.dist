@@ -4,16 +4,25 @@
 
 # App Info
 app:
-  # This will be the name of the bot
+   # [String] This will be the name of the bot
   name: "SysCheck"
+  # [String] Where to connecto to deliver the statuses
   api_base_url: "https://mastodon.social"
   # [String] Type of instance: "mastodon" for Mastodon, "pleroma" for Pleroma / Akkoma
   instance_type: "pleroma"
-  client_credentials: "client.secret"
-  user_credentials: "user.secret"
-  user:
-    email: "bot+syscheck@my-fancy.site"
-    password: "SuperSecureP4ss"
+  # Credentials files to be generated
+  credentials:
+    # [String] Generated when creating the app. Contains Client ID and Client Secret
+    client_file: "client.secret"
+    # [String] Generated at first login. Contains the User Secret to be reused in further runs.
+    user_file: "user.secret"
+    # The User credentials. Used only during the first run.
+    # Should be Ok to delete the values once we have the "user.secret" generated
+    user:
+      # [String] email to be used to log in
+      email: "bot+syscheck@my-fancy.site"
+      # [String] Password to be used to log in
+      password: "SuperSecureP4ss"
   # [String] URL (and maybe port) to send the POST request to.
   remote_service_url: http://127.0.0.1:5000
 

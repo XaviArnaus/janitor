@@ -19,7 +19,7 @@ class CreateApp:
         Mastodon.create_app(
             self._config.get("app.name"),
             api_base_url = self._config.get("app.api_base_url"),
-            to_file = self._config.get("app.client_credentials")
+            to_file = self._config.get("app.credentials.client_file")
         )
         self._logger.info("Run Create App")
 

@@ -2,47 +2,45 @@ from pyxavi.config import Config
 from pyxavi.logger import Logger
 from src.lib.system_info import SystemInfo
 from src.lib.system_info_templater import SystemInfoTemplater
-from src.lib.queue import Queue
 from src.lib.publisher import Publisher
 from src.lib.mastodon_helper import MastodonHelper
 from src.objects.queue_item import QueueItem
+from src.objects.message import Message
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
-from pyxavi.debugger import dd
 
 app = Flask(__name__)
 api = Api(app)
-parser = reqparse.RequestParser()
-parser.add_argument(
-    'sys_data',
-    type = dict,
-    required = True,
-    help = 'No sys_data provided',
-    location = 'json'
-)
 
-class Listen(Resource):
+class ListenSysInfo(Resource):
     '''
-    Listener from remote requests to log
+    Listener from remote SysInfo Report requests to log
     '''
     def __init__(self):
         self._config = Config()
         self._logger = Logger(self._config).getLogger()
         self._sys_info = SystemInfo(self._config)
-        self._queue = Queue(self._config)
-        self._logger.info("Init Listener")
+        self._parser = reqparse.RequestParser()
+        self._parser.add_argument(
+            'sys_data',
+            type = dict,
+            required = True,
+            help = 'No sys_data provided',
+            location = 'json'
+        )
+        self._logger.info("Init SysInfo Listener")
 
-        super(Listen, self).__init__()
+        super(ListenSysInfo, self).__init__()
 
     def post(self):
         """
         This is going to receive the POST request
         """
 
-        self._logger.info("Run local app")
+        self._logger.info("Run SysInfo Listener app")
 
         # Get the data
-        args = parser.parse_args()
+        args = self._parser.parse_args()
         if "sys_data" in args:
             sys_data = args["sys_data"]
         else:
@@ -56,21 +54,73 @@ class Listen(Resource):
         # Make it a message
         message = SystemInfoTemplater(self._config).process_report(sys_data)
 
-        # Add it into the queue and save
-        self._logger.debug("Adding message into the queue")
-        self._queue.append(QueueItem(message))
-        self._queue.save()
+        # Publish the queue
+        mastodon = MastodonHelper.get_instance(self._config)
+        publisher = Publisher(self._config, mastodon)
+        self._logger.info("Publishing one message")
+        publisher.publish_one(QueueItem(message))
+
+        self._logger.info("End.")
+        return 200
+
+class ListenMessage(Resource):
+    '''
+    Listener from remote Message requests to log
+    '''
+    def __init__(self):
+        self._config = Config()
+        self._logger = Logger(self._config).getLogger()
+        self._parser = reqparse.RequestParser()
+        self._parser.add_argument(
+            'message',
+            # type = str,
+            # required = True,
+            # help = 'No message provided',
+            location = 'form'
+        )
+        self._parser.add_argument(
+            'hostname',
+            # type = str,
+            # required = True,
+            # help = 'No hostname provided',
+            location = 'form'
+        )
+        self._logger.info("Init Message Listener Listener")
+
+        super(ListenMessage, self).__init__()
+
+    def post(self):
+        """
+        This is going to receive the POST request
+        """
+
+        self._logger.info("Run Message Listener app")
+
+        # Get the data
+        args = self._parser.parse_args()
+        if "message" in args:
+            text = args["message"]
+        else:
+            return { "error": "Expected dict under a \"message\" variable was not present." }, 400
+        if "hostname" in args:
+            hostname = args["hostname"]
+        else:
+            return { "error": "Expected dict under a \"message\" variable was not present." }, 400
+        
+        # Build the message
+        message = Message(text = f"{hostname}:\n\n{text}")
 
         # Publish the queue
-        akkoma = MastodonHelper.get_instance(self._config)
-        publisher = Publisher(self._config, akkoma)
-        self._logger.info("Publishing the whole queue")
-        publisher.publish_all_from_queue()
+        mastodon = MastodonHelper.get_instance(self._config)
+        publisher = Publisher(self._config, mastodon)
+        self._logger.info("Publishing one message")
+        publisher.publish_one(QueueItem(message))
 
         self._logger.info("End.")
         return 200
     
-api.add_resource(Listen, '/sysinfo')
+api.add_resource(ListenSysInfo, '/sysinfo')
+api.add_resource(ListenMessage, '/message')
 
 if __name__ == '__main__':
     app.run(

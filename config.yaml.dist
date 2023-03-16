@@ -34,7 +34,7 @@ app:
       # [String] Port to listen to.
       port: 5000
     # [String] URL (and maybe port) to send the POST request to.
-    remote_url: http://alderaan:5000
+    remote_url: http://localhost:5000
 
 run_control:
   # [Bool] Performs a dry run: the queue is untouched and no re-toot is really done

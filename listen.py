@@ -6,6 +6,7 @@ from src.lib.publisher import Publisher
 from src.lib.mastodon_helper import MastodonHelper
 from src.objects.queue_item import QueueItem
 from src.objects.message import Message
+from src.objects.message_type import MessageType
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
 
@@ -92,6 +93,13 @@ class ListenMessage(Resource):
             # help = 'No hostname provided',
             location = 'form'
         )
+        self._parser.add_argument(
+            'type',
+            # type = str,
+            # required = True,
+            # help = 'No message provided',
+            location = 'form'
+        )
         self._logger.info("Init Message Listener Listener")
 
         super(ListenMessage, self).__init__()
@@ -109,6 +117,10 @@ class ListenMessage(Resource):
             summary = args["summary"]
         else:
             summary = None
+        if "type" in args:
+            message_type = args["type"]
+        else:
+            message_type = MessageType.NONE
         if "message" in args:
             text = args["message"]
         else:
@@ -119,11 +131,12 @@ class ListenMessage(Resource):
             return { "error": "Expected dict under a \"message\" variable was not present." }, 400
         
         # Build the message
+        icon = MessageType.icon_per_type(message_type)
         if not summary:
-            message = Message(text = f"{hostname}:\n\n{text}")
+            message = Message(text = f"{icon} {hostname}:\n\n{text}")
         else:
             message = Message(
-                summary = f"{hostname}:\n\n{summary}",
+                summary = f"{icon} {hostname}:\n\n{summary}",
                 text = f"{text}"
             )
         
@@ -143,5 +156,6 @@ api.add_resource(ListenMessage, '/message')
 if __name__ == '__main__':
     app.run(
         host = Config().get("app.service.listen.host"),
-        port = Config().get("app.service.listen.port")
+        port = Config().get("app.service.listen.port"),
+        debug=True
     )

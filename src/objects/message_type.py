@@ -19,3 +19,13 @@ class MessageType(LowercaseStrEnum):
     
     def priority() -> list:
         return [MessageType.NONE, MessageType.INFO, MessageType.WARNING, MessageType.ERROR, MessageType.ALARM]
+    
+    def icon_per_type(message_type: MessageType) -> str:
+        icon_per_type = {
+            MessageType.NONE: "",
+            MessageType.INFO: "ℹ️",
+            MessageType.WARNING: "⚠️",
+            MessageType.ERROR: "🔥",
+            MessageType.ALARM: "🚨"
+        }
+        return icon_per_type[message_type]

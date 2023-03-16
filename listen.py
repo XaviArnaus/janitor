@@ -16,9 +16,9 @@ parser = reqparse.RequestParser()
 parser.add_argument(
     'sys_data',
     type = dict,
-    # required = True,
-    # help = 'No sys_data provided',
-    # location = 'json'
+    required = True,
+    help = 'No sys_data provided',
+    location = 'json'
 )
 
 class Listen(Resource):
@@ -43,10 +43,8 @@ class Listen(Resource):
 
         # Get the data
         args = parser.parse_args()
-        dd(args)
         if "sys_data" in args:
             sys_data = args["sys_data"]
-            dd(sys_data)
         else:
             return { "error": "Expected dict under a \"sys_data\" variable was not present." }, 400
 

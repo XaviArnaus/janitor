@@ -26,7 +26,7 @@ class RunRemote:
         # Send the data
         remote_url = self._config.get("app.remote_service_url")
         self._logger.info("Sending sys_data away")
-        r = requests.post(f"{remote_url}/sysinfo", data={'sys_data': sys_data})
+        r = requests.post(f"{remote_url}/sysinfo", json={'sys_data': sys_data})
         if r.status_code == 200:
             self._logger.info("Request was successful")
         else:

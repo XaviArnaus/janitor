@@ -72,6 +72,13 @@ class ListenMessage(Resource):
         self._logger = Logger(self._config).getLogger()
         self._parser = reqparse.RequestParser()
         self._parser.add_argument(
+            'summary',
+            # type = str,
+            # required = True,
+            # help = 'No message provided',
+            location = 'form'
+        )
+        self._parser.add_argument(
             'message',
             # type = str,
             # required = True,
@@ -98,6 +105,10 @@ class ListenMessage(Resource):
 
         # Get the data
         args = self._parser.parse_args()
+        if "summary" in args:
+            summary = args["summary"]
+        else:
+            summary = None
         if "message" in args:
             text = args["message"]
         else:
@@ -108,7 +119,14 @@ class ListenMessage(Resource):
             return { "error": "Expected dict under a \"message\" variable was not present." }, 400
         
         # Build the message
-        message = Message(text = f"{hostname}:\n\n{text}")
+        if not summary:
+            message = Message(text = f"{hostname}:\n\n{text}")
+        else:
+            message = Message(
+                summary = f"{hostname}:\n\n{summary}",
+                text = f"{text}"
+            )
+        
 
         # Publish the queue
         mastodon = MastodonHelper.get_instance(self._config)

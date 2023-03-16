@@ -2,7 +2,7 @@ from pyxavi.config import Config
 from pyxavi.media import Media
 from ..objects.queue_item import QueueItem
 from .queue import Queue
-from .formater import Formater
+from .formatter import Formatter
 from mastodon import Mastodon
 import logging
 
@@ -16,12 +16,12 @@ class Publisher:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
         self._queue = Queue(config)
-        self._formater = Formater(config)
+        self._formatter = Formatter(config)
         self._mastodon = mastodon
 
     def publish_one(self, item: QueueItem) -> dict:
         # Translate the Message to StatusPost
-        status_post = self._formater.build_status_post(item.message)
+        status_post = self._formatter.build_status_post(item.message)
 
         # Publish the StatusPost
         if not self._config.get("run_control.dry_run"):

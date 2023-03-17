@@ -13,12 +13,12 @@ class RunRemote:
         self._logger = Logger(self._config).getLogger()
         self._sys_info = SystemInfo(self._config)
         self._queue = Queue(self._config)
-        self._logger.info("Init Runner")
+        self._logger.info("Init Remote Runner")
 
         return self
 
     def run(self):
-        self._logger.info("Run app")
+        self._logger.info("Run remote app")
 
         # Get the data
         sys_data = self._collect_data()

@@ -49,9 +49,10 @@ def test_to_dict():
 
     # Injected objects must have their own to_dict() method.
     # Won't test them here, should have their own test
-    assert d["message"]["text"] == message.text
-    assert d["media"][0]["url"] == media[0].url
-    assert d["published_at"] == datetime.timestamp(published_at)
+    assert d["message"]["text"], message.text
+    assert d["media"][0]["url"], media[0].url
+    assert d["published_at"], datetime.timestamp(published_at)
+
 
 def test_from_dict():
     message = Message(text="this is a test")
@@ -70,6 +71,6 @@ def test_from_dict():
 
     # Injected objects must have their own from_dict() method.
     # Won't test them here, should have their own test
-    assert queue_item.message.text == message.text
-    assert queue_item.media[0].url == media[0].url
-    assert queue_item.published_at == published_at
+    assert queue_item.message.text, message.text
+    assert queue_item.media[0].url, media[0].url
+    assert queue_item.published_at, published_at

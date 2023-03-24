@@ -2,6 +2,7 @@ from pyxavi.config import Config
 from pyxavi.logger import Logger
 from src.lib.system_info import SystemInfo
 from src.lib.system_info_templater import SystemInfoTemplater
+from src.lib.metric_stats import MetricStats
 from src.lib.publisher import Publisher
 from src.lib.mastodon_helper import MastodonHelper
 from src.objects.queue_item import QueueItem
@@ -24,8 +25,11 @@ class RunLocal:
         # Get the data
         sys_data = self._collect_data()
 
+        # Save the metrics
+        MetricStats(self._config, sys_data["hostname"]).append(sys_data, exceptions=["hostname"])
+
         # If there is no issue, just stop here.
-        if not self._sys_info.crossed_thressholds(sys_data, ["hostname"]):
+        if not self._sys_info.crossed_thressholds(sys_data, exceptions=["hostname"]):
             self._logger.info("No issues found. Ending here.")
             return False
 

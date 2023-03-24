@@ -69,6 +69,16 @@ system_info:
       value: 80.0
       # [String] MessageType in case of crossing: "none" | "info" | "warning" | "error" | "alarm"
       type: "alarm"
+  # Storage for the metrics
+  metric_storage:
+    # [String] Where to store daily metrics
+    daily_file: "storage/daily_metrics_${who}_${when}.yaml"
+    # [String] Where to store weekly metrics
+    weekly_file: "storage/weekly_metrics_${who}_${when}.yaml"
+    # [String] Where to store monthly metrics
+    monthly_file: "storage/monthly_metrics_${who}_${when}.yaml"
+    # [String] Where to download the media to
+    media_storage: "storage/media/"
 
 # Formatting configs
 formatting:

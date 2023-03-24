@@ -53,6 +53,9 @@ class MessageType(LowercaseStrEnum):
         return [MessageType.NONE, MessageType.INFO, MessageType.WARNING, MessageType.ERROR, MessageType.ALARM]
     
     def icon_per_type(message_type: MessageType) -> str:
+        if message_type not in MessageType.priority():
+            raise RuntimeError(f"Value [{message_type}] is not a valid MessageType")
+        
         icon_per_type = {
             MessageType.NONE: "",
             MessageType.INFO: "ℹ️",

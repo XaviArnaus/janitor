@@ -1,6 +1,6 @@
 from pyxavi.config import Config
 from pyxavi.storage import Storage
-from ..objects.queue_item import QueueItem
+from src.objects.queue_item import QueueItem
 import logging
 
 class Queue:

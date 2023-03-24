@@ -1,7 +1,29 @@
 from __future__ import annotations
-from .status_post_visibility import StatusPostVisibility
-from .status_post_content_type import StatusPostContentType
 from datetime import datetime
+from strenum import LowercaseStrEnum
+
+
+class StatusPostVisibility(LowercaseStrEnum):
+    """
+    The visibility parameter is a string value and accepts any of: 
+    
+    "direct" - post will be visible only to mentioned users 
+    "private" - post will be visible only to followers 
+    "unlisted" - post will be public but not appear on the public timeline 
+    "public" - post will be public
+    """
+    DIRECT = "direct"
+    PRIVATE = "private"
+    UNLISTED = "unlisted"
+    PUBLIC = "public"
+
+    def valid_or_raise(value: str) -> StatusPostVisibility:
+        valid_items = [StatusPostVisibility.DIRECT, StatusPostVisibility.PRIVATE, StatusPostVisibility.UNLISTED, StatusPostVisibility.PUBLIC]
+
+        if not value in valid_items:
+            raise RuntimeError(f"Value [{value}] is not a valid StatusPostVisibility")
+        
+        return value
 
 
 class StatusPost:
@@ -84,3 +106,29 @@ class StatusPost:
             status_post_dict["poll"],
             status_post_dict["quote_id"],
         )
+
+
+class StatusPostContentType(LowercaseStrEnum):
+    """
+    Specific to “pleroma” feature set:: Specify content_type to set the content type of your post on Pleroma. It accepts:
+
+    "text/plain" (default)
+    "text/markdown"
+    "text/html"
+    "text/bbcode"
+    
+    This parameter is not supported on Mastodon servers, but will be safely ignored if set.
+    """
+
+    PLAIN = "text/plain"
+    MARKDOWN = "text/markdown"
+    HTML = "text/html"
+    BBCODE = "text/bbcode"
+
+    def valid_or_raise(value: str) -> StatusPostContentType:
+        valid_items = [StatusPostContentType.PLAIN, StatusPostContentType.MARKDOWN, StatusPostContentType.HTML, StatusPostContentType.BBCODE]
+
+        if not value in valid_items:
+            raise RuntimeError(f"Value [{value}] is not a valid StatusPostContentType")
+        
+        return value

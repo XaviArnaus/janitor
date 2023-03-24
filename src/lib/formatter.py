@@ -1,9 +1,7 @@
 from pyxavi.config import Config
 from ..objects.message import Message
-from ..objects.message_type import MessageType
-from ..objects.status_post import StatusPost
-from ..objects.status_post_visibility import StatusPostVisibility
-from ..objects.status_post_content_type import StatusPostContentType
+from src.objects.message import MessageType
+from src.objects.status_post import StatusPost, StatusPostVisibility, StatusPostContentType
 import logging
 
 class Formatter:

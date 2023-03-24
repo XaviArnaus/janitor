@@ -1,6 +1,5 @@
 from pyxavi.config import Config
-from ..objects.message import Message
-from ..objects.message_type import MessageType
+from src.objects.message import Message, MessageType
 from string import Template
 import logging
 

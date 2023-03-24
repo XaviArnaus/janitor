@@ -1,6 +1,6 @@
 from pyxavi.config import Config
 from pyxavi.media import Media
-from ..objects.queue_item import QueueItem
+from src.objects.queue_item import QueueItem
 from .queue import Queue
 from .formatter import Formatter
 from mastodon import Mastodon

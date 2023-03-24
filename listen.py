@@ -5,8 +5,7 @@ from src.lib.system_info_templater import SystemInfoTemplater
 from src.lib.publisher import Publisher
 from src.lib.mastodon_helper import MastodonHelper
 from src.objects.queue_item import QueueItem
-from src.objects.message import Message
-from src.objects.message_type import MessageType
+from src.objects.message import Message, MessageType
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
 

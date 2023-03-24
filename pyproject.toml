@@ -1,0 +1,64 @@
+[tool.poetry]
+name = "python-syscheck"
+version = "0.1.0"
+description = "Bot that collects system metrics and publishes them in case of crossing thresholds. Also publishes arbitrary messages"
+authors = ["Xavier Arnaus <xavi@arnaus.net>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+"Mastodon.py" = "1.8.0"
+psutil = "^5.9.4"
+strenum = "^v0.4.9"
+flask = "^2.2.3"
+flask-restful = "^0.3.9"
+croniter = "^1.3.8"
+pyxavi = { git = "https://github.com/XaviArnaus/pyxavi", tag = "v0.1.5"  }
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0"
+yapf = "^0.32.0"
+toml = "^0.10.2"
+flake8 = "^4.0.1"
+pytest-cov = "^3.0.0"
+
+[tool.isort]
+profile = "hug"
+line_length = 96
+force_grid_wrap = 3
+
+[tool.pytest.ini_options]
+minversion = "6.2"
+addopts = "-ra -q -vvv"
+markers = ["slow"]
+pythonpath = [
+  "src"
+]
+
+[tool.yapf]
+column_limit = 96
+dedent_closing_brackets = 1
+align_closing_bracket_with_visual_indent = 1
+allow_split_before_dict_value = 0
+blank_line_before_module_docstring = 1
+each_dict_entry_on_separate_line = 1
+split_all_top_level_comma_separated_values = 1
+split_arguments_when_comma_terminated = 1
+split_before_expression_after_opening_paren = 1
+split_before_first_argument = 1
+split_before_logical_operator = 0
+
+[tool.coverage.report]
+skip_empty = true
+branch = true
+
+[tool.coverage.run]
+omit = [
+    "*/setup.py",
+    "*/__main__.py",
+    "*/__init__.py"
+]
+
+[build-system]
+requires = ['poetry-core>=1.5.2']
+build-backend = 'poetry.core.masonry.api'

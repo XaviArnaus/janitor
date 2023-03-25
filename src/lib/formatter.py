@@ -21,10 +21,10 @@ class Formatter:
         #   Yes: Then we'll use the spoiler text
         #   No: Then whatever it comes becomes the status itself
         if message.summary and message.text:
-            status_post.spoiler_text = self._format_spoiler(message.summary, message.type)
+            status_post.spoiler_text = self._format_spoiler(message.summary, message.message_type)
             status_post.status = self._format_status(message.text, MessageType.NONE)
         else:
-            status_post.status = self._format_status(message.text if message.text else message.summary, message.type)
+            status_post.status = self._format_status(message.text if message.text else message.summary, message.message_type)
         
         # Now the rest of the details
         status_post.content_type = StatusPostContentType.valid_or_raise(value = self._config.get("status_post.content_type"))

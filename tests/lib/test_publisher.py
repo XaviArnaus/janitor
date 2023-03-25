@@ -8,8 +8,6 @@ from src.objects.queue_item import QueueItem
 from src.objects.status_post import StatusPost
 from mastodon import Mastodon
 from unittest.mock import patch, Mock, call
-import psutil
-import socket
 import pytest
 from logging import Logger
 from datetime import datetime

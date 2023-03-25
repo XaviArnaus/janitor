@@ -1,18 +1,10 @@
 from pyxavi.config import Config
-from pyxavi.media import Media
-from src.lib.publisher import Publisher
 from src.lib.formatter import Formatter
-from src.lib.queue import Queue
 from src.objects.message import Message, MessageType
-from src.objects.queue_item import QueueItem
 from src.objects.status_post import StatusPost, StatusPostContentType, StatusPostVisibility
-from mastodon import Mastodon
 from unittest.mock import patch, Mock, call
-import psutil
-import socket
 import pytest
 from logging import Logger
-from datetime import datetime
 
 
 CONFIG = {

@@ -7,7 +7,7 @@ class SystemInfoTemplater:
     """
     This class converts the system info dict to the Message object.
 
-    It also decides if the message should be an alarm based on the thresholds in the config
+    It decides which template to use based on the MessageType
     """
 
     MESSAGE_TEMPLATE = {
@@ -78,7 +78,7 @@ class SystemInfoTemplater:
         return Message(
             summary = template["summary"].substitute(summary = hostname),
             text = template["text"].substitute(text = "\n".join(report_lines)),
-            type = error_level
+            message_type = error_level
         )
         
     def _build_report_line(self, item_name: str, item_value: any, field_has_issue: bool = False) -> str:

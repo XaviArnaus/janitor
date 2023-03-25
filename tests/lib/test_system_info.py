@@ -43,11 +43,11 @@ def get_instance() -> SystemInfo:
 
 
 def test_initialize():
-    queue = get_instance()
+    system_info = get_instance()
 
-    assert isinstance(queue, SystemInfo)
-    assert isinstance(queue._config, Config)
-    assert isinstance(queue._logger, Logger)
+    assert isinstance(system_info, SystemInfo)
+    assert isinstance(system_info._config, Config)
+    assert isinstance(system_info._logger, Logger)
 
 
 def test_hostname():

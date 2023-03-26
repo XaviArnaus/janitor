@@ -6,15 +6,15 @@ from datetime import datetime
 from run_local import RunLocal
 from run_remote import RunRemote
 
+
 class Scheduler:
     '''
     Runner for scheduled actions
     '''
-    def init(self):
+
+    def __init__(self):
         self._config = Config()
         self._logger = Logger(self._config).getLogger()
-
-        return self
 
     def run(self):
         '''
@@ -30,13 +30,13 @@ class Scheduler:
 
         except Exception as e:
             self._logger.exception(e)
-    
+
     def _execute_action(self, action: str):
         if action == "sysinfo_local":
-            RunLocal().init().run()
+            RunLocal().run()
         elif action == "sysinfo_remote":
-            RunRemote().init().run()
+            RunRemote().run()
 
 
 if __name__ == '__main__':
-    Scheduler().init().run()
+    Scheduler().run()

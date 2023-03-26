@@ -1,10 +1,9 @@
 from pyxavi.config import Config
 from ..objects.message import Message
-from ..objects.message_type import MessageType
-from ..objects.status_post import StatusPost
-from ..objects.status_post_visibility import StatusPostVisibility
-from ..objects.status_post_content_type import StatusPostContentType
+from src.objects.message import MessageType
+from src.objects.status_post import StatusPost, StatusPostVisibility, StatusPostContentType
 import logging
+
 
 class Formatter:
     """
@@ -23,19 +22,27 @@ class Formatter:
         #   Yes: Then we'll use the spoiler text
         #   No: Then whatever it comes becomes the status itself
         if message.summary and message.text:
-            status_post.spoiler_text = self._format_spoiler(message.summary, message.type)
+            status_post.spoiler_text = self._format_spoiler(
+                message.summary, message.message_type
+            )
             status_post.status = self._format_status(message.text, MessageType.NONE)
         else:
-            status_post.status = self._format_status(message.text if message.text else message.summary, message.type)
-        
+            status_post.status = self._format_status(
+                message.text if message.text else message.summary, message.message_type
+            )
+
         # Now the rest of the details
-        status_post.content_type = StatusPostContentType.valid_or_raise(value = self._config.get("status_post.content_type"))
-        status_post.visibility = StatusPostVisibility.valid_or_raise(value = self._config.get("status_post.visibility"))
+        status_post.content_type = StatusPostContentType.valid_or_raise(
+            value=self._config.get("status_post.content_type")
+        )
+        status_post.visibility = StatusPostVisibility.valid_or_raise(
+            value=self._config.get("status_post.visibility")
+        )
 
         return status_post
-    
+
     def _format_spoiler(self, content: str, message_type: MessageType) -> str:
         return content
-    
+
     def _format_status(self, content: str, message_type: MessageType) -> str:
         return content

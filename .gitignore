@@ -12,3 +12,6 @@ storage/*.yaml
 storage/media/*
 config.yaml
 !**/.keep
+
+# No coverage
+.coverage

@@ -1,21 +1,19 @@
 from pyxavi.config import Config
 from pyxavi.logger import Logger
 from src.lib.system_info import SystemInfo
-from src.lib.queue import Queue
 import requests
+
 
 class RunRemote:
     '''
     Main runner of the app
     '''
-    def init(self):
+
+    def __init__(self):
         self._config = Config()
         self._logger = Logger(self._config).getLogger()
         self._sys_info = SystemInfo(self._config)
-        self._queue = Queue(self._config)
         self._logger.info("Init Remote Runner")
-
-        return self
 
     def run(self):
         self._logger.info("Run remote app")
@@ -45,9 +43,8 @@ class RunRemote:
             **self._sys_info.get_cpu_data(),
             **self._sys_info.get_mem_data(),
             **self._sys_info.get_disk_data(),
-            **self._sys_info.get_temp_data(),
         }
 
-if __name__ == '__main__':
-    RunRemote().init().run()
 
+if __name__ == '__main__':
+    RunRemote().run()

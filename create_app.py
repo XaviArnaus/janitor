@@ -7,12 +7,10 @@ from mastodon import Mastodon
 ##
 
 class CreateApp:
-    def init(self):
+    def __init__(self):
         self._config = Config()
         self._logger = Logger(self._config).getLogger()
         self._logger.info("Run Create App")
-
-        return self
 
     def run(self):
         self._logger.info("Run Create App")
@@ -24,4 +22,4 @@ class CreateApp:
         self._logger.info("Run Create App")
 
 if __name__ == '__main__':
-    CreateApp().init().run()
+    CreateApp().run()

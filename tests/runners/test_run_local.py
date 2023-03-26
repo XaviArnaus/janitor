@@ -62,7 +62,11 @@ def collected_data():
     }
 
 
-def patched_templater_init(self, config):
+def patched_generic_init(self):
+    pass
+
+
+def patched_generic_init_with_config(self, config):
     pass
 
 
@@ -73,25 +77,16 @@ def patched_mastodon_get_instance(config):
 def patched_publisher_init(self, config, mastodon):
     pass
 
-
+@patch.object(Config, "__init__", new=patched_generic_init)
+@patch.object(Logger, "__init__", new=patched_generic_init_with_config)
+@patch.object(SystemInfo, "__init__", new=patched_generic_init_with_config)
 def get_instance() -> RunLocal:
-    mocked_config_init = Mock()
-    mocked_config_init.__class__ = Config
-    mocked_config_init.return_value = None
-    mocked_logger_init = Mock()
-    mocked_logger_init.return_value = None
     mocked_official_logger = Mock()
     mocked_official_logger.__class__ = PythonLogger
     mocked_logger_getLogger = Mock()
     mocked_logger_getLogger.return_value = mocked_official_logger
-    mocked_system_info_init = Mock()
-    mocked_system_info_init.__class__ = SystemInfo
-    mocked_system_info_init.return_value = None
-    with patch.object(Config, "__init__", new=mocked_config_init):
-        with patch.object(Logger, "__init__", new=mocked_logger_init):
-            with patch.object(Logger, "getLogger", new=mocked_logger_getLogger):
-                with patch.object(SystemInfo, "__init__", new=mocked_system_info_init):
-                    return RunLocal()
+    with patch.object(Logger, "getLogger", new=mocked_logger_getLogger):
+        return RunLocal()
 
 
 def test_init():
@@ -122,7 +117,7 @@ def test_run_no_crossed_thresholds():
 @patch.object(SystemInfo, "get_cpu_data", new=patched_get_cpu_data)
 @patch.object(SystemInfo, "get_mem_data", new=patched_get_mem_data)
 @patch.object(SystemInfo, "get_disk_data", new=patched_get_disk_data)
-@patch.object(SystemInfoTemplater, "__init__", new=patched_templater_init)
+@patch.object(SystemInfoTemplater, "__init__", new=patched_generic_init_with_config)
 @patch.object(MastodonHelper, "get_instance", new=patched_mastodon_get_instance)
 @patch.object(Publisher, "__init__", new=patched_publisher_init)
 def test_run_crossed_thresholds(collected_data):

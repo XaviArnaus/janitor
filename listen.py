@@ -123,11 +123,11 @@ class ListenMessage(Resource):
         if "message" in args:
             text = args["message"]
         else:
-            return { "error": "Expected dict under a \"message\" variable was not present." }, 400
+            return { "error": "Expected string under a \"message\" variable was not present." }, 400
         if "hostname" in args:
             hostname = args["hostname"]
         else:
-            return { "error": "Expected dict under a \"message\" variable was not present." }, 400
+            return { "error": "Expected string under a \"hostname\" variable was not present." }, 400
         
         # Build the message
         icon = MessageType.icon_per_type(message_type)

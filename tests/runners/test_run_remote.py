@@ -46,6 +46,14 @@ def patched_get_disk_data(self):
     return COLLECTED_DATA["disk"]
 
 
+def patched_generic_init(self):
+    pass
+
+
+def patched_generic_init_with_config(self, config):
+    pass
+
+
 @pytest.fixture
 def collected_data():
     return {
@@ -58,24 +66,16 @@ def collected_data():
     }
 
 
+@patch.object(Config, "__init__", new=patched_generic_init)
+@patch.object(Logger, "__init__", new=patched_generic_init_with_config)
+@patch.object(SystemInfo, "__init__", new=patched_generic_init_with_config)
 def get_instance() -> RunRemote:
-    mocked_config_init = Mock()
-    mocked_config_init.__class__ = Config
-    mocked_config_init.return_value = None
-    mocked_logger_init = Mock()
-    mocked_logger_init.return_value = None
     mocked_official_logger = Mock()
     mocked_official_logger.__class__ = PythonLogger
     mocked_logger_getLogger = Mock()
     mocked_logger_getLogger.return_value = mocked_official_logger
-    mocked_system_info_init = Mock()
-    mocked_system_info_init.__class__ = SystemInfo
-    mocked_system_info_init.return_value = None
-    with patch.object(Config, "__init__", new=mocked_config_init):
-        with patch.object(Logger, "__init__", new=mocked_logger_init):
-            with patch.object(Logger, "getLogger", new=mocked_logger_getLogger):
-                with patch.object(SystemInfo, "__init__", new=mocked_system_info_init):
-                    return RunRemote()
+    with patch.object(Logger, "getLogger", new=mocked_logger_getLogger):
+        return RunRemote()
 
 
 def test_init():

@@ -133,7 +133,7 @@ def test_disk_data():
     }
 
 
-def test_crossed_thressholds_return_false():
+def test_crossed_thresholds_return_false():
     data = {
         "hostname": "endor",
         "cpu_percent": 50,
@@ -151,10 +151,10 @@ def test_crossed_thressholds_return_false():
     system_info = get_instance()
 
     with patch.object(Config, "get", new=patched_config_get):
-        assert system_info.crossed_thressholds(data, ["hostname"]) == False
+        assert system_info.crossed_thresholds(data, ["hostname"]) == False
 
 
-def test_crossed_thressholds_return_true():
+def test_crossed_thresholds_return_true():
     data = {
         "hostname": "endor",
         "cpu_percent": 50,
@@ -172,4 +172,4 @@ def test_crossed_thressholds_return_true():
     system_info = get_instance()
 
     with patch.object(Config, "get", new=patched_config_get):
-        assert system_info.crossed_thressholds(data, ["hostname"]) == True
+        assert system_info.crossed_thresholds(data, ["hostname"]) == True

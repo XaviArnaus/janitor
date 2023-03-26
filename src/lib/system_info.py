@@ -49,7 +49,7 @@ class SystemInfo:
             # 'sensor_temperatures': psutil.sensors_temperatures()['cpu-thermal'][0].current,
         }
     
-    def crossed_thressholds(self, data_to_check: dict, exceptions: list = []) -> bool:
+    def crossed_thresholds(self, data_to_check: dict, exceptions: list = []) -> bool:
         self._logger.debug("Checking if values crossed thresholds")
         thresholds = dict(self._config.get("system_info.thresholds"))
 

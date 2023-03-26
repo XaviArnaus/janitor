@@ -47,7 +47,7 @@ class ListenSysInfo(Resource):
             return { "error": "Expected dict under a \"sys_data\" variable was not present." }, 400
 
         # If there is no issue, just stop here.
-        if not self._sys_info.crossed_thressholds(sys_data, ["hostname"]):
+        if not self._sys_info.crossed_thresholds(sys_data, ["hostname"]):
             self._logger.info("No issues found. Ending here.")
             return 200
 

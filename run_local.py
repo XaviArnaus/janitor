@@ -6,6 +6,7 @@ from src.lib.publisher import Publisher
 from src.lib.mastodon_helper import MastodonHelper
 from src.objects.queue_item import QueueItem
 
+
 class RunLocal:
     '''
     Main runner of the app
@@ -15,7 +16,6 @@ class RunLocal:
         self._logger = Logger(self._config).getLogger()
         self._sys_info = SystemInfo(self._config)
         self._logger.info("Init Local Runner")
-
 
     def run(self):
         self._logger.info("Run local app")
@@ -50,6 +50,6 @@ class RunLocal:
             **self._sys_info.get_disk_data()
         }
 
+
 if __name__ == '__main__':
     RunLocal().run()
-

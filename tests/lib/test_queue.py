@@ -17,37 +17,46 @@ def patched_config_init(self):
     pass
 
 
-def patched_config_get(self, param: str, default = None) -> str:
+def patched_config_get(self, param: str, default=None) -> str:
     return CONFIG[param]
+
 
 def patched_storage_init(self, filename):
     pass
 
+
 def patched_storage_write(self):
     pass
 
+
 def patched_storage_get(self, param_name: str = "", default_value: any = None) -> any:
     return []
+
 
 @pytest.fixture
 def datetime_1():
     return datetime(2023, 3, 21)
 
+
 @pytest.fixture
 def datetime_2():
     return datetime(2023, 3, 22)
+
 
 @pytest.fixture
 def datetime_3():
     return datetime(2023, 3, 23)
 
+
 @pytest.fixture
 def queue_item_1(datetime_1):
     return QueueItem(message=Message(text="one"), published_at=datetime_1)
 
+
 @pytest.fixture
 def queue_item_2(datetime_2):
     return QueueItem(message=Message(text="two"), published_at=datetime_2)
+
 
 @pytest.fixture
 def queue_item_3(datetime_3):
@@ -124,9 +133,33 @@ def test_save(datetime_1, datetime_2, datetime_3, queue_item_1, queue_item_2, qu
             queue.save()
 
     mocked_set.assert_called_once_with("queue", [
-        {"message": {"summary": None, "text":"one", "message_type": "none"}, "media": None, "published_at": datetime.timestamp(datetime_1)},
-        {"message": {"summary": None, "text":"two", "message_type": "none"}, "media": None, "published_at": datetime.timestamp(datetime_2)},
-        {"message": {"summary": None, "text":"three", "message_type": "none"}, "media": None, "published_at": datetime.timestamp(datetime_3)}
+        {
+            "message": {
+                "summary": None,
+                "text": "one",
+                "message_type": "none"
+            },
+            "media": None,
+            "published_at": datetime.timestamp(datetime_1)
+        },
+        {
+            "message": {
+                "summary": None,
+                "text": "two",
+                "message_type": "none"
+            },
+            "media": None,
+            "published_at": datetime.timestamp(datetime_2)
+        },
+        {
+            "message": {
+                "summary": None,
+                "text": "three",
+                "message_type": "none"
+            },
+            "media": None,
+            "published_at": datetime.timestamp(datetime_3)
+        }
     ])
     mocked_write.assert_called_once()
 
@@ -150,15 +183,15 @@ def test_update():
 def test_is_empty(queue_item_1):
     queue = get_instance()
 
-    assert queue.is_empty() == True
+    assert queue.is_empty() is True
 
     queue.append(queue_item_1)
 
-    assert queue.is_empty() == False
+    assert queue.is_empty() is False
 
     queue._queue = []
 
-    assert queue.is_empty() == True
+    assert queue.is_empty() is True
 
 
 def test_get_all(queue_item_1, queue_item_2, queue_item_3):
@@ -181,7 +214,7 @@ def test_clean(queue_item_1, queue_item_2, queue_item_3):
 
     queue.clean()
 
-    assert queue.is_empty() == True
+    assert queue.is_empty() is True
 
 
 def test_pop_with_dry_run(queue_item_1, queue_item_2, queue_item_3):
@@ -196,7 +229,7 @@ def test_pop_with_dry_run(queue_item_1, queue_item_2, queue_item_3):
     mocked_get_dry_run.return_value = True
     with patch.object(Config, "get", new=mocked_get_dry_run):
         queue_item = queue.pop()
-    
+
     assert queue_item, queue_item_1
     assert len(queue.get_all()), 3
 
@@ -213,6 +246,6 @@ def test_pop_with_no_dry_run(queue_item_1, queue_item_2, queue_item_3):
     mocked_get_dry_run.return_value = False
     with patch.object(Config, "get", new=mocked_get_dry_run):
         queue_item = queue.pop()
-    
+
     assert queue_item, queue_item_1
     assert len(queue.get_all()), 2

@@ -1,8 +1,8 @@
 from pyxavi.config import Config
 from pyxavi.logger import Logger
 from src.lib.system_info import SystemInfo
-from src.lib.queue import Queue
 import requests
+
 
 class RunRemote:
     '''
@@ -44,6 +44,6 @@ class RunRemote:
             **self._sys_info.get_disk_data(),
         }
 
+
 if __name__ == '__main__':
     RunRemote().run()
-

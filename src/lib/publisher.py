@@ -6,6 +6,7 @@ from .formatter import Formatter
 from mastodon import Mastodon
 import logging
 
+
 class Publisher:
     '''
     Publisher
@@ -39,24 +40,26 @@ class Publisher:
             #             self._logger.info("Could not publish %s", item["url"])
             self._logger.info("Publishing new post")
             return self._mastodon.status_post(
-                status = status_post.status,
-                in_reply_to_id = status_post.in_reply_to_id,
-                media_ids = status_post.media_ids,
-                sensitive = status_post.sensitive,
-                visibility = status_post.visibility,
-                spoiler_text = status_post.spoiler_text,
-                language = status_post.language,
-                idempotency_key = status_post.idempotency_key,
-                content_type = status_post.content_type,
-                scheduled_at = status_post.scheduled_at,
-                poll = status_post.poll,
-                quote_id = status_post.quote_id,
+                status=status_post.status,
+                in_reply_to_id=status_post.in_reply_to_id,
+                media_ids=status_post.media_ids,
+                sensitive=status_post.sensitive,
+                visibility=status_post.visibility,
+                spoiler_text=status_post.spoiler_text,
+                language=status_post.language,
+                idempotency_key=status_post.idempotency_key,
+                content_type=status_post.content_type,
+                scheduled_at=status_post.scheduled_at,
+                poll=status_post.poll,
+                quote_id=status_post.quote_id,
                 # media_ids=posted_media if posted_media else None
             )
-    
+
     def _post_media(self, media_file: str, description: str) -> dict:
         try:
-            downloaded = Media().download_from_url(media_file, self._config.get("publisher.media_storage"))
+            downloaded = Media().download_from_url(
+                media_file, self._config.get("publisher.media_storage")
+            )
             return self._mastodon.media_post(
                 downloaded["file"],
                 mime_type=downloaded["mime_type"],
@@ -64,7 +67,6 @@ class Publisher:
             )
         except Exception as e:
             self._logger.exception(e)
-
 
     def publish_all_from_queue(self) -> None:
         if self._queue.is_empty():
@@ -79,7 +81,6 @@ class Publisher:
             self._queue.clean()
             self._queue.save()
 
-    
     def publish_older_from_queue(self) -> None:
         if self._queue.is_empty():
             self._logger.info("The queue is empty, skipping.")
@@ -89,5 +90,3 @@ class Publisher:
 
         if not self._config.get("run_control.dry_run"):
             self._queue.save()
-
-

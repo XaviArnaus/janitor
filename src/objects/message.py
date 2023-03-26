@@ -24,12 +24,14 @@ class Message:
             "text": self.text,
             "message_type": str(self.message_type),
         }
-    
+
     def from_dict(message_dict: dict) -> Message:
         return Message(
-            summary = message_dict["summary"] if "summary" in message_dict else None,
-            text = message_dict["text"] if "text" in message_dict else None,
-            message_type = MessageType.valid_or_raise(value = message_dict["message_type"]) if "message_type" in message_dict else None,
+            summary=message_dict["summary"] if "summary" in message_dict else None,
+            text=message_dict["text"] if "text" in message_dict else None,
+            message_type=MessageType.valid_or_raise(
+                value=message_dict["message_type"]
+            ) if "message_type" in message_dict else None,
         )
 
 
@@ -44,18 +46,24 @@ class MessageType(LowercaseStrEnum):
     def valid_or_raise(value: str) -> MessageType:
         valid_items = list(map(lambda x: str(x), MessageType.priority()))
 
-        if not value in valid_items:
+        if value not in valid_items:
             raise RuntimeError(f"Value [{value}] is not a valid MessageType")
-        
+
         return value
-    
+
     def priority() -> list:
-        return [MessageType.NONE, MessageType.INFO, MessageType.WARNING, MessageType.ERROR, MessageType.ALARM]
-    
+        return [
+            MessageType.NONE,
+            MessageType.INFO,
+            MessageType.WARNING,
+            MessageType.ERROR,
+            MessageType.ALARM
+        ]
+
     def icon_per_type(message_type: MessageType) -> str:
         if message_type not in MessageType.priority():
             raise RuntimeError(f"Value [{message_type}] is not a valid MessageType")
-        
+
         icon_per_type = {
             MessageType.NONE: "",
             MessageType.INFO: "ℹ️",
@@ -84,7 +92,7 @@ class MessageMedia:
             "url": self.url,
             "alt_text": self.alt_text,
         }
-    
+
     def from_dict(message_media_dict: dict) -> MessageMedia:
         return MessageMedia(
             message_media_dict["url"] if "url" in message_media_dict else None,

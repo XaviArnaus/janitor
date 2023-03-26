@@ -6,6 +6,7 @@ from datetime import datetime
 from run_local import RunLocal
 from run_remote import RunRemote
 
+
 class Scheduler:
     '''
     Runner for scheduled actions
@@ -28,7 +29,7 @@ class Scheduler:
 
         except Exception as e:
             self._logger.exception(e)
-    
+
     def _execute_action(self, action: str):
         if action == "sysinfo_local":
             RunLocal().run()

@@ -13,11 +13,12 @@ CONFIG = {
     "status_post.visibility": "public"
 }
 
+
 def patched_config_init(self):
     pass
 
 
-def patched_config_get(self, param: str, default = None) -> str:
+def patched_config_get(self, param: str, default=None) -> str:
     return CONFIG[param]
 
 
@@ -69,7 +70,7 @@ def test_build_status_post_without_summary(message_without_summary: Message):
     ]
     with patch.object(Config, "get", new=mocked_config_get):
         formatted_status_post = formatter.build_status_post(message=message_without_summary)
-    
+
     mocked_config_get.assert_has_calls([
         call("status_post.content_type"),
         call("status_post.visibility"),

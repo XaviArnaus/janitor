@@ -8,7 +8,6 @@ import pytest
 from logging import Logger as PythonLogger
 
 
-
 COLLECTED_DATA = {
     "hostname": "endor",
     "cpu": {
@@ -29,6 +28,7 @@ COLLECTED_DATA = {
         "disk_usage_percent": 20
     }
 }
+
 
 def patched_get_hostname(self):
     return COLLECTED_DATA["hostname"]
@@ -98,7 +98,7 @@ def test_run_dry_run():
     mocked_config_dry_run.return_value = True
     with patch.object(Config, "get", new=mocked_config_dry_run):
         runner.run()
-    
+
     mocked_config_dry_run.assert_called_once_with("run_control.dry_run")
 
 
@@ -108,10 +108,10 @@ def test_run_dry_run():
 @patch.object(SystemInfo, "get_disk_data", new=patched_get_disk_data)
 def test_run_success(collected_data):
     class ObjectFaker:
-        def __init__(self, d:dict):
+        def __init__(self, d: dict):
             for key, value in d.items():
                 setattr(self, key, value)
-    
+
     remote_url = "http://remote.url"
 
     runner = get_instance()
@@ -130,7 +130,7 @@ def test_run_success(collected_data):
         with patch.object(requests, "post", new=mocked_requests_post):
             with patch.object(runner._logger, "info", new=mocked_logger_info):
                 runner.run()
-    
+
     mocked_config_get.assert_has_calls([
         call("run_control.dry_run"),
         call("app.service.remote_url")
@@ -152,10 +152,10 @@ def test_run_success(collected_data):
 @patch.object(SystemInfo, "get_disk_data", new=patched_get_disk_data)
 def test_run_fail(collected_data):
     class ObjectFaker:
-        def __init__(self, d:dict):
+        def __init__(self, d: dict):
             for key, value in d.items():
                 setattr(self, key, value)
-    
+
     remote_url = "http://remote.url"
 
     runner = get_instance()
@@ -174,7 +174,7 @@ def test_run_fail(collected_data):
         with patch.object(requests, "post", new=mocked_requests_post):
             with patch.object(runner._logger, "warning", new=mocked_logger_warning):
                 runner.run()
-    
+
     mocked_config_get.assert_has_calls([
         call("run_control.dry_run"),
         call("app.service.remote_url")

@@ -47,7 +47,7 @@ def test_instantiate_with_sensitive_defers_to_false():
     instance = StatusPost()
 
     assert isinstance(instance, StatusPost)
-    assert instance.sensitive == False
+    assert instance.sensitive is False
 
 
 def test_instantiate_with_visibility():
@@ -106,7 +106,7 @@ def test_instantiate_with_content_type_defers_to_plain():
 
 @freeze_time("2023-03-24")
 def test_instantiate_with_scheduled_at():
-    scheduled_at_value = datetime(2023,3,23)
+    scheduled_at_value = datetime(2023, 3, 23)
     instance = StatusPost(scheduled_at=scheduled_at_value)
 
     assert isinstance(instance, StatusPost)
@@ -140,23 +140,23 @@ def test_to_dict_full():
     language_value = "ca"
     idempotency_key_value = "abcdefghijk"
     content_type_value = StatusPostContentType.PLAIN
-    scheduled_at_value = datetime(2023,3,23)
+    scheduled_at_value = datetime(2023, 3, 23)
     poll_value = "whatever, the Poll object is missing, not supported"
     quote_id_value = 1234
 
     d = StatusPost(
-        status = status_value,
-        in_reply_to_id = in_reply_to_id_value,
-        media_ids = media_ids_value,
-        sensitive = sensitive_value,
-        visibility = visibility_value,
-        spoiler_text = spoiler_text_value,
-        language = language_value,
-        idempotency_key = idempotency_key_value,
-        content_type = content_type_value,
-        scheduled_at = scheduled_at_value,
-        poll = poll_value,
-        quote_id = quote_id_value,
+        status=status_value,
+        in_reply_to_id=in_reply_to_id_value,
+        media_ids=media_ids_value,
+        sensitive=sensitive_value,
+        visibility=visibility_value,
+        spoiler_text=spoiler_text_value,
+        language=language_value,
+        idempotency_key=idempotency_key_value,
+        content_type=content_type_value,
+        scheduled_at=scheduled_at_value,
+        poll=poll_value,
+        quote_id=quote_id_value,
     ).to_dict()
 
     assert d["status"], status_value
@@ -176,18 +176,18 @@ def test_to_dict_full():
 def test_to_dict_minimal():
     d = StatusPost().to_dict()
 
-    assert d["status"] == None
-    assert d["in_reply_to_id"] == None
-    assert d["media_ids"] == None
-    assert d["sensitive"] == False
+    assert d["status"] is None
+    assert d["in_reply_to_id"] is None
+    assert d["media_ids"] is None
+    assert d["sensitive"] is False
     assert d["visibility"] == StatusPostVisibility.PUBLIC
-    assert d["spoiler_text"] == None
-    assert d["language"] == None
-    assert d["idempotency_key"] == None
+    assert d["spoiler_text"] is None
+    assert d["language"] is None
+    assert d["idempotency_key"] is None
     assert d["content_type"] == StatusPostContentType.PLAIN
-    assert d["scheduled_at"] == None
-    assert d["poll"] == None
-    assert d["quote_id"] == None
+    assert d["scheduled_at"] is None
+    assert d["poll"] is None
+    assert d["quote_id"] is None
 
 
 def test_from_dict_full():
@@ -200,7 +200,7 @@ def test_from_dict_full():
     language_value = "ca"
     idempotency_key_value = "abcdefghijk"
     content_type_value = StatusPostContentType.MARKDOWN
-    scheduled_at_value = datetime(2023,3,23)
+    scheduled_at_value = datetime(2023, 3, 23)
     poll_value = "whatever, the Poll object is missing, not supported"
     quote_id_value = 1234
 
@@ -236,18 +236,18 @@ def test_from_dict_full():
 def test_from_dict_minimal():
     status_post = StatusPost.from_dict({})
 
-    assert status_post.status == None
-    assert status_post.in_reply_to_id == None
-    assert status_post.media_ids == None
-    assert status_post.sensitive == False
+    assert status_post.status is None
+    assert status_post.in_reply_to_id is None
+    assert status_post.media_ids is None
+    assert status_post.sensitive is False
     assert status_post.visibility == StatusPostVisibility.PUBLIC
-    assert status_post.spoiler_text == None
-    assert status_post.language == None
-    assert status_post.idempotency_key == None
+    assert status_post.spoiler_text is None
+    assert status_post.language is None
+    assert status_post.idempotency_key is None
     assert status_post.content_type == StatusPostContentType.PLAIN
-    assert status_post.scheduled_at == None
-    assert status_post.poll == None
-    assert status_post.quote_id == None
+    assert status_post.scheduled_at is None
+    assert status_post.poll is None
+    assert status_post.quote_id is None
 
 
 @pytest.mark.parametrize(
@@ -260,12 +260,18 @@ def test_from_dict_minimal():
         ("whatever", None, RuntimeError),
     ],
 )
-def test_message_type_valid_or_raise(value, expected_status_post_visibility, expected_exception):
+def test_status_post_type_valid_or_raise(value,
+                                         expected_status_post_visibility,
+                                         expected_exception):
     if expected_exception:
         with TestCase.assertRaises(StatusPostVisibility, expected_exception):
-            instanciated_status_post_visibility = StatusPostVisibility.valid_or_raise(value=value)
+            instanciated_status_post_visibility = StatusPostVisibility.valid_or_raise(
+                value=value
+            )
     else:
-        instanciated_status_post_visibility = StatusPostVisibility.valid_or_raise(value=value)
+        instanciated_status_post_visibility = StatusPostVisibility.valid_or_raise(
+            value=value
+        )
         assert instanciated_status_post_visibility, expected_status_post_visibility
 
 
@@ -279,11 +285,16 @@ def test_message_type_valid_or_raise(value, expected_status_post_visibility, exp
         ("whatever", None, RuntimeError),
     ],
 )
-def test_message_type_valid_or_raise(value, expected_status_post_content_type, expected_exception):
+def test_content_type_valid_or_raise(value,
+                                     expected_status_post_content_type,
+                                     expected_exception):
     if expected_exception:
         with TestCase.assertRaises(StatusPostContentType, expected_exception):
-            instanciated_status_post_content_type = StatusPostContentType.valid_or_raise(value=value)
+            instanciated_status_post_content_type = StatusPostContentType.valid_or_raise(
+                value=value
+            )
     else:
-        instanciated_status_post_content_type = StatusPostContentType.valid_or_raise(value=value)
+        instanciated_status_post_content_type = StatusPostContentType.valid_or_raise(
+            value=value
+        )
         assert instanciated_status_post_content_type, expected_status_post_content_type
-

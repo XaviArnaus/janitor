@@ -13,7 +13,6 @@ from logging import Logger as PythonLogger
 from flask_restful import reqparse
 
 
-
 COLLECTED_DATA = {
     "hostname": "endor",
     "cpu": {
@@ -43,6 +42,7 @@ ICONS = {
         MessageType.ALARM: "4"
     }
 
+
 def patched_get_hostname(self):
     return COLLECTED_DATA["hostname"]
 
@@ -69,6 +69,7 @@ def collected_data():
         **COLLECTED_DATA["memory"],
         **COLLECTED_DATA["disk"]
     }
+
 
 def patched_generic_init(self):
     pass
@@ -100,12 +101,14 @@ def get_instance_sys_info() -> ListenSysInfo:
     mocked_logger_getLogger = Mock()
     mocked_logger_getLogger.return_value = mocked_official_logger
     with patch.object(Logger, "getLogger", new=mocked_logger_getLogger):
-            return ListenSysInfo()
+        return ListenSysInfo()
 
 
 def test_init_sys_info():
     mocked_reqparser_add_argument = Mock()
-    with patch.object(reqparse.RequestParser, "add_argument", new=mocked_reqparser_add_argument):
+    with patch.object(reqparse.RequestParser,
+                      "add_argument",
+                      new=mocked_reqparser_add_argument):
         runner = get_instance_sys_info()
 
     assert isinstance(runner, ListenSysInfo)
@@ -114,11 +117,12 @@ def test_init_sys_info():
     assert isinstance(runner._sys_info, SystemInfo)
     mocked_reqparser_add_argument.assert_called_once_with(
         'sys_data',
-        type = dict,
-        required = True,
-        help = 'No sys_data provided',
-        location = 'json'
+        type=dict,
+        required=True,
+        help='No sys_data provided',
+        location='json'
     )
+
 
 @patch.object(reqparse.RequestParser, "add_argument", new=patched_parser_add_argument)
 def test_post_data_does_not_come_in_post():
@@ -129,9 +133,9 @@ def test_post_data_does_not_come_in_post():
     mocked_parse_args.return_value = {"not_wanted": "parameter"}
     with patch.object(listener._parser, "parse_args", new=mocked_parse_args):
         result, code = listener.post()
-    
+
     mocked_parse_args.assert_called_once()
-    assert result == { "error": "Expected dict under a \"sys_data\" variable was not present." }
+    assert result == {"error": "Expected dict under a \"sys_data\" variable was not present."}
     assert code == 400
 
 
@@ -147,7 +151,7 @@ def test_post_data_comes_in_post_no_crossed_thresholds(collected_data):
     with patch.object(listener._parser, "parse_args", new=mocked_parse_args):
         with patch.object(SystemInfo, "crossed_thresholds", new=mocked_crossed_thresholds):
             code = listener.post()
-    
+
     mocked_parse_args.assert_called_once()
     mocked_crossed_thresholds.assert_called_once_with(collected_data, ["hostname"])
     assert code == 200
@@ -174,11 +178,15 @@ def test_post_data_comes_in_post_crossed_thresholds(collected_data):
     mocked_queue_item_init.return_value = None
     with patch.object(listener._parser, "parse_args", new=mocked_parse_args):
         with patch.object(SystemInfo, "crossed_thresholds", new=mocked_crossed_thresholds):
-            with patch.object(SystemInfoTemplater, "process_report", new=mocked_templater_process_report):
+            with patch.object(SystemInfoTemplater,
+                              "process_report",
+                              new=mocked_templater_process_report):
                 with patch.object(QueueItem, "__init__", new=mocked_queue_item_init):
-                    with patch.object(Publisher, "publish_one", new=mocked_publisher_publish_one):
+                    with patch.object(Publisher,
+                                      "publish_one",
+                                      new=mocked_publisher_publish_one):
                         code = listener.post()
-    
+
     mocked_parse_args.assert_called_once()
     mocked_crossed_thresholds.assert_called_once_with(collected_data, ["hostname"])
     mocked_templater_process_report.assert_called_once_with(collected_data)
@@ -197,12 +205,14 @@ def get_instance_message() -> ListenMessage:
     mocked_logger_getLogger = Mock()
     mocked_logger_getLogger.return_value = mocked_official_logger
     with patch.object(Logger, "getLogger", new=mocked_logger_getLogger):
-            return ListenMessage()
+        return ListenMessage()
 
 
 def test_init_message():
     mocked_reqparser_add_argument = Mock()
-    with patch.object(reqparse.RequestParser, "add_argument", new=mocked_reqparser_add_argument):
+    with patch.object(reqparse.RequestParser,
+                      "add_argument",
+                      new=mocked_reqparser_add_argument):
         runner = get_instance_message()
 
     assert isinstance(runner, ListenMessage)
@@ -211,33 +221,45 @@ def test_init_message():
     mocked_reqparser_add_argument.assert_has_calls([
         call(
             'summary',
-            location = 'form'
+            location='form'
         ),
         call(
             'message',
-            location = 'form'
+            location='form'
         ),
         call(
             'hostname',
-            location = 'form'
+            location='form'
         ),
         call(
             'type',
-            location = 'form'
+            location='form'
         ),
     ])
 
 
 @pytest.mark.parametrize(
-    argnames=("summary", "text", "message_type", "hostname", "expected_message_summary", "expected_message_text", "expected_code"),
+    argnames=(
+        "summary",
+        "text",
+        "message_type",
+        "hostname",
+        "expected_message_summary",
+        "expected_message_text",
+        "expected_code"
+    ),
     argvalues=[
         (None, None, None, None, None, None, 400),
         (None, "I am a text message", None, None, None, None, 400),
         (None, None, None, "endor", None, None, 400),
-        (None, "I am a text message", None, "endor", None, " endor:\n\nI am a text message", 200),
-        (None, "I am a text message", MessageType.ALARM, "endor", None, "4 endor:\n\nI am a text message", 200),
-        ("I am a summary", "I am a text message", None, "endor", " endor:\n\nI am a summary", "I am a text message", 200),
-        ("I am a summary", "I am a text message", MessageType.WARNING, "endor", "2 endor:\n\nI am a summary", "I am a text message", 200),
+        (None, "I am a text message", None, "endor",
+            None, " endor:\n\nI am a text message", 200),
+        (None, "I am a text message", MessageType.ALARM, "endor",
+            None, "4 endor:\n\nI am a text message", 200),
+        ("I am a summary", "I am a text message", None, "endor",
+            " endor:\n\nI am a summary", "I am a text message", 200),
+        ("I am a summary", "I am a text message", MessageType.WARNING, "endor",
+            "2 endor:\n\nI am a summary", "I am a text message", 200),
         ("I am a summary", None, MessageType.WARNING, "endor", None, None, 400),
     ],
 )
@@ -262,8 +284,7 @@ def test_post_optional_params_not_present(summary,
         parameters["type"] = message_type
     if hostname is not None:
         parameters["hostname"] = hostname
-    
-    
+
     mocked_parse_args = Mock()
     mocked_parse_args.return_value = parameters
     mocked_message_init = Mock()
@@ -274,21 +295,28 @@ def test_post_optional_params_not_present(summary,
     mocked_queue_item_init.__class__ = QueueItem
     mocked_queue_item_init.return_value = None
     mocked_message_type_icon = Mock()
-    mocked_message_type_icon.return_value = ICONS[message_type] if message_type is not None else ""
+    mocked_message_type_icon.return_value = ICONS[message_type]\
+        if message_type is not None else ""
     with patch.object(listener._parser, "parse_args", new=mocked_parse_args):
         with patch.object(MessageType, "icon_per_type", new=mocked_message_type_icon):
             with patch.object(Message, "__init__", new=mocked_message_init):
                 with patch.object(QueueItem, "__init__", new=mocked_queue_item_init):
-                    with patch.object(Publisher, "publish_one", new=mocked_publisher_publish_one):
+                    with patch.object(Publisher,
+                                      "publish_one",
+                                      new=mocked_publisher_publish_one):
                         result = listener.post()
-    
+
     mocked_parse_args.assert_called_once()
     if expected_code == 200:
-        mocked_message_type_icon.assert_called_once_with(message_type if message_type else MessageType.NONE)
+        mocked_message_type_icon.assert_called_once_with(
+            message_type if message_type else MessageType.NONE
+        )
         if expected_message_summary is not None:
-            mocked_message_init.assert_called_once_with(summary = expected_message_summary, text = expected_message_text)
+            mocked_message_init.assert_called_once_with(
+                summary=expected_message_summary, text=expected_message_text
+            )
         else:
-            mocked_message_init.assert_called_once_with(text = expected_message_text)
+            mocked_message_init.assert_called_once_with(text=expected_message_text)
         # For any reason I can't ensure that publish_one() is called with the mocked message!
         mocked_queue_item_init.assert_called_once()
         # For any reason I can't ensure that publish_one() is called with the mocked queue item!

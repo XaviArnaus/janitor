@@ -7,10 +7,9 @@ from src.lib.mastodon_helper import MastodonHelper
 from src.objects.message import Message
 from src.objects.queue_item import QueueItem
 from run_local import RunLocal
-from unittest.mock import patch, Mock, call
+from unittest.mock import patch, Mock
 import pytest
 from logging import Logger as PythonLogger
-
 
 
 COLLECTED_DATA = {
@@ -33,6 +32,7 @@ COLLECTED_DATA = {
         "disk_usage_percent": 20
     }
 }
+
 
 def patched_get_hostname(self):
     return COLLECTED_DATA["hostname"]
@@ -77,6 +77,7 @@ def patched_mastodon_get_instance(config):
 def patched_publisher_init(self, config, mastodon):
     pass
 
+
 @patch.object(Config, "__init__", new=patched_generic_init)
 @patch.object(Logger, "__init__", new=patched_generic_init_with_config)
 @patch.object(SystemInfo, "__init__", new=patched_generic_init_with_config)
@@ -109,8 +110,8 @@ def test_run_no_crossed_thresholds():
     mocked_crossed_thresholds.return_value = False
     with patch.object(SystemInfo, "crossed_thresholds", new=mocked_crossed_thresholds):
         result = runner.run()
-    
-    assert result == False
+
+    assert result is False
 
 
 @patch.object(SystemInfo, "get_hostname", new=patched_get_hostname)
@@ -134,11 +135,13 @@ def test_run_crossed_thresholds(collected_data):
     mocked_queue_item_init.__class__ = QueueItem
     mocked_queue_item_init.return_value = None
     with patch.object(SystemInfo, "crossed_thresholds", new=mocked_crossed_thresholds):
-        with patch.object(SystemInfoTemplater, "process_report", new=mocked_templater_process_report):
+        with patch.object(SystemInfoTemplater,
+                          "process_report",
+                          new=mocked_templater_process_report):
             with patch.object(QueueItem, "__init__", new=mocked_queue_item_init):
                 with patch.object(Publisher, "publish_one", new=mocked_publisher_publish_one):
-                    result = runner.run()
-    
+                    runner.run()
+
     mocked_templater_process_report.assert_called_once_with(collected_data)
     mocked_queue_item_init.assert_called_once_with(message)
     # For any reason I can't ensure that publish_one() is called with the mocked queue item!

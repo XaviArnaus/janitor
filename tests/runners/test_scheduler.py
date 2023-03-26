@@ -1,7 +1,7 @@
 from pyxavi.config import Config
 from pyxavi.logger import Logger
 from scheduler import Scheduler
-from unittest.mock import patch, Mock, call
+from unittest.mock import patch, Mock
 from croniter import croniter
 from freezegun import freeze_time
 from datetime import datetime
@@ -57,7 +57,7 @@ def test_run_time_does_not_match():
         with patch.object(croniter, "match", new=mocked_croniter_match):
             with patch.object(runner, "_execute_action", new=mocked_action_execution):
                 runner.run()
-    
+
     print(mocked_croniter_match.call_args_list)
     mocked_croniter_match.assert_called_once_with(
         SCHEDULES[0]["when"],
@@ -80,7 +80,7 @@ def test_run_time_does_match():
         with patch.object(croniter, "match", new=mocked_croniter_match):
             with patch.object(runner, "_execute_action", new=mocked_action_execution):
                 runner.run()
-    
+
     print(mocked_croniter_match.call_args_list)
     mocked_croniter_match.assert_called_once_with(
         SCHEDULES[0]["when"],

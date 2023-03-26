@@ -50,15 +50,14 @@ def test_create_app():
     with patch.object(Mastodon, "create_app", new=mocked_create_app):
         with patch.object(Config, "get", new=mocked_config_get):
             runner.run()
-    
+
     mocked_create_app.assert_called_once_with(
         app_name,
-        api_base_url = base_url,
-        to_file = client_file
+        api_base_url=base_url,
+        to_file=client_file
     )
     mocked_config_get.assert_has_calls([
         call("app.name"),
         call("app.api_base_url"),
         call("app.credentials.client_file"),
     ])
-

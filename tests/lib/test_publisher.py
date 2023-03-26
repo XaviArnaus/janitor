@@ -21,11 +21,12 @@ CONFIG = {
 
 _mocked_mastodon_instance: Mastodon = Mock()
 
+
 def patched_config_init(self):
     pass
 
 
-def patched_config_get(self, param: str, default = None) -> str:
+def patched_config_get(self, param: str, default=None) -> str:
     return CONFIG[param]
 
 
@@ -34,7 +35,6 @@ def patched_generic_init(self, config: Config):
 
 
 def get_instance() -> Publisher:
-    
     _mocked_mastodon_instance.__class__ = Mastodon
     _mocked_mastodon_instance.status_post = Mock()
     _mocked_mastodon_instance.status_post.return_value = {"id": 123}
@@ -90,24 +90,25 @@ def test_publish_one_not_dry_run(queue_item_1: QueueItem):
     with patch.object(Formatter, "build_status_post", new=mocked_build_status_post):
         with patch.object(Config, "get", new=mocked_config_get):
             result = publisher.publish_one(queue_item_1)
-    
+
     mocked_config_get.assert_called_once_with("run_control.dry_run")
     mocked_build_status_post.assert_called_once_with(queue_item_1.message)
     _mocked_mastodon_instance.status_post.assert_called_once_with(
-        status = status_post.status,
-        in_reply_to_id = status_post.in_reply_to_id,
-        media_ids = status_post.media_ids,
-        sensitive = status_post.sensitive,
-        visibility = status_post.visibility,
-        spoiler_text = status_post.spoiler_text,
-        language = status_post.language,
-        idempotency_key = status_post.idempotency_key,
-        content_type = status_post.content_type,
-        scheduled_at = status_post.scheduled_at,
-        poll = status_post.poll,
-        quote_id = status_post.quote_id
+        status=status_post.status,
+        in_reply_to_id=status_post.in_reply_to_id,
+        media_ids=status_post.media_ids,
+        sensitive=status_post.sensitive,
+        visibility=status_post.visibility,
+        spoiler_text=status_post.spoiler_text,
+        language=status_post.language,
+        idempotency_key=status_post.idempotency_key,
+        content_type=status_post.content_type,
+        scheduled_at=status_post.scheduled_at,
+        poll=status_post.poll,
+        quote_id=status_post.quote_id
     )
     assert result == {"id": 123}
+
 
 def test_publish_one_dry_run(queue_item_1: QueueItem):
     status_post = StatusPost(status=queue_item_1.message.text)
@@ -120,11 +121,11 @@ def test_publish_one_dry_run(queue_item_1: QueueItem):
     with patch.object(Formatter, "build_status_post", new=mocked_build_status_post):
         with patch.object(Config, "get", new=mocked_config_get):
             result = publisher.publish_one(queue_item_1)
-    
+
     mocked_config_get.assert_called_once_with("run_control.dry_run")
     mocked_build_status_post.assert_called_once_with(queue_item_1.message)
     _mocked_mastodon_instance.status_post.assert_not_called()
-    assert result == None
+    assert result is None
 
 
 def test_post_media():
@@ -145,7 +146,7 @@ def test_post_media():
     with patch.object(Media, "download_from_url", new=mocked_download_from_url):
         with patch.object(Config, "get", new=mocked_config_get):
             result = publisher._post_media(media_file=media_url, description=description)
-    
+
     mocked_download_from_url.assert_called_once_with(
         media_url,
         CONFIG["publisher.media_storage"]
@@ -161,9 +162,9 @@ def test_publish_all_from_queue_is_empty():
     mocked_queue_is_empty.return_value = True
     with patch.object(Queue, "is_empty", new=mocked_queue_is_empty):
         result = publisher.publish_all_from_queue()
-    
+
     mocked_queue_is_empty.assert_called_once()
-    assert result == None
+    assert result is None
 
 
 def test_publish_all_from_queue_not_is_empty_dry_run(queue_item_1, queue_item_2):
@@ -184,7 +185,7 @@ def test_publish_all_from_queue_not_is_empty_dry_run(queue_item_1, queue_item_2)
             with patch.object(publisher, "publish_one", new=mocked_publish_one):
                 with patch.object(Config, "get", new=mocked_config_dry_run):
                     result = publisher.publish_all_from_queue()
-    
+
     mocked_queue_is_empty.assert_called_once()
     mocked_queue_get_all.assert_called_once()
     mocked_config_dry_run.assert_called_once_with("run_control.dry_run")
@@ -192,7 +193,7 @@ def test_publish_all_from_queue_not_is_empty_dry_run(queue_item_1, queue_item_2)
         call(queue_item_1),
         call(queue_item_2)
     ])
-    assert result == None
+    assert result is None
 
 
 def test_publish_all_from_queue_not_is_empty_no_dry_run(queue_item_1, queue_item_2):
@@ -217,7 +218,7 @@ def test_publish_all_from_queue_not_is_empty_no_dry_run(queue_item_1, queue_item
                     with patch.object(Queue, "clean", new=mocked_queue_clean):
                         with patch.object(Queue, "save", new=mocked_queue_save):
                             result = publisher.publish_all_from_queue()
-    
+
     mocked_queue_is_empty.assert_called_once()
     mocked_queue_get_all.assert_called_once()
     mocked_config_dry_run.assert_called_once_with("run_control.dry_run")
@@ -227,7 +228,7 @@ def test_publish_all_from_queue_not_is_empty_no_dry_run(queue_item_1, queue_item
     ])
     mocked_queue_clean.assert_called_once()
     mocked_queue_save.assert_called_once()
-    assert result == None
+    assert result is None
 
 
 def test_publish_older_from_queue_is_empty():
@@ -236,10 +237,10 @@ def test_publish_older_from_queue_is_empty():
     mocked_queue_is_empty = Mock()
     mocked_queue_is_empty.return_value = True
     with patch.object(Queue, "is_empty", new=mocked_queue_is_empty):
-        result = publisher.publish_older_from_queue()
-    
+        result = publisher.publish_all_from_queue()
+
     mocked_queue_is_empty.assert_called_once()
-    assert result == None
+    assert result is None
 
 
 def test_publish_older_from_queue_not_is_empty_dry_run(queue_item_1):
@@ -256,16 +257,16 @@ def test_publish_older_from_queue_not_is_empty_dry_run(queue_item_1):
         with patch.object(Queue, "pop", new=mocked_queue_pop):
             with patch.object(publisher, "publish_one", new=mocked_publish_one):
                 with patch.object(Config, "get", new=mocked_config_dry_run):
-                    result = publisher.publish_all_from_queue()
-    
+                    result = publisher.publish_older_from_queue()
+
     mocked_queue_is_empty.assert_called_once()
     mocked_queue_pop.assert_called_once()
     mocked_config_dry_run.assert_called_once_with("run_control.dry_run")
     mocked_publish_one.assert_called_once_with(queue_item_1)
-    assert result == None
+    assert result is None
 
 
-def test_publish_older_from_queue_not_is_empty_dry_run(queue_item_1):
+def test_publish_older_from_queue_not_is_empty(queue_item_1):
     publisher = get_instance()
 
     mocked_queue_is_empty = Mock()
@@ -282,10 +283,10 @@ def test_publish_older_from_queue_not_is_empty_dry_run(queue_item_1):
                 with patch.object(Config, "get", new=mocked_config_dry_run):
                     with patch.object(Queue, "save", new=mocked_queue_save):
                         result = publisher.publish_older_from_queue()
-    
+
     mocked_queue_is_empty.assert_called_once()
     mocked_queue_pop.assert_called_once()
     mocked_config_dry_run.assert_called_once_with("run_control.dry_run")
     mocked_publish_one.assert_called_once_with(queue_item_1)
     mocked_queue_save.assert_called_once()
-    assert result == None
+    assert result is None

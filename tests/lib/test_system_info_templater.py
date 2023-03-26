@@ -36,7 +36,7 @@ def patched_config_init(self):
     pass
 
 
-def patched_config_get(self, param: str, default = None) -> str:
+def patched_config_get(self, param: str, default=None) -> str:
     return CONFIG[param]
 
 
@@ -70,10 +70,10 @@ def test_build_report_line_no_issue():
             item_value=item_value,
             field_has_issue=field_has_issue
         )
-    
+
     expected_string = templater.REPORT_LINE_TEMPLATE_OK.substitute(
-        title = title_item_name,
-        value = item_value
+        title=title_item_name,
+        value=item_value
     )
 
     assert templated_line == expected_string
@@ -95,13 +95,14 @@ def test_build_report_line_with_issue():
             item_value=item_value,
             field_has_issue=field_has_issue
         )
-    
+
     expected_string = templater.REPORT_LINE_TEMPLATE_ISSUE.substitute(
-        title = title_item_name,
-        value = item_value
+        title=title_item_name,
+        value=item_value
     )
 
     assert templated_line == expected_string
+
 
 @pytest.mark.parametrize(
     argnames=('value', 'expected_result'),
@@ -189,7 +190,6 @@ def test_process_report():
         with patch.object(templater, "_build_report_line", new=mocked_build_line):
             with patch.object(templater, "_humansize", new=mocked_humansize):
                 content = templater.process_report(data)
-    
 
     expected_content = Message(
         summary="⚠️ " + hostname,

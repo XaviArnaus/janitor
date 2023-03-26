@@ -29,7 +29,7 @@ def patched_config_init(self):
     pass
 
 
-def patched_config_get(self, param: str, default = None) -> str:
+def patched_config_get(self, param: str, default=None) -> str:
     return CONFIG[param]
 
 
@@ -78,10 +78,10 @@ def test_cpu_data():
 
 def test_mem_data():
     class InputData:
-        def __init__(self, d:dict):
+        def __init__(self, d: dict):
             for key, value in d.items():
                 setattr(self, key, value)
-    
+
     memory = InputData({
         "total": 8000,
         "available": 4000,
@@ -101,16 +101,16 @@ def test_mem_data():
         "memory_avail": memory.available,
         "memory_used": memory.used,
         "memory_free": memory.free,
-        "memory_percent": round(( memory.used / memory.total ) * 100, 2)
+        "memory_percent": round((memory.used / memory.total) * 100, 2)
     }
 
 
 def test_disk_data():
     class InputData:
-        def __init__(self, d:dict):
+        def __init__(self, d: dict):
             for key, value in d.items():
                 setattr(self, key, value)
-    
+
     disk = InputData({
         "total": 8000,
         "used": 3000,
@@ -120,7 +120,7 @@ def test_disk_data():
 
     system_info = get_instance()
 
-    mocked_disk_usage= Mock()
+    mocked_disk_usage = Mock()
     mocked_disk_usage.return_value = disk
     with patch.object(psutil, "disk_usage", new=mocked_disk_usage):
         data = system_info.get_disk_data()
@@ -151,7 +151,7 @@ def test_crossed_thresholds_return_false():
     system_info = get_instance()
 
     with patch.object(Config, "get", new=patched_config_get):
-        assert system_info.crossed_thresholds(data, ["hostname"]) == False
+        assert system_info.crossed_thresholds(data, ["hostname"]) is False
 
 
 def test_crossed_thresholds_return_true():
@@ -172,4 +172,4 @@ def test_crossed_thresholds_return_true():
     system_info = get_instance()
 
     with patch.object(Config, "get", new=patched_config_get):
-        assert system_info.crossed_thresholds(data, ["hostname"]) == True
+        assert system_info.crossed_thresholds(data, ["hostname"]) is True

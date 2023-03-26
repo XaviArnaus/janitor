@@ -251,7 +251,7 @@ def test_init_message():
             "endor",
             None,
             "4 endor:\n\nI am a text message",
-            20
+            200
         ),
         (
             "I am a summary",
@@ -269,7 +269,7 @@ def test_init_message():
             "endor",
             "2 endor:\n\nI am a summary",
             "I am a text message",
-            20
+            200
         ),
         ("I am a summary", None, MessageType.WARNING, "endor", None, None, 400),
     ],

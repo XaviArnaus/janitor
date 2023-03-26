@@ -129,18 +129,15 @@ jobs:
 
       - name: Create Coverage Report
         run: |
-          poetry run pytest --junitxml=coverage.xml --cov-report=term-missing \
-            --cov=src/image_id_gen \
-            --cov=src/normalizer \
-            --cov=src/verifier \
-            tests/ | tee coverage.txt
+          poetry run pytest --junitxml=python-syscheck.xml --cov-report=term-missing \
+          --cov=src tests/ | tee python-syscheck.txt
 
       - name: Create Unified Coverage Comment
         if: ${{ github.event_name == 'pull_request' }}
         uses: MishaKav/pytest-coverage-comment@v1.1.28
         with:
-          pytest-coverage-path: ./coverage.txt
-          junitxml-path: ./coverage.xml
+          pytest-coverage-path: ./python-syscheck.txt
+          junitxml-path: ./python-syscheck.xml
           hide-badge: false
           hide-report: false
           title: Coverage Report

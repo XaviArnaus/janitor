@@ -35,9 +35,7 @@ test:
 .PHONY: coverage
 coverage:
 	$(POETRY) run pytest --cov-report html:coverage \
-		--cov=src/bundle_basic \
-		--cov=src/bundle_debug \
-		--cov=src/bundle_media \
+		--cov=src \
 		tests/
 	$(OPEN) coverage/index.html
 

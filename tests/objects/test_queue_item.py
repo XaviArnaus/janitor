@@ -1,6 +1,5 @@
 from src.objects.queue_item import QueueItem
 from src.objects.message import Message, MessageMedia
-from unittest import TestCase
 from freezegun import freeze_time
 from datetime import datetime
 

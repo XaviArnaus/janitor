@@ -10,11 +10,9 @@ class Scheduler:
     '''
     Runner for scheduled actions
     '''
-    def init(self):
+    def __init__(self):
         self._config = Config()
         self._logger = Logger(self._config).getLogger()
-
-        return self
 
     def run(self):
         '''
@@ -33,10 +31,10 @@ class Scheduler:
     
     def _execute_action(self, action: str):
         if action == "sysinfo_local":
-            RunLocal().init().run()
+            RunLocal().run()
         elif action == "sysinfo_remote":
-            RunRemote().init().run()
+            RunRemote().run()
 
 
 if __name__ == '__main__':
-    Scheduler().init().run()
+    Scheduler().run()

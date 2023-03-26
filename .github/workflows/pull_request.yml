@@ -90,7 +90,7 @@ jobs:
       - name: Create Coverage Reports
         run: |
           poetry run pytest --junitxml=python-syscheck.xml --cov-report=term-missing \
-          --cov=python-syscheck tests/ | tee python-syscheck.txt
+          --cov=src tests/ | tee python-syscheck.txt
 
       - name: Create Coverage Comment
         if: ${{ github.event_name == 'pull_request' }}

@@ -12,10 +12,7 @@ class MastodonHelper:
 
     VALID_TYPES = [TYPE_MASTODON, TYPE_PLEROMA]
 
-    FEATURE_SET_BY_INSTANCE_TYPE = {
-        TYPE_MASTODON: "mainline",
-        TYPE_PLEROMA: "pleroma"
-    }
+    FEATURE_SET_BY_INSTANCE_TYPE = {TYPE_MASTODON: "mainline", TYPE_PLEROMA: "pleroma"}
 
     def get_instance(config: Config) -> Mastodon:
         logger = logging.getLogger(config.get("logger.name"))

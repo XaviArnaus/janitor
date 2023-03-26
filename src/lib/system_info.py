@@ -19,7 +19,6 @@ class SystemInfo:
         return {
             'cpu_percent': psutil.cpu_percent(1),
             'cpu_count': psutil.cpu_count(),
-            # 'cpu_freq': psutil.cpu_freq(),
         }
 
     def get_mem_data(self) -> dict:

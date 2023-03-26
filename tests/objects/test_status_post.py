@@ -204,20 +204,22 @@ def test_from_dict_full():
     poll_value = "whatever, the Poll object is missing, not supported"
     quote_id_value = 1234
 
-    status_post = StatusPost.from_dict({
-        "status": status_value,
-        "in_reply_to_id": in_reply_to_id_value,
-        "media_ids": media_ids_value,
-        "sensitive": sensitive_value,
-        "visibility": visibility_value,
-        "spoiler_text": spoiler_text_value,
-        "language": language_value,
-        "idempotency_key": idempotency_key_value,
-        "content_type": content_type_value,
-        "scheduled_at": datetime.timestamp(scheduled_at_value),
-        "poll": poll_value,
-        "quote_id": quote_id_value,
-    })
+    status_post = StatusPost.from_dict(
+        {
+            "status": status_value,
+            "in_reply_to_id": in_reply_to_id_value,
+            "media_ids": media_ids_value,
+            "sensitive": sensitive_value,
+            "visibility": visibility_value,
+            "spoiler_text": spoiler_text_value,
+            "language": language_value,
+            "idempotency_key": idempotency_key_value,
+            "content_type": content_type_value,
+            "scheduled_at": datetime.timestamp(scheduled_at_value),
+            "poll": poll_value,
+            "quote_id": quote_id_value,
+        }
+    )
 
     assert status_post.status == status_value
     assert status_post.in_reply_to_id == in_reply_to_id_value
@@ -260,18 +262,16 @@ def test_from_dict_minimal():
         ("whatever", None, RuntimeError),
     ],
 )
-def test_status_post_type_valid_or_raise(value,
-                                         expected_status_post_visibility,
-                                         expected_exception):
+def test_status_post_type_valid_or_raise(
+    value, expected_status_post_visibility, expected_exception
+):
     if expected_exception:
         with TestCase.assertRaises(StatusPostVisibility, expected_exception):
             instanciated_status_post_visibility = StatusPostVisibility.valid_or_raise(
                 value=value
             )
     else:
-        instanciated_status_post_visibility = StatusPostVisibility.valid_or_raise(
-            value=value
-        )
+        instanciated_status_post_visibility = StatusPostVisibility.valid_or_raise(value=value)
         assert instanciated_status_post_visibility, expected_status_post_visibility
 
 
@@ -285,9 +285,9 @@ def test_status_post_type_valid_or_raise(value,
         ("whatever", None, RuntimeError),
     ],
 )
-def test_content_type_valid_or_raise(value,
-                                     expected_status_post_content_type,
-                                     expected_exception):
+def test_content_type_valid_or_raise(
+    value, expected_status_post_content_type, expected_exception
+):
     if expected_exception:
         with TestCase.assertRaises(StatusPostContentType, expected_exception):
             instanciated_status_post_content_type = StatusPostContentType.valid_or_raise(

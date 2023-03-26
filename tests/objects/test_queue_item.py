@@ -45,11 +45,7 @@ def test_to_dict():
     media = [MessageMedia("http://hello.world")]
     published_at = datetime(2023, 3, 23)
 
-    d = QueueItem(
-        message=message,
-        media=media,
-        published_at=published_at
-    ).to_dict()
+    d = QueueItem(message=message, media=media, published_at=published_at).to_dict()
 
     # Injected objects must have their own to_dict() method.
     # Won't test them here, should have their own test
@@ -63,15 +59,17 @@ def test_from_dict():
     media = [MessageMedia("http://hello.world")]
     published_at = datetime(2023, 3, 23)
 
-    queue_item = QueueItem.from_dict({
-        "message": {
-            "text": message.text
-        },
-        "media": [{
-            "url": media[0].url
-        }],
-        "published_at": datetime.timestamp(published_at)
-    })
+    queue_item = QueueItem.from_dict(
+        {
+            "message": {
+                "text": message.text
+            },
+            "media": [{
+                "url": media[0].url
+            }],
+            "published_at": datetime.timestamp(published_at)
+        }
+    )
 
     # Injected objects must have their own from_dict() method.
     # Won't test them here, should have their own test

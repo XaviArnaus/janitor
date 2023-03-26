@@ -21,22 +21,24 @@ class StatusPost:
     idempotency_key: str = None
     content_type: StatusPostContentType = None
     scheduled_at: datetime = None
-    poll: any = None    # Poll not supported. It should be here a Poll object
+    poll: any = None  # Poll not supported. It should be here a Poll object
     quote_id: int = None
 
-    def __init__(self,
-                 status: str = None,
-                 in_reply_to_id: int = None,
-                 media_ids: list[int] = None,
-                 sensitive: bool = None,
-                 visibility: StatusPostVisibility = None,
-                 spoiler_text: str = None,
-                 language: str = None,
-                 idempotency_key: str = None,
-                 content_type: StatusPostContentType = None,
-                 scheduled_at: datetime = None,
-                 poll: any = None,
-                 quote_id: int = None) -> None:
+    def __init__(
+        self,
+        status: str = None,
+        in_reply_to_id: int = None,
+        media_ids: list[int] = None,
+        sensitive: bool = None,
+        visibility: StatusPostVisibility = None,
+        spoiler_text: str = None,
+        language: str = None,
+        idempotency_key: str = None,
+        content_type: StatusPostContentType = None,
+        scheduled_at: datetime = None,
+        poll: any = None,
+        quote_id: int = None
+    ) -> None:
 
         self.status = status
         self.in_reply_to_id = in_reply_to_id
@@ -72,30 +74,23 @@ class StatusPost:
 
     def from_dict(status_post_dict: dict) -> StatusPost:
         return StatusPost(
-            status_post_dict["status"]
-            if "status" in status_post_dict else None,
+            status_post_dict["status"] if "status" in status_post_dict else None,
             status_post_dict["in_reply_to_id"]
             if "in_reply_to_id" in status_post_dict else None,
-            status_post_dict["media_ids"]
-            if "media_ids" in status_post_dict else None,
-            status_post_dict["sensitive"]
-            if "sensitive" in status_post_dict else None,
+            status_post_dict["media_ids"] if "media_ids" in status_post_dict else None,
+            status_post_dict["sensitive"] if "sensitive" in status_post_dict else None,
             StatusPostVisibility.valid_or_raise(status_post_dict["visibility"])
             if "visibility" in status_post_dict else None,
-            status_post_dict["spoiler_text"]
-            if "spoiler_text" in status_post_dict else None,
-            status_post_dict["language"]
-            if "language" in status_post_dict else None,
-            status_post_dict["idempotency_key"] if "idempotency_key"
-            in status_post_dict else None,
+            status_post_dict["spoiler_text"] if "spoiler_text" in status_post_dict else None,
+            status_post_dict["language"] if "language" in status_post_dict else None,
+            status_post_dict["idempotency_key"]
+            if "idempotency_key" in status_post_dict else None,
             StatusPostContentType.valid_or_raise(status_post_dict["content_type"])
             if "content_type" in status_post_dict else None,
             datetime.fromtimestamp(status_post_dict["scheduled_at"])
             if "scheduled_at" in status_post_dict else None,
-            status_post_dict["poll"]
-            if "poll" in status_post_dict else None,
-            status_post_dict["quote_id"]
-            if "quote_id" in status_post_dict else None,
+            status_post_dict["poll"] if "poll" in status_post_dict else None,
+            status_post_dict["quote_id"] if "quote_id" in status_post_dict else None,
         )
 
 

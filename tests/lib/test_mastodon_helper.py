@@ -6,7 +6,6 @@ import pytest
 from mastodon import Mastodon
 import os
 
-
 CONFIG = {
     "logger.name": "logger_test",
     "app.instance_type": "mastodon",
@@ -58,8 +57,7 @@ def test_get_instance_mastodon_user_credentials_exists():
 
     mocked_path_exists.assert_called_once_with(CONFIG["app.credentials.user_file"])
     mocked_mastodon_init.assert_called_once_with(
-        access_token=CONFIG["app.credentials.user_file"],
-        feature_set="mainline"
+        access_token=CONFIG["app.credentials.user_file"], feature_set="mainline"
     )
     assert isinstance(instance, Mastodon)
 
@@ -79,8 +77,7 @@ def test_get_instance_pleroma_user_credentials_exists():
 
     mocked_path_exists.assert_called_once_with(CONFIG["app.credentials.user_file"])
     mocked_mastodon_init.assert_called_once_with(
-        access_token=CONFIG["app.credentials.user_file"],
-        feature_set="pleroma"
+        access_token=CONFIG["app.credentials.user_file"], feature_set="pleroma"
     )
     assert isinstance(instance, Mastodon)
 

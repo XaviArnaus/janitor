@@ -12,9 +12,9 @@ class Queue:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
         self._queue_manager = Storage(self._config.get("queue_storage.file"))
-        self._queue = list(map(
-            lambda x: QueueItem.from_dict(x), self._queue_manager.get("queue", [])
-        ))
+        self._queue = list(
+            map(lambda x: QueueItem.from_dict(x), self._queue_manager.get("queue", []))
+        )
 
     def append(self, item: QueueItem) -> None:
         self._queue.append(item)

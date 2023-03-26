@@ -42,22 +42,18 @@ def test_create_app():
 
     mocked_create_app = Mock()
     mocked_config_get = Mock()
-    mocked_config_get.side_effect = [
-        app_name,
-        base_url,
-        client_file
-    ]
+    mocked_config_get.side_effect = [app_name, base_url, client_file]
     with patch.object(Mastodon, "create_app", new=mocked_create_app):
         with patch.object(Config, "get", new=mocked_config_get):
             runner.run()
 
     mocked_create_app.assert_called_once_with(
-        app_name,
-        api_base_url=base_url,
-        to_file=client_file
+        app_name, api_base_url=base_url, to_file=client_file
     )
-    mocked_config_get.assert_has_calls([
-        call("app.name"),
-        call("app.api_base_url"),
-        call("app.credentials.client_file"),
-    ])
+    mocked_config_get.assert_has_calls(
+        [
+            call("app.name"),
+            call("app.api_base_url"),
+            call("app.credentials.client_file"),
+        ]
+    )

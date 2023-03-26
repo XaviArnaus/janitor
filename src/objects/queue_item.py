@@ -9,11 +9,12 @@ class QueueItem:
     media: list[MessageMedia]
     published_at: datetime
 
-    def __init__(self,
-                 message: Message = None,
-                 media: list[MessageMedia] = None,
-                 published_at: datetime = None
-                 ) -> None:
+    def __init__(
+        self,
+        message: Message = None,
+        media: list[MessageMedia] = None,
+        published_at: datetime = None
+    ) -> None:
 
         self.message = message
         self.media = media
@@ -28,13 +29,10 @@ class QueueItem:
 
     def from_dict(queue_item_dict: dict) -> QueueItem:
         return QueueItem(
-            Message.from_dict(
-                queue_item_dict["message"]
-            ) if "message" in queue_item_dict else None,
-            list(map(
-                lambda x: MessageMedia.from_dict(x), queue_item_dict["media"]
-            )) if "media" in queue_item_dict and queue_item_dict["media"] else None,
-            datetime.fromtimestamp(
-                queue_item_dict["published_at"]
-            ) if "published_at" in queue_item_dict else None
+            Message.from_dict(queue_item_dict["message"])
+            if "message" in queue_item_dict else None,
+            list(map(lambda x: MessageMedia.from_dict(x), queue_item_dict["media"]))
+            if "media" in queue_item_dict and queue_item_dict["media"] else None,
+            datetime.fromtimestamp(queue_item_dict["published_at"])
+            if "published_at" in queue_item_dict else None
         )

@@ -7,10 +7,8 @@ from unittest.mock import patch, Mock
 import pytest
 from logging import Logger
 from datetime import datetime
-CONFIG = {
-    "logger.name": "logger_test",
-    "queue_storage.file": "queue.yaml"
-}
+
+CONFIG = {"logger.name": "logger_test", "queue_storage.file": "queue.yaml"}
 
 
 def patched_config_init(self):
@@ -132,35 +130,32 @@ def test_save(datetime_1, datetime_2, datetime_3, queue_item_1, queue_item_2, qu
         with patch.object(Storage, "write_file", new=mocked_write):
             queue.save()
 
-    mocked_set.assert_called_once_with("queue", [
-        {
-            "message": {
-                "summary": None,
-                "text": "one",
-                "message_type": "none"
+    mocked_set.assert_called_once_with(
+        "queue",
+        [
+            {
+                "message": {
+                    "summary": None, "text": "one", "message_type": "none"
+                },
+                "media": None,
+                "published_at": datetime.timestamp(datetime_1)
             },
-            "media": None,
-            "published_at": datetime.timestamp(datetime_1)
-        },
-        {
-            "message": {
-                "summary": None,
-                "text": "two",
-                "message_type": "none"
+            {
+                "message": {
+                    "summary": None, "text": "two", "message_type": "none"
+                },
+                "media": None,
+                "published_at": datetime.timestamp(datetime_2)
             },
-            "media": None,
-            "published_at": datetime.timestamp(datetime_2)
-        },
-        {
-            "message": {
-                "summary": None,
-                "text": "three",
-                "message_type": "none"
-            },
-            "media": None,
-            "published_at": datetime.timestamp(datetime_3)
-        }
-    ])
+            {
+                "message": {
+                    "summary": None, "text": "three", "message_type": "none"
+                },
+                "media": None,
+                "published_at": datetime.timestamp(datetime_3)
+            }
+        ]
+    )
     mocked_write.assert_called_once()
 
 

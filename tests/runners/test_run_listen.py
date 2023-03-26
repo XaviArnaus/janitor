@@ -12,7 +12,6 @@ import pytest
 from logging import Logger as PythonLogger
 from flask_restful import reqparse
 
-
 COLLECTED_DATA = {
     "hostname": "endor",
     "cpu": {
@@ -35,12 +34,12 @@ COLLECTED_DATA = {
 }
 
 ICONS = {
-        MessageType.NONE: "",
-        MessageType.INFO: "1",
-        MessageType.WARNING: "2",
-        MessageType.ERROR: "3",
-        MessageType.ALARM: "4"
-    }
+    MessageType.NONE: "",
+    MessageType.INFO: "1",
+    MessageType.WARNING: "2",
+    MessageType.ERROR: "3",
+    MessageType.ALARM: "4"
+}
 
 
 def patched_get_hostname(self):
@@ -106,8 +105,7 @@ def get_instance_sys_info() -> ListenSysInfo:
 
 def test_init_sys_info():
     mocked_reqparser_add_argument = Mock()
-    with patch.object(reqparse.RequestParser,
-                      "add_argument",
+    with patch.object(reqparse.RequestParser, "add_argument",
                       new=mocked_reqparser_add_argument):
         runner = get_instance_sys_info()
 
@@ -116,11 +114,7 @@ def test_init_sys_info():
     assert isinstance(runner._logger, PythonLogger)
     assert isinstance(runner._sys_info, SystemInfo)
     mocked_reqparser_add_argument.assert_called_once_with(
-        'sys_data',
-        type=dict,
-        required=True,
-        help='No sys_data provided',
-        location='json'
+        'sys_data', type=dict, required=True, help='No sys_data provided', location='json'
     )
 
 
@@ -210,32 +204,21 @@ def get_instance_message() -> ListenMessage:
 
 def test_init_message():
     mocked_reqparser_add_argument = Mock()
-    with patch.object(reqparse.RequestParser,
-                      "add_argument",
+    with patch.object(reqparse.RequestParser, "add_argument",
                       new=mocked_reqparser_add_argument):
         runner = get_instance_message()
 
     assert isinstance(runner, ListenMessage)
     assert isinstance(runner._config, Config)
     assert isinstance(runner._logger, PythonLogger)
-    mocked_reqparser_add_argument.assert_has_calls([
-        call(
-            'summary',
-            location='form'
-        ),
-        call(
-            'message',
-            location='form'
-        ),
-        call(
-            'hostname',
-            location='form'
-        ),
-        call(
-            'type',
-            location='form'
-        ),
-    ])
+    mocked_reqparser_add_argument.assert_has_calls(
+        [
+            call('summary', location='form'),
+            call('message', location='form'),
+            call('hostname', location='form'),
+            call('type', location='form'),
+        ]
+    )
 
 
 @pytest.mark.parametrize(
@@ -252,27 +235,57 @@ def test_init_message():
         (None, None, None, None, None, None, 400),
         (None, "I am a text message", None, None, None, None, 400),
         (None, None, None, "endor", None, None, 400),
-        (None, "I am a text message", None, "endor",
-            None, " endor:\n\nI am a text message", 200),
-        (None, "I am a text message", MessageType.ALARM, "endor",
-            None, "4 endor:\n\nI am a text message", 200),
-        ("I am a summary", "I am a text message", None, "endor",
-            " endor:\n\nI am a summary", "I am a text message", 200),
-        ("I am a summary", "I am a text message", MessageType.WARNING, "endor",
-            "2 endor:\n\nI am a summary", "I am a text message", 200),
+        (
+            None,
+            "I am a text message",
+            None,
+            "endor",
+            None,
+            " endor:\n\nI am a text message",
+            200
+        ),
+        (
+            None,
+            "I am a text message",
+            MessageType.ALARM,
+            "endor",
+            None,
+            "4 endor:\n\nI am a text message",
+            20
+        ),
+        (
+            "I am a summary",
+            "I am a text message",
+            None,
+            "endor",
+            " endor:\n\nI am a summary",
+            "I am a text message",
+            200
+        ),
+        (
+            "I am a summary",
+            "I am a text message",
+            MessageType.WARNING,
+            "endor",
+            "2 endor:\n\nI am a summary",
+            "I am a text message",
+            20
+        ),
         ("I am a summary", None, MessageType.WARNING, "endor", None, None, 400),
     ],
 )
 @patch.object(reqparse.RequestParser, "add_argument", new=patched_parser_add_argument)
 @patch.object(MastodonHelper, "get_instance", new=patched_mastodon_get_instance)
 @patch.object(Publisher, "__init__", new=patched_publisher_init)
-def test_post_optional_params_not_present(summary,
-                                          text,
-                                          message_type,
-                                          hostname,
-                                          expected_message_summary,
-                                          expected_message_text,
-                                          expected_code):
+def test_post_optional_params_not_present(
+    summary,
+    text,
+    message_type,
+    hostname,
+    expected_message_summary,
+    expected_message_text,
+    expected_code
+):
     listener = get_instance_message()
 
     parameters = {}

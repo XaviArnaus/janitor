@@ -12,7 +12,6 @@ import pytest
 from logging import Logger
 from datetime import datetime
 
-
 CONFIG = {
     "logger.name": "logger_test",
     "run_control.dry_run": False,
@@ -137,10 +136,7 @@ def test_post_media():
     publisher = get_instance()
 
     mocked_download_from_url = Mock()
-    mocked_download_from_url.return_value = {
-        "file": media_file,
-        "mime_type": media_mime
-    }
+    mocked_download_from_url.return_value = {"file": media_file, "mime_type": media_mime}
     mocked_config_get = Mock()
     mocked_config_get.return_value = CONFIG["publisher.media_storage"]
     with patch.object(Media, "download_from_url", new=mocked_download_from_url):
@@ -148,8 +144,7 @@ def test_post_media():
             result = publisher._post_media(media_file=media_url, description=description)
 
     mocked_download_from_url.assert_called_once_with(
-        media_url,
-        CONFIG["publisher.media_storage"]
+        media_url, CONFIG["publisher.media_storage"]
     )
     mocked_config_get.assert_called_once_with("publisher.media_storage")
     assert result == {"id": 456}
@@ -173,10 +168,7 @@ def test_publish_all_from_queue_not_is_empty_dry_run(queue_item_1, queue_item_2)
     mocked_queue_is_empty = Mock()
     mocked_queue_is_empty.return_value = False
     mocked_queue_get_all = Mock()
-    mocked_queue_get_all.return_value = [
-        queue_item_1,
-        queue_item_2
-    ]
+    mocked_queue_get_all.return_value = [queue_item_1, queue_item_2]
     mocked_config_dry_run = Mock()
     mocked_config_dry_run.return_value = True
     mocked_publish_one = Mock()
@@ -189,10 +181,7 @@ def test_publish_all_from_queue_not_is_empty_dry_run(queue_item_1, queue_item_2)
     mocked_queue_is_empty.assert_called_once()
     mocked_queue_get_all.assert_called_once()
     mocked_config_dry_run.assert_called_once_with("run_control.dry_run")
-    mocked_publish_one.assert_has_calls([
-        call(queue_item_1),
-        call(queue_item_2)
-    ])
+    mocked_publish_one.assert_has_calls([call(queue_item_1), call(queue_item_2)])
     assert result is None
 
 
@@ -202,10 +191,7 @@ def test_publish_all_from_queue_not_is_empty_no_dry_run(queue_item_1, queue_item
     mocked_queue_is_empty = Mock()
     mocked_queue_is_empty.return_value = False
     mocked_queue_get_all = Mock()
-    mocked_queue_get_all.return_value = [
-        queue_item_1,
-        queue_item_2
-    ]
+    mocked_queue_get_all.return_value = [queue_item_1, queue_item_2]
     mocked_config_dry_run = Mock()
     mocked_config_dry_run.return_value = False
     mocked_publish_one = Mock()
@@ -222,10 +208,7 @@ def test_publish_all_from_queue_not_is_empty_no_dry_run(queue_item_1, queue_item
     mocked_queue_is_empty.assert_called_once()
     mocked_queue_get_all.assert_called_once()
     mocked_config_dry_run.assert_called_once_with("run_control.dry_run")
-    mocked_publish_one.assert_has_calls([
-        call(queue_item_1),
-        call(queue_item_2)
-    ])
+    mocked_publish_one.assert_has_calls([call(queue_item_1), call(queue_item_2)])
     mocked_queue_clean.assert_called_once()
     mocked_queue_save.assert_called_once()
     assert result is None

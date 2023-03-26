@@ -13,6 +13,7 @@ class Publisher:
 
     It is responsible to publish the queued status posts.
     '''
+
     def __init__(self, config: Config, mastodon: Mastodon) -> None:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
@@ -61,9 +62,7 @@ class Publisher:
                 media_file, self._config.get("publisher.media_storage")
             )
             return self._mastodon.media_post(
-                downloaded["file"],
-                mime_type=downloaded["mime_type"],
-                description=description
+                downloaded["file"], mime_type=downloaded["mime_type"], description=description
             )
         except Exception as e:
             self._logger.exception(e)

@@ -8,6 +8,7 @@ class PublishQueue:
     '''
     Runner that publishes the queue
     '''
+
     def init(self):
         self._config = Config()
         self._logger = Logger(self._config).getLogger()

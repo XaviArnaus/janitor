@@ -6,28 +6,21 @@ from string import Template
 import pytest
 from logging import Logger
 
-
 CONFIG = {
     "logger.name": "logger_test",
     "system_info.thresholds": {
         "cpu_percent": {
-            "value": 80.0,
-            "type": "warning"
+            "value": 80.0, "type": "warning"
         },
         "memory_percent": {
-            "value": 80.0,
-            "type": "warning"
+            "value": 80.0, "type": "warning"
         },
         "disk_usage_percent": {
-            "value": 80.0,
-            "type": "alarm"
+            "value": 80.0, "type": "alarm"
         },
     },
     "formatting.system_info.human_readable_exceptions": [
-        "cpu_percent",
-        "cpu_count",
-        "memory_percent",
-        "disk_usage_percent"
+        "cpu_percent", "cpu_count", "memory_percent", "disk_usage_percent"
     ]
 }
 
@@ -66,14 +59,11 @@ def test_build_report_line_no_issue():
     mocked_config_get.return_value = title_item_name
     with patch.object(Config, "get", new=mocked_config_get):
         templated_line = templater._build_report_line(
-            item_name=item_name,
-            item_value=item_value,
-            field_has_issue=field_has_issue
+            item_name=item_name, item_value=item_value, field_has_issue=field_has_issue
         )
 
     expected_string = templater.REPORT_LINE_TEMPLATE_OK.substitute(
-        title=title_item_name,
-        value=item_value
+        title=title_item_name, value=item_value
     )
 
     assert templated_line == expected_string
@@ -91,14 +81,11 @@ def test_build_report_line_with_issue():
     mocked_config_get.return_value = title_item_name
     with patch.object(Config, "get", new=mocked_config_get):
         templated_line = templater._build_report_line(
-            item_name=item_name,
-            item_value=item_value,
-            field_has_issue=field_has_issue
+            item_name=item_name, item_value=item_value, field_has_issue=field_has_issue
         )
 
     expected_string = templater.REPORT_LINE_TEMPLATE_ISSUE.substitute(
-        title=title_item_name,
-        value=item_value
+        title=title_item_name, value=item_value
     )
 
     assert templated_line == expected_string
@@ -193,12 +180,14 @@ def test_process_report():
 
     expected_content = Message(
         summary="⚠️ " + hostname,
-        text="\n".join([
-            template_ok.substitute(value=50),
-            template_ok.substitute(value=4),
-            template_ok.substitute(value="2 MB"),
-            template_ko.substitute(value=85),
-        ]),
+        text="\n".join(
+            [
+                template_ok.substitute(value=50),
+                template_ok.substitute(value=4),
+                template_ok.substitute(value="2 MB"),
+                template_ko.substitute(value=85),
+            ]
+        ),
         message_type=MessageType.WARNING
     )
 

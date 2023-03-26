@@ -11,6 +11,7 @@ class Scheduler:
     '''
     Runner for scheduled actions
     '''
+
     def __init__(self):
         self._config = Config()
         self._logger = Logger(self._config).getLogger()

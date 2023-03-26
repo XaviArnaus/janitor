@@ -46,9 +46,7 @@ def test_to_dict_full():
     message_type_value = MessageType.INFO
 
     d = Message(
-        summary=summary_value,
-        text=text_value,
-        message_type=message_type_value
+        summary=summary_value, text=text_value, message_type=message_type_value
     ).to_dict()
 
     assert d["summary"] == summary_value
@@ -69,11 +67,13 @@ def test_from_dict_full():
     text_value = "I am a text"
     message_type_value = MessageType.INFO
 
-    message = Message.from_dict({
-        "summary": summary_value,
-        "text": text_value,
-        "message_type": str(message_type_value)
-    })
+    message = Message.from_dict(
+        {
+            "summary": summary_value,
+            "text": text_value,
+            "message_type": str(message_type_value)
+        }
+    )
 
     assert message.summary == summary_value
     assert message.text == text_value
@@ -166,10 +166,7 @@ def test_media_to_dict_full():
     url_value = "http://hello.world"
     alt_text_value = "I am an alt text"
 
-    d = MessageMedia(
-        url=url_value,
-        alt_text=alt_text_value
-    ).to_dict()
+    d = MessageMedia(url=url_value, alt_text=alt_text_value).to_dict()
 
     assert d["url"] == url_value
     assert d["alt_text"] == alt_text_value
@@ -186,10 +183,7 @@ def test_media_from_dict_full():
     url_value = "http://hello.world"
     alt_text_value = "I am an alt text"
 
-    message_media = MessageMedia.from_dict({
-        "url": url_value,
-        "alt_text": alt_text_value
-    })
+    message_media = MessageMedia.from_dict({"url": url_value, "alt_text": alt_text_value})
 
     assert message_media.url == url_value
     assert message_media.alt_text == alt_text_value

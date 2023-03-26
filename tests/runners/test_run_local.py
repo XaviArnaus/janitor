@@ -11,7 +11,6 @@ from unittest.mock import patch, Mock
 import pytest
 from logging import Logger as PythonLogger
 
-
 COLLECTED_DATA = {
     "hostname": "endor",
     "cpu": {

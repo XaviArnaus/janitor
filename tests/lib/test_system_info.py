@@ -5,21 +5,17 @@ import psutil
 import socket
 from logging import Logger
 
-
 CONFIG = {
     "logger.name": "logger_test",
     "system_info.thresholds": {
         "cpu_percent": {
-            "value": 80.0,
-            "type": "warning"
+            "value": 80.0, "type": "warning"
         },
         "memory_percent": {
-            "value": 80.0,
-            "type": "warning"
+            "value": 80.0, "type": "warning"
         },
         "disk_usage_percent": {
-            "value": 80.0,
-            "type": "alarm"
+            "value": 80.0, "type": "alarm"
         },
     }
 }
@@ -70,24 +66,18 @@ def test_cpu_data():
         with patch.object(psutil, "cpu_count", new=mocked_cpu_count):
             data = system_info.get_cpu_data()
 
-    assert data, {
-        "cpu_percent": cpu_percent,
-        "cpu_count": cpu_count
-    }
+    assert data, {"cpu_percent": cpu_percent, "cpu_count": cpu_count}
 
 
 def test_mem_data():
+
     class InputData:
+
         def __init__(self, d: dict):
             for key, value in d.items():
                 setattr(self, key, value)
 
-    memory = InputData({
-        "total": 8000,
-        "available": 4000,
-        "used": 3000,
-        "free": 2000
-    })
+    memory = InputData({"total": 8000, "available": 4000, "used": 3000, "free": 2000})
 
     system_info = get_instance()
 
@@ -106,17 +96,14 @@ def test_mem_data():
 
 
 def test_disk_data():
+
     class InputData:
+
         def __init__(self, d: dict):
             for key, value in d.items():
                 setattr(self, key, value)
 
-    disk = InputData({
-        "total": 8000,
-        "used": 3000,
-        "free": 2000,
-        "percent": 25.4
-    })
+    disk = InputData({"total": 8000, "used": 3000, "free": 2000, "percent": 25.4})
 
     system_info = get_instance()
 

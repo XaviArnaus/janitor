@@ -7,13 +7,7 @@ from freezegun import freeze_time
 from datetime import datetime
 from logging import Logger as PythonLogger
 
-SCHEDULES = [
-    {
-        "name": "Heartbeat",
-        "when": "* * * * *",
-        "action": "sysinfo_local"
-    }
-]
+SCHEDULES = [{"name": "Heartbeat", "when": "* * * * *", "action": "sysinfo_local"}]
 
 
 def patched_generic_init(self):
@@ -59,10 +53,7 @@ def test_run_time_does_not_match():
                 runner.run()
 
     print(mocked_croniter_match.call_args_list)
-    mocked_croniter_match.assert_called_once_with(
-        SCHEDULES[0]["when"],
-        now
-    )
+    mocked_croniter_match.assert_called_once_with(SCHEDULES[0]["when"], now)
     mocked_action_execution.assert_not_called()
 
 
@@ -82,8 +73,5 @@ def test_run_time_does_match():
                 runner.run()
 
     print(mocked_croniter_match.call_args_list)
-    mocked_croniter_match.assert_called_once_with(
-        SCHEDULES[0]["when"],
-        now
-    )
+    mocked_croniter_match.assert_called_once_with(SCHEDULES[0]["when"], now)
     mocked_action_execution.assert_called_once_with(SCHEDULES[0]["action"])

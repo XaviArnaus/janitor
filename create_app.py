@@ -2,12 +2,13 @@ from pyxavi.config import Config
 from pyxavi.logger import Logger
 from mastodon import Mastodon
 
-
 #######
 # This is meant to be run just once.
 ##
 
+
 class CreateApp:
+
     def __init__(self):
         self._config = Config()
         self._logger = Logger(self._config).getLogger()

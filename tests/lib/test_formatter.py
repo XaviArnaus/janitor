@@ -6,7 +6,6 @@ from unittest.mock import patch, Mock, call
 import pytest
 from logging import Logger
 
-
 CONFIG = {
     "logger.name": "logger_test",
     "status_post.content_type": "text/plain",
@@ -24,9 +23,7 @@ def patched_config_get(self, param: str, default=None) -> str:
 
 @pytest.fixture
 def message_without_summary() -> Message:
-    return Message(
-        text="this is the text",
-        message_type=MessageType.WARNING)
+    return Message(text="this is the text", message_type=MessageType.WARNING)
 
 
 @pytest.fixture
@@ -34,7 +31,8 @@ def message_with_summary() -> Message:
     return Message(
         summary="this is the summary",
         text="this is the text",
-        message_type=MessageType.WARNING)
+        message_type=MessageType.WARNING
+    )
 
 
 def get_instance() -> Formatter:
@@ -65,16 +63,17 @@ def test_build_status_post_without_summary(message_without_summary: Message):
 
     mocked_config_get = Mock()
     mocked_config_get.side_effect = [
-        CONFIG["status_post.content_type"],
-        CONFIG["status_post.visibility"]
+        CONFIG["status_post.content_type"], CONFIG["status_post.visibility"]
     ]
     with patch.object(Config, "get", new=mocked_config_get):
         formatted_status_post = formatter.build_status_post(message=message_without_summary)
 
-    mocked_config_get.assert_has_calls([
-        call("status_post.content_type"),
-        call("status_post.visibility"),
-    ])
+    mocked_config_get.assert_has_calls(
+        [
+            call("status_post.content_type"),
+            call("status_post.visibility"),
+        ]
+    )
     assert formatted_status_post.spoiler_text == expected_status_post.spoiler_text
     assert formatted_status_post.status == expected_status_post.status
     assert formatted_status_post.visibility == expected_status_post.visibility

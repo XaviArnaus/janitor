@@ -17,17 +17,14 @@ class ListenSysInfo(Resource):
     '''
     Listener from remote SysInfo Report requests to log
     '''
+
     def __init__(self):
         self._config = Config()
         self._logger = Logger(self._config).getLogger()
         self._sys_info = SystemInfo(self._config)
         self._parser = reqparse.RequestParser()
         self._parser.add_argument(
-            'sys_data',
-            type=dict,
-            required=True,
-            help='No sys_data provided',
-            location='json'
+            'sys_data', type=dict, required=True, help='No sys_data provided', location='json'
         )
         self._logger.info("Init SysInfo Listener")
 
@@ -71,6 +68,7 @@ class ListenMessage(Resource):
     '''
     Listener from remote Message requests to log
     '''
+
     def __init__(self):
         self._config = Config()
         self._logger = Logger(self._config).getLogger()
@@ -142,10 +140,7 @@ class ListenMessage(Resource):
         if not summary:
             message = Message(text=f"{icon} {hostname}:\n\n{text}")
         else:
-            message = Message(
-                summary=f"{icon} {hostname}:\n\n{summary}",
-                text=f"{text}"
-            )
+            message = Message(summary=f"{icon} {hostname}:\n\n{summary}", text=f"{text}")
 
         # Publish the queue
         mastodon = MastodonHelper.get_instance(self._config)

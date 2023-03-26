@@ -8,11 +8,12 @@ class Message:
     text: str = None
     message_type: MessageType = None
 
-    def __init__(self,
-                 summary: str = None,
-                 text: str = None,
-                 message_type: MessageType = None,
-                 ) -> None:
+    def __init__(
+        self,
+        summary: str = None,
+        text: str = None,
+        message_type: MessageType = None,
+    ) -> None:
 
         self.summary = summary
         self.text = text
@@ -29,9 +30,8 @@ class Message:
         return Message(
             summary=message_dict["summary"] if "summary" in message_dict else None,
             text=message_dict["text"] if "text" in message_dict else None,
-            message_type=MessageType.valid_or_raise(
-                value=message_dict["message_type"]
-            ) if "message_type" in message_dict else None,
+            message_type=MessageType.valid_or_raise(value=message_dict["message_type"])
+            if "message_type" in message_dict else None,
         )
 
 
@@ -79,10 +79,11 @@ class MessageMedia:
     url: str = None
     alt_text: str = None
 
-    def __init__(self,
-                 url: str = None,
-                 alt_text: str = None,
-                 ) -> None:
+    def __init__(
+        self,
+        url: str = None,
+        alt_text: str = None,
+    ) -> None:
 
         self.url = url
         self.alt_text = alt_text

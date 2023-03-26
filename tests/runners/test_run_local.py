@@ -8,11 +8,8 @@ from src.objects.message import Message
 from src.objects.queue_item import QueueItem
 from run_local import RunLocal
 from unittest.mock import patch, Mock, call
-from unittest import TestCase
 import pytest
-from mastodon import Mastodon
 from logging import Logger as PythonLogger
-import os
 
 
 

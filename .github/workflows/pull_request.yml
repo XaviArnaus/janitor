@@ -1,0 +1,175 @@
+name: Pull Request
+
+on: [pull_request, workflow_dispatch]
+
+jobs:
+  # Autoformatter
+  yapf:
+    name: Yapf
+    runs-on: [ubuntu-latest]
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setting up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Setting up Poetry
+        uses: Gr1N/setup-poetry@v7
+        with:
+          poetry-preview: true
+          poetry-version: "1.5.2"
+
+      - name: Install Dependencies
+        run: |
+          make init
+
+      - name: Run Yapf
+        run: make yapf
+
+  # Linter
+  flake8:
+    name: Flake8
+    runs-on: [ubuntu-latest]
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setting up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Setting up Poetry
+        uses: Gr1N/setup-poetry@v7
+        with:
+          poetry-preview: true
+          poetry-version: "1.5.2"
+
+      - name: Install Dependencies
+        run: |
+          make init
+
+      - name: Setup flake8 Annotations
+        uses: rbialon/flake8-annotations@v1
+
+      - name: Run flake8
+        run: make flake8
+
+  # Coverage
+  coverage-reports:
+    name: Coverage Reports
+    runs-on: [ubuntu-latest]
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setting up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Setting up Poetry
+        uses: Gr1N/setup-poetry@v7
+        with:
+          poetry-preview: true
+          poetry-version: "1.5.2"
+
+      - name: Install Dependencies
+        run: |
+          make init
+
+      - name: Create Coverage Reports
+        run: |
+          poetry run pytest --junitxml=python-syscheck.xml --cov-report=term-missing \
+          --cov=python-syscheck tests/ | tee python-syscheck.txt
+
+      - name: Create Coverage Comment
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: MishaKav/pytest-coverage-comment@v1.1.28
+        with:
+          hide-badge: false
+          hide-report: true
+          title: Coverage Report by Package
+          badge-title: Coverage
+          multiple-files: |
+            python-syscheck, python-syscheck.txt, python-syscheck.xml
+
+  unified-coverage-report:
+    name: Unified Coverage Report
+    runs-on: [ubuntu-latest]
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setting up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Setting up Poetry
+        uses: Gr1N/setup-poetry@v7
+        with:
+          poetry-preview: true
+          poetry-version: "1.5.2"
+
+      - name: Install Dependencies
+        run: |
+          make init
+
+      - name: Create Coverage Report
+        run: |
+          poetry run pytest --junitxml=coverage.xml --cov-report=term-missing \
+            --cov=src/image_id_gen \
+            --cov=src/normalizer \
+            --cov=src/verifier \
+            tests/ | tee coverage.txt
+
+      - name: Create Unified Coverage Comment
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: MishaKav/pytest-coverage-comment@v1.1.28
+        with:
+          pytest-coverage-path: ./coverage.txt
+          junitxml-path: ./coverage.xml
+          hide-badge: false
+          hide-report: false
+          title: Coverage Report
+          badge-title: Coverage
+
+  # Tests
+  tests:
+    name: Tests
+    runs-on: [ubuntu-latest]
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setting up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Setting up Poetry
+        uses: Gr1N/setup-poetry@v7
+        with:
+          poetry-preview: true
+          poetry-version: "1.5.2"
+
+      - name: Install Dependencies
+        run: |
+          make init
+
+      - name: Run Tests
+        run: make test

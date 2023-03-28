@@ -1,6 +1,6 @@
 from pyxavi.config import Config
-from src.objects.message import Message, MessageType
-from src.lib.system_info_templater import SystemInfoTemplater
+from janitor.objects.message import Message, MessageType
+from janitor.lib.system_info_templater import SystemInfoTemplater
 from unittest.mock import patch, Mock
 from string import Template
 import pytest

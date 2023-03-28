@@ -89,8 +89,8 @@ jobs:
 
   #     - name: Create Coverage Reports
   #       run: |
-  #         poetry run pytest --junitxml=python-syscheck.xml --cov-report=term-missing \
-  #         --cov=src tests/ | tee python-syscheck.txt
+  #         poetry run pytest --junitxml=janitor.xml --cov-report=term-missing \
+  #         --cov=src tests/ | tee janitor.txt
 
   #     - name: Create Coverage Comment
   #       if: ${{ github.event_name == 'pull_request' }}
@@ -101,7 +101,7 @@ jobs:
   #         title: Coverage Report by Package
   #         badge-title: Coverage
   #         multiple-files: |
-  #           python-syscheck, python-syscheck.txt, python-syscheck.xml
+  #           janitor, janitor.txt, janitor.xml
 
   # unified-coverage-report:
   #   name: Unified Coverage Report
@@ -129,15 +129,15 @@ jobs:
 
   #     - name: Create Coverage Report
   #       run: |
-  #         poetry run pytest --junitxml=python-syscheck.xml --cov-report=term-missing \
-  #         --cov=src tests/ | tee python-syscheck.txt
+  #         poetry run pytest --junitxml=janitor.xml --cov-report=term-missing \
+  #         --cov=src tests/ | tee janitor.txt
 
   #     - name: Create Unified Coverage Comment
   #       if: ${{ github.event_name == 'pull_request' }}
   #       uses: MishaKav/pytest-coverage-comment@v1.1.28
   #       with:
-  #         pytest-coverage-path: ./python-syscheck.txt
-  #         junitxml-path: ./python-syscheck.xml
+  #         pytest-coverage-path: ./janitor.txt
+  #         junitxml-path: ./janitor.xml
   #         hide-badge: false
   #         hide-report: false
   #         title: Coverage Report

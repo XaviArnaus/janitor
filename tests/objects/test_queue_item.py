@@ -1,5 +1,5 @@
-from src.objects.queue_item import QueueItem
-from src.objects.message import Message, MessageMedia
+from janitor.objects.queue_item import QueueItem
+from janitor.objects.message import Message, MessageMedia
 from freezegun import freeze_time
 from datetime import datetime
 

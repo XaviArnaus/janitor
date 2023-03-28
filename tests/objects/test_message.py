@@ -1,4 +1,4 @@
-from src.objects.message import Message, MessageType, MessageMedia
+from janitor.objects.message import Message, MessageType, MessageMedia
 from unittest import TestCase
 import pytest
 

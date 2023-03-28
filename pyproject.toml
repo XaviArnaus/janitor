@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "python-syscheck"
+name = "janitor"
 version = "0.1.0"
-description = "Bot that collects system metrics and publishes them in case of crossing thresholds. Also publishes arbitrary messages"
+description = "Bot that collects system metrics and publishes them in case of crossing thresholds. Also publishes arbitrary messages in a client-observer fashion"
 authors = ["Xavier Arnaus <xavi@arnaus.net>"]
 
 [tool.poetry.dependencies]

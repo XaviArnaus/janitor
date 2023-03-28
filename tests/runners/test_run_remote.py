@@ -1,6 +1,6 @@
 from pyxavi.config import Config
 from pyxavi.logger import Logger
-from src.lib.system_info import SystemInfo
+from janitor.lib.system_info import SystemInfo
 from run_remote import RunRemote
 from unittest.mock import patch, Mock, call
 import requests

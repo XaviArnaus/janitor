@@ -1,8 +1,8 @@
 from pyxavi.config import Config
 from pyxavi.storage import Storage
-from src.lib.queue import Queue
-from src.objects.queue_item import QueueItem
-from src.objects.message import Message
+from janitor.lib.queue import Queue
+from janitor.objects.queue_item import QueueItem
+from janitor.objects.message import Message
 from unittest.mock import patch, Mock
 import pytest
 from logging import Logger

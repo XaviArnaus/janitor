@@ -1,11 +1,11 @@
 from pyxavi.config import Config
 from pyxavi.media import Media
-from src.lib.publisher import Publisher
-from src.lib.formatter import Formatter
-from src.lib.queue import Queue
-from src.objects.message import Message
-from src.objects.queue_item import QueueItem
-from src.objects.status_post import StatusPost
+from janitor.lib.publisher import Publisher
+from janitor.lib.formatter import Formatter
+from janitor.lib.queue import Queue
+from janitor.objects.message import Message
+from janitor.objects.queue_item import QueueItem
+from janitor.objects.status_post import StatusPost
 from mastodon import Mastodon
 from unittest.mock import patch, Mock, call
 import pytest

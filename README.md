@@ -1,4 +1,4 @@
-# python-syscheck
+# janitor
 System check monitoring written in Python
 
 # Requirements
@@ -9,12 +9,12 @@ System check monitoring written in Python
 
 ### 1. Clone the repository
 ```
-git clone git@github.com:XaviArnaus/python-syscheck.git
+git clone git@github.com:XaviArnaus/janitor.git
 ```
 
 ### 2. Move yourself to the directory
 ```
-cd python-syscheck
+cd janitor
 ```
 
 ### 3. Settle your config from the example
@@ -67,9 +67,9 @@ make run_local
 
 If the parameter `logger.loglevel` is set to `20`, this is the usual output:
 ```
-[2023-03-17 08:24:57,891] INFO     python-syscheck Init Local Runner
-[2023-03-17 08:24:57,891] INFO     python-syscheck Run local app
-[2023-03-17 08:24:58,893] INFO     python-syscheck No issues found. Ending here.
+[2023-03-17 08:24:57,891] INFO     janitor Init Local Runner
+[2023-03-17 08:24:57,891] INFO     janitor Run local app
+[2023-03-17 08:24:58,893] INFO     janitor No issues found. Ending here.
 ```
 
 ## A client-server environment
@@ -107,9 +107,9 @@ make run_remote
 
 If the parameter `logger.loglevel` is set to `20`, this is the usual output:
 ```
-[2023-03-17 08:24:57,891] INFO     python-syscheck Init Remote Runner
-[2023-03-17 08:24:57,891] INFO     python-syscheck Run remote app
-[2023-03-17 08:24:58,893] INFO     python-syscheck Sending sys_data away
+[2023-03-17 08:24:57,891] INFO     janitor Init Remote Runner
+[2023-03-17 08:24:57,891] INFO     janitor Run remote app
+[2023-03-17 08:24:58,893] INFO     janitor Sending sys_data away
 ```
 
 ### Sending arbitrary messages
@@ -146,7 +146,7 @@ crontab -e
 
 2. Add the following line
 ```
-* * * * * cd /home/xavier/bots/python-syscheck; make scheduler
+* * * * * cd /home/xavier/bots/janitor; make scheduler
 ```
 
 3. Save and exit.

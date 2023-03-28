@@ -1,7 +1,7 @@
 from pyxavi.config import Config
-from src.lib.formatter import Formatter
-from src.objects.message import Message, MessageType
-from src.objects.status_post import StatusPost, StatusPostContentType, StatusPostVisibility
+from janitor.lib.formatter import Formatter
+from janitor.objects.message import Message, MessageType
+from janitor.objects.status_post import StatusPost, StatusPostContentType, StatusPostVisibility
 from unittest.mock import patch, Mock, call
 import pytest
 from logging import Logger

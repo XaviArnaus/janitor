@@ -32,9 +32,9 @@ Depending on how you'll want this bot instance to behave, there are some mandato
 
 **Typical single mode instance**
 This mode checks the system and publishes to the social media platform, but do not make use of the service functionality.
-- `app.api_base_url`: Sets the URL of the social media platform instance where the user that will publish the posts lives.
-- `app.instance_type`: The type of social media platform that it is. All of them use the Mastodon API, but for instances different from Mastodon we need to set up some extras. This is all abstracted with this parameter. Set `mastodon` for a Mastodon instance or `pleroma` for Pleroma or Akkoma.
-- `app.credentials.user`: Just set up the `user` and the `password` here.
+- `mastodon.api_base_url`: Sets the URL of the social media platform instance where the user that will publish the posts lives.
+- `mastodon.instance_type`: The type of social media platform that it is. All of them use the Mastodon API, but for instances different from Mastodon we need to set up some extras. This is all abstracted with this parameter. Set `mastodon` for a Mastodon instance or `pleroma` for Pleroma or Akkoma.
+- `mastodon.credentials.user`: Just set up the `user` and the `password` here.
 - `run_control.dry_run`: Set it to False when you're ready to start publishing. This lets you run the bot without an actual publishing.
 - `status_post.content_type`: For Mastodon it needs to be `text/plain`. For Pleroma or Akkoma it can be any of the possible values defined in the comment.
 

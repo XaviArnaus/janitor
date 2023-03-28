@@ -33,10 +33,10 @@ class Formatter:
 
         # Now the rest of the details
         status_post.content_type = StatusPostContentType.valid_or_raise(
-            value=self._config.get("status_post.content_type")
+            value=self._config.get("mastodon.status_post.content_type")
         )
         status_post.visibility = StatusPostVisibility.valid_or_raise(
-            value=self._config.get("status_post.visibility")
+            value=self._config.get("mastodon.status_post.visibility")
         )
 
         return status_post

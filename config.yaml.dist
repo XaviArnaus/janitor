@@ -16,11 +16,11 @@ app:
       port: 5000
     # [String] URL (and maybe port) to send the POST request to.
     remote_url: http://localhost:5000
-
-run_control:
-  # [Bool] Performs a dry run: the queue is untouched and no re-toot is really done
-  # Check the logs/stdout to see the results
-  dry_run: True
+  # Control of the app runners
+  run_control:
+    # [Bool] Performs a dry run: the queue is untouched and no re-toot is really done
+    # Check the logs/stdout to see the results
+    dry_run: True
   # Manage the scheduling.
   # Will be read by the scheduler (running every minute) to know what to do
   schedules:

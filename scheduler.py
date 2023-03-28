@@ -21,7 +21,7 @@ class Scheduler:
         Read and react to schedules
         '''
         try:
-            schedules = list(self._config.get("run_control.schedules"))
+            schedules = list(self._config.get("app.schedules"))
             now_dt = datetime.now()
 
             for schedule in schedules:

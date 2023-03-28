@@ -98,7 +98,7 @@ def test_run_dry_run():
     with patch.object(Config, "get", new=mocked_config_dry_run):
         runner.run()
 
-    mocked_config_dry_run.assert_called_once_with("run_control.dry_run")
+    mocked_config_dry_run.assert_called_once_with("app.run_control.dry_run")
 
 
 @patch.object(SystemInfo, "get_hostname", new=patched_get_hostname)
@@ -128,7 +128,7 @@ def test_run_success(collected_data):
                 runner.run()
 
     mocked_config_get.assert_has_calls(
-        [call("run_control.dry_run"), call("app.service.remote_url")]
+        [call("app.run_control.dry_run"), call("app.service.remote_url")]
     )
     mocked_requests_post.assert_called_once_with(
         f"{remote_url}/sysinfo", json={'sys_data': collected_data}
@@ -170,7 +170,7 @@ def test_run_fail(collected_data):
                 runner.run()
 
     mocked_config_get.assert_has_calls(
-        [call("run_control.dry_run"), call("app.service.remote_url")]
+        [call("app.run_control.dry_run"), call("app.service.remote_url")]
     )
     mocked_requests_post.assert_called_once_with(
         f"{remote_url}/sysinfo", json={'sys_data': collected_data}

@@ -76,7 +76,7 @@ formatting:
 # Configuration regarding the connection with Mastodon API
 mastodon:
    # [String] This will be the name of the bot
-  name: "SysCheck"
+  app_name: "Janitor"
   # [String] Where to connecto to deliver the statuses
   api_base_url: "https://mastodon.social"
   # [String] Type of instance: "mastodon" for Mastodon, "pleroma" for Pleroma / Akkoma

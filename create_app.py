@@ -17,11 +17,11 @@ class CreateApp:
     def run(self):
         self._logger.info("Run Create App")
         Mastodon.create_app(
-            self._config.get("app.name"),
+            self._config.get("mastodon.app_name"),
             api_base_url=self._config.get("mastodon.api_base_url"),
             to_file=self._config.get("mastodon.credentials.client_file")
         )
-        self._logger.info("Run Create App")
+        self._logger.info("Finished Create App")
 
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 from pyxavi.config import Config
 from pyxavi.logger import Logger
-from src.lib.system_info import SystemInfo
+from janitor.lib.system_info import SystemInfo
 import requests
 
 

@@ -1,5 +1,5 @@
 from pyxavi.config import Config
-from src.lib.system_info import SystemInfo
+from janitor.lib.system_info import SystemInfo
 from unittest.mock import patch, Mock
 import psutil
 import socket

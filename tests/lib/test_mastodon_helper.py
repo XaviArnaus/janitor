@@ -1,5 +1,5 @@
 from pyxavi.config import Config
-from src.lib.mastodon_helper import MastodonHelper
+from janitor.lib.mastodon_helper import MastodonHelper
 from unittest.mock import patch, Mock
 from unittest import TestCase
 import pytest

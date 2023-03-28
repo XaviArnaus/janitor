@@ -1,4 +1,4 @@
-from src.objects.status_post import StatusPost, StatusPostContentType, StatusPostVisibility
+from janitor.objects.status_post import StatusPost, StatusPostContentType, StatusPostVisibility
 from unittest import TestCase
 from freezegun import freeze_time
 from datetime import datetime

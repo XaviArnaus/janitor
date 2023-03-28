@@ -1,11 +1,11 @@
 from pyxavi.config import Config
 from pyxavi.logger import Logger
-from src.lib.system_info import SystemInfo
-from src.lib.system_info_templater import SystemInfoTemplater
-from src.lib.publisher import Publisher
-from src.lib.mastodon_helper import MastodonHelper
-from src.objects.queue_item import QueueItem
-from src.objects.message import Message, MessageType
+from janitor.lib.system_info import SystemInfo
+from janitor.lib.system_info_templater import SystemInfoTemplater
+from janitor.lib.publisher import Publisher
+from janitor.lib.mastodon_helper import MastodonHelper
+from janitor.objects.queue_item import QueueItem
+from janitor.objects.message import Message, MessageType
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
 

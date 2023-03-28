@@ -1,7 +1,7 @@
 from pyxavi.config import Config
 from ..objects.message import Message
-from src.objects.message import MessageType
-from src.objects.status_post import StatusPost, StatusPostVisibility, StatusPostContentType
+from janitor.objects.message import MessageType
+from janitor.objects.status_post import StatusPost, StatusPostVisibility, StatusPostContentType
 import logging
 
 

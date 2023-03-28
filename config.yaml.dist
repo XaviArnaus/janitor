@@ -107,11 +107,11 @@ logger:
   # [Integer] Log level: NOTSET=0 | DEBUG=10 | INFO=20 | WARN=30 | ERROR=40 | CRITICAL=50
   loglevel: 10
   # [String] Name of the logger
-  name: "python-syscheck"
+  name: "janitor"
   # [Bool] Dump the log into a file
   to_file: True
   # [String] Path and filename of the log file
-  filename: "log/python-syscheck.log"
+  filename: "log/janitor.log"
   # [Bool] Dump the log into a stdout
   to_stdout: True
   # [String] Format of the log

@@ -50,7 +50,7 @@ class Queue:
 
     def pop(self) -> dict:
         if not self.is_empty():
-            if not self._config.get("run_control.dry_run"):
+            if not self._config.get("app.run_control.dry_run"):
                 return self._queue.pop(0)
             else:
                 return self._queue[0]

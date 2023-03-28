@@ -32,10 +32,10 @@ Depending on how you'll want this bot instance to behave, there are some mandato
 
 **Typical single mode instance**
 This mode checks the system and publishes to the social media platform, but do not make use of the service functionality.
-- `app.api_base_url`: Sets the URL of the social media platform instance where the user that will publish the posts lives.
-- `app.instance_type`: The type of social media platform that it is. All of them use the Mastodon API, but for instances different from Mastodon we need to set up some extras. This is all abstracted with this parameter. Set `mastodon` for a Mastodon instance or `pleroma` for Pleroma or Akkoma.
-- `app.credentials.user`: Just set up the `user` and the `password` here.
-- `run_control.dry_run`: Set it to False when you're ready to start publishing. This lets you run the bot without an actual publishing.
+- `mastodon.api_base_url`: Sets the URL of the social media platform instance where the user that will publish the posts lives.
+- `mastodon.instance_type`: The type of social media platform that it is. All of them use the Mastodon API, but for instances different from Mastodon we need to set up some extras. This is all abstracted with this parameter. Set `mastodon` for a Mastodon instance or `pleroma` for Pleroma or Akkoma.
+- `mastodon.credentials.user`: Just set up the `user` and the `password` here.
+- `app.run_control.dry_run`: Set it to False when you're ready to start publishing. This lets you run the bot without an actual publishing.
 - `status_post.content_type`: For Mastodon it needs to be `text/plain`. For Pleroma or Akkoma it can be any of the possible values defined in the comment.
 
 
@@ -48,7 +48,7 @@ This mode publishes System Info reports and arbitrary messages that reach out th
 **Remote mode where this instance collects the data and sends it to an API**
 This mode only collects the data and sends it away. Therefor, we only need to set up very basic parameters:
 - `app.service.remote_url`: Where to send the collected data.
-- `run_control.dry_run`: Set it to False when you're ready to start sending the data away. This lets you run the bot without an actual data sending.
+- `app.run_control.dry_run`: Set it to False when you're ready to start sending the data away. This lets you run the bot without an actual data sending.
 
 
 ### 6. Install all Python dependencies
@@ -131,7 +131,7 @@ The Listener also accepts receiving arbitrary messages that will get published. 
 This is most likely the intended purpose of this bot, to run periodically. To easy the set up, and also intending to settle a set up for further implementations, there is another "scheduler" mode that can be used.
 
 ### 1. Define the schedule that should run
-In the config file there is a `run_control.schedules` parameter that accepts a list of objects representing each task to perform:
+In the config file there is a `app.schedules` parameter that accepts a list of objects representing each task to perform:
 - `name` is just to describe what is this task
 - `when` is a `crontab` expression defining when this task will be triggered.
 - `action` is one of the possible values: "sysinfo_local" or "sysinfo_remote", at this point.

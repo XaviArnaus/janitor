@@ -14,7 +14,7 @@ from datetime import datetime
 
 CONFIG = {
     "logger.name": "logger_test",
-    "run_control.dry_run": False,
+    "app.run_control.dry_run": False,
     "publisher.media_storage": "storage/media/"
 }
 
@@ -90,7 +90,7 @@ def test_publish_one_not_dry_run(queue_item_1: QueueItem):
         with patch.object(Config, "get", new=mocked_config_get):
             result = publisher.publish_one(queue_item_1)
 
-    mocked_config_get.assert_called_once_with("run_control.dry_run")
+    mocked_config_get.assert_called_once_with("app.run_control.dry_run")
     mocked_build_status_post.assert_called_once_with(queue_item_1.message)
     _mocked_mastodon_instance.status_post.assert_called_once_with(
         status=status_post.status,
@@ -121,7 +121,7 @@ def test_publish_one_dry_run(queue_item_1: QueueItem):
         with patch.object(Config, "get", new=mocked_config_get):
             result = publisher.publish_one(queue_item_1)
 
-    mocked_config_get.assert_called_once_with("run_control.dry_run")
+    mocked_config_get.assert_called_once_with("app.run_control.dry_run")
     mocked_build_status_post.assert_called_once_with(queue_item_1.message)
     _mocked_mastodon_instance.status_post.assert_not_called()
     assert result is None
@@ -180,7 +180,7 @@ def test_publish_all_from_queue_not_is_empty_dry_run(queue_item_1, queue_item_2)
 
     mocked_queue_is_empty.assert_called_once()
     mocked_queue_get_all.assert_called_once()
-    mocked_config_dry_run.assert_called_once_with("run_control.dry_run")
+    mocked_config_dry_run.assert_called_once_with("app.run_control.dry_run")
     mocked_publish_one.assert_has_calls([call(queue_item_1), call(queue_item_2)])
     assert result is None
 
@@ -207,7 +207,7 @@ def test_publish_all_from_queue_not_is_empty_no_dry_run(queue_item_1, queue_item
 
     mocked_queue_is_empty.assert_called_once()
     mocked_queue_get_all.assert_called_once()
-    mocked_config_dry_run.assert_called_once_with("run_control.dry_run")
+    mocked_config_dry_run.assert_called_once_with("app.run_control.dry_run")
     mocked_publish_one.assert_has_calls([call(queue_item_1), call(queue_item_2)])
     mocked_queue_clean.assert_called_once()
     mocked_queue_save.assert_called_once()
@@ -244,7 +244,7 @@ def test_publish_older_from_queue_not_is_empty_dry_run(queue_item_1):
 
     mocked_queue_is_empty.assert_called_once()
     mocked_queue_pop.assert_called_once()
-    mocked_config_dry_run.assert_called_once_with("run_control.dry_run")
+    mocked_config_dry_run.assert_called_once_with("app.run_control.dry_run")
     mocked_publish_one.assert_called_once_with(queue_item_1)
     assert result is None
 
@@ -269,7 +269,7 @@ def test_publish_older_from_queue_not_is_empty(queue_item_1):
 
     mocked_queue_is_empty.assert_called_once()
     mocked_queue_pop.assert_called_once()
-    mocked_config_dry_run.assert_called_once_with("run_control.dry_run")
+    mocked_config_dry_run.assert_called_once_with("app.run_control.dry_run")
     mocked_publish_one.assert_called_once_with(queue_item_1)
     mocked_queue_save.assert_called_once()
     assert result is None

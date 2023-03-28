@@ -26,7 +26,7 @@ class Publisher:
         status_post = self._formatter.build_status_post(item.message)
 
         # Publish the StatusPost
-        if not self._config.get("run_control.dry_run"):
+        if not self._config.get("app.run_control.dry_run"):
             # posted_media = []
             # if "media" in item and item["media"]:
             #     self._logger.info("Publising first %s media items", len(item["media"]))
@@ -76,7 +76,7 @@ class Publisher:
             self.publish_one(queued_post)
 
         self._logger.info("Cleaning stored queue")
-        if not self._config.get("run_control.dry_run"):
+        if not self._config.get("app.run_control.dry_run"):
             self._queue.clean()
             self._queue.save()
 
@@ -87,5 +87,5 @@ class Publisher:
 
         self.publish_one(self._queue.pop())
 
-        if not self._config.get("run_control.dry_run"):
+        if not self._config.get("app.run_control.dry_run"):
             self._queue.save()

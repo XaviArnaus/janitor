@@ -8,8 +8,8 @@ from logging import Logger
 
 CONFIG = {
     "logger.name": "logger_test",
-    "status_post.content_type": "text/plain",
-    "status_post.visibility": "public"
+    "mastodon.status_post.content_type": "text/plain",
+    "mastodon.status_post.visibility": "public"
 }
 
 
@@ -63,15 +63,15 @@ def test_build_status_post_without_summary(message_without_summary: Message):
 
     mocked_config_get = Mock()
     mocked_config_get.side_effect = [
-        CONFIG["status_post.content_type"], CONFIG["status_post.visibility"]
+        CONFIG["mastodon.status_post.content_type"], CONFIG["mastodon.status_post.visibility"]
     ]
     with patch.object(Config, "get", new=mocked_config_get):
         formatted_status_post = formatter.build_status_post(message=message_without_summary)
 
     mocked_config_get.assert_has_calls(
         [
-            call("status_post.content_type"),
-            call("status_post.visibility"),
+            call("mastodon.status_post.content_type"),
+            call("mastodon.status_post.visibility"),
         ]
     )
     assert formatted_status_post.spoiler_text == expected_status_post.spoiler_text

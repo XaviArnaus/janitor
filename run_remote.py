@@ -22,7 +22,7 @@ class RunRemote:
         sys_data = self._collect_data()
 
         # Send the data
-        if not self._config.get("run_control.dry_run"):
+        if not self._config.get("app.run_control.dry_run"):
             remote_url = self._config.get("app.service.remote_url")
             self._logger.info("Sending sys_data away")
             r = requests.post(f"{remote_url}/sysinfo", json={'sys_data': sys_data})

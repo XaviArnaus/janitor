@@ -54,7 +54,7 @@ class SystemInfoTemplater:
                 if "value" in thresholds[name] and value > thresholds[name]["value"]:
                     self._logger.debug(f"The metric [{name}] is greater than the threshold")
                     error_type.append(
-                        thresholds[name]["type"] if "type" in
+                        thresholds[name]["message_type"] if "message_type" in
                         thresholds[name] else MessageType.WARNING
                     )
                     field_has_issue = True

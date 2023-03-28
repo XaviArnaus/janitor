@@ -136,9 +136,9 @@ The Listener also accepts receiving arbitrary messages that will get published. 
 - `hostname`: Mandatory. Defines who sends the message.
 - `message`: Mandatory. The message itself to publish
 - `summary`: Optional. If present, the published post will have the `summary` as Spoiler Text, having this "show more" button.
-- `type`: Optional. If present it will present an emoji according to the type of message (see the table below). If `summary` is also present, the emoji will appear in the beginning of the Spoiler Text, otherwise it will appear in the beginning of the main text.
+- `message_type`: Optional. If present it will present an emoji according to the type of message (see the table below). If `summary` is also present, the emoji will appear in the beginning of the Spoiler Text, otherwise it will appear in the beginning of the main text.
 
-| type | Emoji |
+| message_type | Emoji |
 |---|---|
 | `none` | (none) |
 | `info` | ℹ️ |
@@ -192,7 +192,7 @@ The System Info data gathering provides a set of metrics. Each metric is a value
 The definition of these thresholds is done in the `system_info.thresholds` config file parameter. Every subobject works as follows:
 - `[name_of_the_metric]`: The name of the metric is the key of the object. It is the metric that will be analysed.
 - `value`: It is the threshold value against the what the metric is compared. **The comparison is greater than**.
-- `type`: This is the level of severity of the raise we will do. It can be one of the following: "none", "info", "warning", "error" or "alarm", and will become a slighly different post template when publishing it.
+- `message_type`: This is the level of severity of the raise we will do. It can be one of the following: "none", "info", "warning", "error" or "alarm", and will become a slighly different post template when publishing it.
 
 The bot comes with 3 metric thresholds relating to the percentage of CPU, memory and disk. Technically, anything that can be compared in a _greather than_ way can be placed here. All default metrics are floats or integers, so one could add several thresholds.
 
@@ -234,16 +234,16 @@ OUTPUT=$(git pull 2>&1)
 ret=$?
 if [ $ret -ne 0 ]; then
 	encoded=$(urlencode "$OUTPUT")
-        curl -X POST -d "hostname=Auto+Git+Pull+at+myhostname&message=$encoded&type=error" http://server:5000/message
+        curl -X POST -d "hostname=Auto+Git+Pull+at+myhostname&message=$encoded&message_type=error" http://server:5000/message
 else
 	if [[ "$OUTPUT" != "Already up to date." ]]; then
 		encoded=$(urlencode "$OUTPUT")
-        	curl -X POST -d "hostname=Auto+Git+Pull+at+myhostname&message=👍+Done:+$encoded&type=info" http://server:5000/message
+        	curl -X POST -d "hostname=Auto+Git+Pull+at+myhostname&message=👍+Done:+$encoded&message_type=info" http://server:5000/message
 	fi
 fi
 ```
 
-This script just executes a normal `git pull` from which we capture the output and the returning code of it. Depending on the returning code we know if it worked or not, and then we send a message to the listener with an url-encoded text and a defined type that will lead to a related emoji.
+This script just executes a normal `git pull` from which we capture the output and the returning code of it. Depending on the returning code we know if it worked or not, and then we send a message to the listener with an url-encoded text and a defined Message Type that will lead to a related emoji.
 At the end of the day we only perform a POST CURL request to our listener with a defined set of parameters that will be posted in the Mastodon-API.
 
 

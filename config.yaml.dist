@@ -39,17 +39,17 @@ system_info:
       # [Float] CPU percent
       value: 80.0
       # [String] MessageType in case of crossing: "none" | "info" | "warning" | "error" | "alarm"
-      type: "warning"
+      message_type: "warning"
     memory_percent:
       # [Float] Memory percent
       value: 80.0
       # [String] MessageType in case of crossing: "none" | "info" | "warning" | "error" | "alarm"
-      type: "warning"
+      message_type: "warning"
     disk_usage_percent:
       # [Float] Disk percent
       value: 80.0
       # [String] MessageType in case of crossing: "none" | "info" | "warning" | "error" | "alarm"
-      type: "alarm"
+      message_type: "alarm"
 
 # Formatting configs
 formatting:

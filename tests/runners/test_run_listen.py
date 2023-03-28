@@ -216,7 +216,7 @@ def test_init_message():
             call('summary', location='form'),
             call('message', location='form'),
             call('hostname', location='form'),
-            call('type', location='form'),
+            call('message_type', location='form'),
         ]
     )
 
@@ -294,7 +294,7 @@ def test_post_optional_params_not_present(
     if text is not None:
         parameters["message"] = text
     if message_type is not None:
-        parameters["type"] = message_type
+        parameters["message_type"] = message_type
     if hostname is not None:
         parameters["hostname"] = hostname
 

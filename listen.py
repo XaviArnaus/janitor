@@ -95,7 +95,7 @@ class ListenMessage(Resource):
             location='form'
         )
         self._parser.add_argument(
-            'type',
+            'message_type',
             # type = str,
             # required = True,
             # help = 'No message provided',
@@ -118,8 +118,8 @@ class ListenMessage(Resource):
             summary = args["summary"]
         else:
             summary = None
-        if "type" in args:
-            message_type = args["type"]
+        if "message_type" in args:
+            message_type = args["message_type"]
         else:
             message_type = MessageType.NONE
         if "message" in args:

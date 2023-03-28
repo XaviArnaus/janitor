@@ -52,7 +52,7 @@ def test_create_app():
     )
     mocked_config_get.assert_has_calls(
         [
-            call("app.name"),
+            call("mastodon.app_name"),
             call("mastodon.api_base_url"),
             call("mastodon.credentials.client_file"),
         ]

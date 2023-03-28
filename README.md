@@ -1,6 +1,9 @@
 # Janitor
 Bot in Python that collects system metrics and publishes them via a Mastodon-like API in case of crossing thresholds. Also publishes arbitrary messages in a client-server API fashion for generic monitoring.
 
+[![Tests, yapf and flake8](https://github.com/XaviArnaus/janitor/actions/workflows/pull_request.yml/badge.svg)](https://github.com/XaviArnaus/janitor/actions/workflows/pull_request.yml)
+---
+
 # Requirements
 - Python 3.9
 - Poetry (`poetry-core>=1.5.2`)

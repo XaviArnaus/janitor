@@ -1,5 +1,5 @@
 ###########################
-#     Python SysCheck     #
+#         Janitor         #
 ###########################
 
 # App Info
@@ -91,7 +91,7 @@ mastodon:
     # Should be Ok to delete the values once we have the "user.secret" generated
     user:
       # [String] email to be used to log in
-      email: "bot+syscheck@my-fancy.site"
+      email: "bot+janitor@my-fancy.site"
       # [String] Password to be used to log in
       password: "SuperSecureP4ss"
   # Configuration regarding the Status Post itself

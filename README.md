@@ -1,9 +1,28 @@
-# janitor
-System check monitoring written in Python
+# Janitor
+Bot in Python that collects system metrics and publishes them via a Mastodon-like API in case of crossing thresholds. Also publishes arbitrary messages in a client-server API fashion for generic monitoring.
 
 # Requirements
 - Python 3.9
-- pip
+- Poetry (`poetry-core>=1.5.2`)
+
+# Dependencies
+This Python app uses the following libraries:
+
+## Execution
+- `Mastodon.py`: Communication with the API of the Mastodon/Pleroma/Akkoma server of oyur preference
+- `psutil`: To get some internal system metrics
+- `strenum`: Enrich string Enums
+- `flask` & `flask-restful`: Bring up an API for client-server communication
+- `cronizer`: Parse cron timmings
+- `pyxavi`: Encapsulate some common work
+
+## Development
+- `pytest`: Tests
+- `pytest-cov`: Test coverage analysis
+- `freezegun`: Datetime freezings for tests
+- `yapf`: Autoformatter
+- `flake8`: Linter
+- `toml`: tom files support
 
 # Installation
 
@@ -28,13 +47,13 @@ nano config.yaml
 ```
 
 ### 5. Change the parameters that make sense to your configuration
-Depending on how you'll want this bot instance to behave, there are some mandatory parameters to set up. The config file is quite well documented. Later on this document there are sections explaining which modes can be set, what are they and how to set them up. Still, here are some tips, and other params are just useful by default:
+Depending on how you'll want this bot instance to behave, there are some mandatory parameters to set up. The config file is quite well documented. Later on this document there are sections explaining which modes can be set, what are they and how to set them up. Still, here are some tips, and other params are just ok by default:
 
 **Typical single mode instance**
-This mode checks the system and publishes to the social media platform, but do not make use of the service functionality.
+This mode checks the system and publishes to the social media platform, but does not make use of the client-server functionality.
 - `mastodon.api_base_url`: Sets the URL of the social media platform instance where the user that will publish the posts lives.
 - `mastodon.instance_type`: The type of social media platform that it is. All of them use the Mastodon API, but for instances different from Mastodon we need to set up some extras. This is all abstracted with this parameter. Set `mastodon` for a Mastodon instance or `pleroma` for Pleroma or Akkoma.
-- `mastodon.credentials.user`: Just set up the `user` and the `password` here.
+- `mastodon.credentials.user`: Just set up the `user` and the `password` here. Will be used in the first run to generate the `user.secret` file and then these parameters can be cleared.
 - `app.run_control.dry_run`: Set it to False when you're ready to start publishing. This lets you run the bot without an actual publishing.
 - `status_post.content_type`: For Mastodon it needs to be `text/plain`. For Pleroma or Akkoma it can be any of the possible values defined in the comment.
 
@@ -65,7 +84,7 @@ This is a typical run-all. Once we have the corresponding parameters set up (see
 make run_local
 ```
 
-If the parameter `logger.loglevel` is set to `20`, this is the usual output:
+If the parameter `logger.loglevel` is set to `20` (INFO), this is the usual output:
 ```
 [2023-03-17 08:24:57,891] INFO     janitor Init Local Runner
 [2023-03-17 08:24:57,891] INFO     janitor Run local app
@@ -78,7 +97,7 @@ This architecture has a host with one instance of this bot listening through som
 ### Host that Listens
 This host is in charge to spawn an API, listen for incoming reports, check the thresholds, format a message and publish it to the social media instance.
 
-Basically does the exact same job than the "local mode" but besides collecting the data it receives the data from a remote client.
+Basically it does the exact same job than the "local mode" but besides collecting the data it receives the data from a remote client.
 
 Once we have the corresponding parameters set up (see the Installation point 5 above), run:
 ```
@@ -98,7 +117,7 @@ kill -9 1234
 ```
 
 ### Host that sends the collected data
-This host is in charge to collect the local System data and send it to the listener.
+This host is in charge to collect the local System metrics and send tehm to the listener.
 
 It does nothing else, so that the parameters to set up are very minimal. Once we have the corresponding parameters set up (see the Installation point 5 above), run:
 ```
@@ -126,6 +145,16 @@ The Listener also accepts receiving arbitrary messages that will get published. 
 | `warning` | ⚠️ |
 | `error` | 🔥 |
 | `alarm` | 🚨 |
+
+To send a minimal message from a linux shell you could run something like:
+```
+curl -X POST -d "hostname=MyHostname&message=This+is+a+test+message" http://server:5000/message
+```
+
+You can also enrich it a bit more, like:
+```
+curl -X POST -d "hostname=MyHostname&message=This+is+the+deep+dump+of+the+incident&summary=We+had+an+warning!&type=warning" http://server:5000/message
+```
 
 ## Setting it up as a Scheduled task (cron)
 This is most likely the intended purpose of this bot, to run periodically. To easy the set up, and also intending to settle a set up for further implementations, there is another "scheduler" mode that can be used.
@@ -172,3 +201,61 @@ As we're publishing metrics in a social media instance, we can also replace the 
 
 ## System Info human readable values
 The values shown are "humanized". To add a metric in the list of execptions use the `formatting.system_info.human_readable_exceptions` list in the config file parameter. If you want to totally deactivate it then set `formatting.system_info.human_readable` to `False`
+
+# Use cases examples
+As explained in the section above [Different run modes as per use case](#different-run-modes-as-per-use-case) we can run this bot in a variety of ways depending on the behaviour we want to achieve. This section presents some useful examples to start using it straight away
+
+## Local mode
+Clone the repo, adjust the configuration and install the dependencies [as explained above](#installation). Be sure that your schedule item points the action to `run_local`. Then edit your crontab [as explained](#2-add-our-scheduler-into-the-crontab) to set up the scheduler.
+
+## Client-Server mode
+In both server and client machines, clone the repo, adjust the configuration and install the dependencies [as explained above](#installation). Be sure that you set up the host and port to listen. 
+
+### In the Server machine
+Run the `make listen` command [as explained](#host-that-listens).
+
+### In the Client machine for a periodic check of system metrics
+Be sure that your schedule item points the action to `run_remote`. Then edit your crontab [as explained](#2-add-our-scheduler-into-the-crontab) to set up the scheduler.
+
+### In the client machine for an arbitrary message send
+Here the things are a bit more interesting. You have most likely a script, maybe a bash script, that performs any particular job. You want to capture the output and to send the execution report (or not) to the listener to be published.
+
+As an example, take a look at this "auto `git pull`" script:
+```
+#! /bin/bash
+
+urlencode() {
+  python3 -c 'import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1], sys.argv[2]))' \
+    "$1" "$urlencode_safe"
+}
+
+cd /var/www/folder/of-my-project
+OUTPUT=$(git pull 2>&1)
+ret=$?
+if [ $ret -ne 0 ]; then
+	encoded=$(urlencode "$OUTPUT")
+        curl -X POST -d "hostname=Auto+Git+Pull+at+myhostname&message=$encoded&type=error" http://server:5000/message
+else
+	if [[ "$OUTPUT" != "Already up to date." ]]; then
+		encoded=$(urlencode "$OUTPUT")
+        	curl -X POST -d "hostname=Auto+Git+Pull+at+myhostname&message=👍+Done:+$encoded&type=info" http://server:5000/message
+	fi
+fi
+```
+
+This script just executes a normal `git pull` from which we capture the output and the returning code of it. Depending on the returning code we know if it worked or not, and then we send a message to the listener with an url-encoded text and a defined type that will lead to a related emoji.
+At the end of the day we only perform a POST CURL request to our listener with a defined set of parameters that will be posted in the Mastodon-API.
+
+
+# How does it look like
+In the following screenshot we have 3 examples of posts published into an Akkoma instance:
+![Screenshot of some alerts in an Akkoma instance](./docs/akkoma-screenshot.png "Screenshot of some alerts in an Akkoma instance")
+
+### Message 1: Error
+This is an arbitrary message sent from the bash script above. It actually happened that [GitHub changed the RSA keys](https://github.blog/2023-03-23-we-updated-our-rsa-ssh-host-key/) and the bot captured the failure.
+
+### Message 2: Info
+This is another arbitrary message sent from the same bash script above. It only communicates that a `git pull` that carried on some changes was done successfully.
+
+### Message 3: Warning
+This is an example of a periodic check of system metrics that identified an excess of CPU usage, publishing the current metrics for further analysis.

@@ -80,6 +80,12 @@ This mode only collects the data and sends it away. Therefor, we only need to se
 make init
 ```
 
+### 7. Create the app
+For the publishing into the Mastodon-like servers we need first to log in and set up the credential files. This is only needed for the "single mode" and the "listener mode", as they are the only ones that publish to the Mastodon API.
+```
+make create_app
+```
+
 # Different run modes as per use case
 This section explains the different ways we can have this bot running dependining on the use case
 

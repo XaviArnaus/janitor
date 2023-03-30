@@ -128,7 +128,7 @@ kill -9 1234
 ```
 
 ### Host that sends the collected data
-This host is in charge to collect the local System metrics and send tehm to the listener.
+This host is in charge to collect the local System metrics and send them to the listener.
 
 It does nothing else, so that the parameters to set up are very minimal. Once we have the corresponding parameters set up (see the Installation point 5 above), run:
 ```
@@ -164,7 +164,7 @@ curl -X POST -d "hostname=MyHostname&message=This+is+a+test+message" http://serv
 
 You can also enrich it a bit more, like:
 ```
-curl -X POST -d "hostname=MyHostname&message=This+is+the+deep+dump+of+the+incident&summary=We+had+an+warning!&type=warning" http://server:5000/message
+curl -X POST -d "hostname=MyHostname&message=This+is+the+deep+dump+of+the+incident&summary=We+had+an+warning!&message_type=warning" http://server:5000/message
 ```
 
 ## Setting it up as a Scheduled task (cron)
@@ -186,7 +186,7 @@ crontab -e
 
 2. Add the following line
 ```
-* * * * * cd /home/xavier/bots/janitor; make scheduler
+* * * * * cd /path/to/the/repository/janitor; make scheduler
 ```
 
 3. Save and exit.

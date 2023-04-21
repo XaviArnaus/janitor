@@ -12,6 +12,8 @@ from flask_restful import Resource, Api, reqparse
 app = Flask(__name__)
 api = Api(app)
 
+DEFAULT_MESSAGE_TYPE = str(MessageType.NONE)
+
 
 class ListenSysInfo(Resource):
     '''
@@ -114,21 +116,21 @@ class ListenMessage(Resource):
 
         # Get the data
         args = self._parser.parse_args()
-        if "summary" in args:
+        if "summary" in args and args["summary"] is not None:
             summary = args["summary"]
         else:
             summary = None
-        if "message_type" in args:
+        if "message_type" in args and args["message_type"] is not None:
             message_type = args["message_type"]
         else:
-            message_type = MessageType.NONE
-        if "message" in args:
+            message_type = DEFAULT_MESSAGE_TYPE
+        if "message" in args and args["message"] is not None:
             text = args["message"]
         else:
             return {
                 "error": "Expected string under a \"message\" variable was not present."
             }, 400
-        if "hostname" in args:
+        if "hostname" in args and args["hostname"] is not None:
             hostname = args["hostname"]
         else:
             return {

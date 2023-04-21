@@ -31,6 +31,12 @@ This Python app uses the following libraries:
 
 # Installation
 
+### 0. Install Poetry
+Following [the official docs](https://python-poetry.org/docs/#installation), or skip this step if you already have it installed
+```
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
 ### 1. Clone the repository
 ```
 git clone git@github.com:XaviArnaus/janitor.git

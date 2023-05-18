@@ -103,6 +103,8 @@ mastodon:
     content_type: "text/markdown"
     # [String] Status Post visibility: "direct" | "private" | "unlisted" | "public"
     visibility: "public"
+    # [String] Username to mention for "direct" visibility 
+    username_to_dm: "@admin"
 
 # Logging config
 logger:

@@ -15,7 +15,8 @@ from datetime import datetime
 CONFIG = {
     "logger.name": "logger_test",
     "app.run_control.dry_run": False,
-    "publisher.media_storage": "storage/media/"
+    "publisher.media_storage": "storage/media/",
+    "mastodon.instance_type": "mastodon"
 }
 
 _mocked_mastodon_instance: Mastodon = Mock()
@@ -78,19 +79,24 @@ def queue_item_2(datetime_2) -> QueueItem:
     return QueueItem(message=Message(text="one"), published_at=datetime_2)
 
 
-def test_publish_one_not_dry_run(queue_item_1: QueueItem):
+def test_publish_one_not_dry_run_pleroma(queue_item_1: QueueItem):
     status_post = StatusPost(status=queue_item_1.message.text)
     publisher = get_instance()
 
     mocked_build_status_post = Mock()
     mocked_build_status_post.return_value = status_post
     mocked_config_get = Mock()
-    mocked_config_get.return_value = False
+    mocked_config_get.side_effect = [False, "pleroma"]
     with patch.object(Formatter, "build_status_post", new=mocked_build_status_post):
         with patch.object(Config, "get", new=mocked_config_get):
             result = publisher.publish_one(queue_item_1)
 
-    mocked_config_get.assert_called_once_with("app.run_control.dry_run")
+    mocked_config_get.assert_has_calls(
+        [
+            call("app.run_control.dry_run"),
+            call("mastodon.instance_type", "mastodon"),
+        ]
+    )
     mocked_build_status_post.assert_called_once_with(queue_item_1.message)
     _mocked_mastodon_instance.status_post.assert_called_once_with(
         status=status_post.status,
@@ -105,6 +111,40 @@ def test_publish_one_not_dry_run(queue_item_1: QueueItem):
         scheduled_at=status_post.scheduled_at,
         poll=status_post.poll,
         quote_id=status_post.quote_id
+    )
+    assert result == {"id": 123}
+
+
+def test_publish_one_not_dry_run_mastodon(queue_item_1: QueueItem):
+    status_post = StatusPost(status=queue_item_1.message.text)
+    publisher = get_instance()
+
+    mocked_build_status_post = Mock()
+    mocked_build_status_post.return_value = status_post
+    mocked_config_get = Mock()
+    mocked_config_get.side_effect = [False, "mastodon"]
+    with patch.object(Formatter, "build_status_post", new=mocked_build_status_post):
+        with patch.object(Config, "get", new=mocked_config_get):
+            result = publisher.publish_one(queue_item_1)
+
+    mocked_config_get.assert_has_calls(
+        [
+            call("app.run_control.dry_run"),
+            call("mastodon.instance_type", "mastodon"),
+        ]
+    )
+    mocked_build_status_post.assert_called_once_with(queue_item_1.message)
+    _mocked_mastodon_instance.status_post.assert_called_once_with(
+        status=status_post.status,
+        in_reply_to_id=status_post.in_reply_to_id,
+        media_ids=status_post.media_ids,
+        sensitive=status_post.sensitive,
+        visibility=status_post.visibility,
+        spoiler_text=status_post.spoiler_text,
+        language=status_post.language,
+        idempotency_key=status_post.idempotency_key,
+        scheduled_at=status_post.scheduled_at,
+        poll=status_post.poll,
     )
     assert result == {"id": 123}
 

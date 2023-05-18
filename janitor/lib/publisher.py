@@ -4,6 +4,7 @@ from janitor.objects.queue_item import QueueItem
 from .queue import Queue
 from .formatter import Formatter
 from mastodon import Mastodon
+from .mastodon_helper import MastodonHelper
 import logging
 
 
@@ -39,22 +40,41 @@ class Publisher:
             #             posted_media.append(posted_result["id"])
             #         else:
             #             self._logger.info("Could not publish %s", item["url"])
-            self._logger.info("Publishing new post")
-            return self._mastodon.status_post(
-                status=status_post.status,
-                in_reply_to_id=status_post.in_reply_to_id,
-                media_ids=status_post.media_ids,
-                sensitive=status_post.sensitive,
-                visibility=status_post.visibility,
-                spoiler_text=status_post.spoiler_text,
-                language=status_post.language,
-                idempotency_key=status_post.idempotency_key,
-                content_type=status_post.content_type,
-                scheduled_at=status_post.scheduled_at,
-                poll=status_post.poll,
-                quote_id=status_post.quote_id,
-                # media_ids=posted_media if posted_media else None
+            instance_type = MastodonHelper.valid_or_raise(
+                self._config.get("mastodon.instance_type", MastodonHelper.TYPE_MASTODON)
             )
+            if instance_type == MastodonHelper.TYPE_MASTODON:
+                self._logger.info("Publishing new post for Mastodon instance type")
+                return self._mastodon.status_post(
+                    status=status_post.status,
+                    in_reply_to_id=status_post.in_reply_to_id,
+                    media_ids=status_post.media_ids,
+                    sensitive=status_post.sensitive,
+                    visibility=status_post.visibility,
+                    spoiler_text=status_post.spoiler_text,
+                    language=status_post.language,
+                    idempotency_key=status_post.idempotency_key,
+                    scheduled_at=status_post.scheduled_at,
+                    poll=status_post.poll,
+                    # media_ids=posted_media if posted_media else None # yapf: disable
+                )
+            elif instance_type == MastodonHelper.TYPE_PLEROMA:
+                self._logger.info("Publishing new post for Pleroma instance type")
+                return self._mastodon.status_post(
+                    status=status_post.status,
+                    in_reply_to_id=status_post.in_reply_to_id,
+                    media_ids=status_post.media_ids,
+                    sensitive=status_post.sensitive,
+                    visibility=status_post.visibility,
+                    spoiler_text=status_post.spoiler_text,
+                    language=status_post.language,
+                    idempotency_key=status_post.idempotency_key,
+                    content_type=status_post.content_type,
+                    scheduled_at=status_post.scheduled_at,
+                    poll=status_post.poll,
+                    quote_id=status_post.quote_id,
+                    # media_ids=posted_media if posted_media else None # yapf: disable
+                )
 
     def _post_media(self, media_file: str, description: str) -> dict:
         try:

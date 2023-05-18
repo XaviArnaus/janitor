@@ -33,7 +33,7 @@ class Formatter:
             status_post.status = self._format_status(
                 message.text if message.text else message.summary, message.message_type
             )
-        
+
         # Now the rest of the details
         status_post.content_type = StatusPostContentType.valid_or_raise(
             value=self._config.get("mastodon.status_post.content_type")
@@ -44,7 +44,9 @@ class Formatter:
 
         # We always have to have a status (main text).
         # So we apply here the mention in case it's a direct message
-        status_post.status = self.add_mention_to_message_if_direct_visibility(status_post.status)
+        status_post.status = self.add_mention_to_message_if_direct_visibility(
+            status_post.status
+        )
 
         return status_post
 
@@ -53,25 +55,27 @@ class Formatter:
 
     def _format_status(self, content: str, message_type: MessageType) -> str:
         return content
-    
+
     def add_mention_to_message_if_direct_visibility(self, text: str) -> str:
-        is_dm = self._config.get("mastodon.status_post.visibility") == StatusPostVisibility.DIRECT
+        is_dm = self._config.get(
+            "mastodon.status_post.visibility"
+        ) == StatusPostVisibility.DIRECT
         mention = self._config.get("mastodon.status_post.username_to_dm")
 
         if is_dm and mention:
             self._logger.info(f"It's a DM posting, applying mention to {mention}")
             return Template(self.TEMPLATE_TEXT_WITH_MENTION).substitute(
-                mention=mention,
-                text=text
+                mention=mention, text=text
             )
         else:
             if is_dm and not mention:
-                self._logger.error(f"It's a DM posting, but there is no mention! \
-                                   Make sure the config has the parameter \
-                                   [mastodon.status_post.username_to_dm]. \
-                                   The post won't be actually visible to anybody!")
+                self._logger.error(
+                    "It's a DM posting, but there is no user mention! \
+                    Make sure the config has the parameter \
+                    [mastodon.status_post.username_to_dm]. \
+                    The post won't be actually visible to anybody!"
+                )
             else:
                 self._logger.debug("Not a DM posting, not adding a mention")
-            
-            return text
 
+            return text

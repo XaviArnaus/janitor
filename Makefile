@@ -41,19 +41,19 @@ coverage:
 
 .PHONY: run_local
 run_local:
-	$(PYTHON) run_local.py
+	$(POETRY) run python run_local.py
 
 .PHONY: create_app
 create_app:
-	$(PYTHON) create_app.py
+	$(POETRY) run python create_app.py
 
 .PHONY: publish_queue
 publish_queue:
-	$(PYTHON) publish_queue.py
+	$(POETRY) run python publish_queue.py
 
 .PHONY: listen
 listen:
-	nohup $(PYTHON) listen.py > log/listen_in_background.log 2>&1 &
+	nohup $(POETRY) run python listen.py > log/listen_in_background.log 2>&1 &
 
 .PHONY: background
 background:
@@ -66,7 +66,7 @@ kill:
 
 .PHONY: run_remote
 run_remote:
-	$(PYTHON) run_remote.py
+	$(POETRY) run python run_remote.py
 
 .PHONY: test_message
 test_message:
@@ -74,7 +74,7 @@ test_message:
 
 .PHONY: scheduler
 scheduler:
-	$(PYTHON) scheduler.py
+	$(POETRY) run python scheduler.py
 
 .PHONY: validate_config
 validate_config:

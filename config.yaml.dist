@@ -97,7 +97,7 @@ mastodon:
   # Configuration regarding the Status Post itself
   status_post:
     # [Integer] Status max length
-    max_length: 5000
+    max_length: 500
     # [String] Status Post content type: "text/plain" | "text/markdown" | "text/html" | "text/bbcode"
     # Only vaild for Pleroma and Akkoma instances. Mastodon instances will ignore it
     content_type: "text/markdown"

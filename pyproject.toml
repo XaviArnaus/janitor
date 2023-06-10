@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "janitor"
-version = "0.1.3"
+version = "0.1.4"
 description = "Bot that collects system metrics and publishes them in case of crossing thresholds. Also publishes arbitrary messages in a client-observer fashion"
 authors = ["Xavier Arnaus <xavi@arnaus.net>"]
 

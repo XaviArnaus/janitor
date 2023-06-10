@@ -46,10 +46,14 @@ class Publisher:
                 self._config.get("mastodon.instance_type", MastodonHelper.TYPE_MASTODON)
             )
 
-            max_length = self._config.get("mastodon.status_post.max_length", self.DEFAULT_MAX_LENGTH)
+            max_length = self._config.get(
+                "mastodon.status_post.max_length", self.DEFAULT_MAX_LENGTH
+            )
             if len(status_post.status) > max_length:
-                self._logger.info(f"The status post is longer than the max length of {max_length}. Cutting...")
-                status_post.status = status_post.status[:max_length-3] + "..."
+                self._logger.info(
+                    f"The status post is longer than the max length of {max_length}. Cutting..."
+                )
+                status_post.status = status_post.status[:max_length - 3] + "..."
 
             if instance_type == MastodonHelper.TYPE_MASTODON:
                 self._logger.info("Publishing new post for Mastodon instance type")

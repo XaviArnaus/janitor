@@ -78,11 +78,29 @@ def queue_item_1(datetime_1) -> QueueItem:
 def queue_item_2(datetime_2) -> QueueItem:
     return QueueItem(message=Message(text="two"), published_at=datetime_2)
 
+
 @pytest.fixture
 def queue_item_long(datetime_2) -> QueueItem:
-    return QueueItem(message=Message(
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Risus nullam eget felis eget nunc lobortis mattis. Convallis a cras semper auctor neque. Aliquet nec ullamcorper sit amet risus. Scelerisque purus semper eget duis at tellus at urna condimentum. Urna cursus eget nunc scelerisque viverra mauris. Tortor aliquam nulla facilisi cras fermentum odio eu feugiat. Vitae nunc sed velit dignissim sodales ut eu sem integer. Viverra adipiscing at in tellus. Nunc scelerisque viverra mauris in aliquam sem fringilla ut morbi. Sed tempus urna et pharetra pharetra massa massa ultricies. Felis imperdiet proin fermentum leo. Felis eget velit aliquet sagittis id consectetur purus ut faucibus. Pellentesque sit amet porttitor eget. Turpis tincidunt id aliquet risus feugiat in."
-        ), published_at=datetime_2)
+    return QueueItem(
+        message=Message(
+            text="""
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                Risus nullam eget felis eget nunc lobortis mattis. Convallis a
+                cras semper auctor neque. Aliquet nec ullamcorper sit amet risus.
+                Scelerisque purus semper eget duis at tellus at urna condimentum.
+                Urna cursus eget nunc scelerisque viverra mauris. Tortor aliquam
+                nulla facilisi cras fermentum odio eu feugiat. Vitae nunc sed velit
+                dignissim sodales ut eu sem integer. Viverra adipiscing at in
+                tellus. Nunc scelerisque viverra mauris in aliquam sem fringilla
+                ut morbi. Sed tempus urna et pharetra pharetra massa massa ultricies.
+                Felis imperdiet proin fermentum leo. Felis eget velit aliquet sagittis
+                id consectetur purus ut faucibus. Pellentesque sit amet porttitor eget.
+                Turpis tincidunt id aliquet risus feugiat in.
+            """
+        ),
+        published_at=datetime_2
+    )
 
 
 def test_publish_one_not_dry_run_pleroma(queue_item_1: QueueItem):
@@ -154,7 +172,8 @@ def test_publish_one_not_dry_run_mastodon(queue_item_1: QueueItem):
     )
     assert result == {"id": 123}
 
-def test_publish_one_not_dry_run_mastodon_too_long_text(queue_item_long: QueueItem):
+
+def test_publish_one_not_dry_run_mastodon_cut_text(queue_item_long: QueueItem):
     status_post = StatusPost(status=queue_item_long.message.text)
     publisher = get_instance()
 

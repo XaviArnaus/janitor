@@ -76,7 +76,13 @@ def queue_item_1(datetime_1) -> QueueItem:
 
 @pytest.fixture
 def queue_item_2(datetime_2) -> QueueItem:
-    return QueueItem(message=Message(text="one"), published_at=datetime_2)
+    return QueueItem(message=Message(text="two"), published_at=datetime_2)
+
+@pytest.fixture
+def queue_item_long(datetime_2) -> QueueItem:
+    return QueueItem(message=Message(
+        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Risus nullam eget felis eget nunc lobortis mattis. Convallis a cras semper auctor neque. Aliquet nec ullamcorper sit amet risus. Scelerisque purus semper eget duis at tellus at urna condimentum. Urna cursus eget nunc scelerisque viverra mauris. Tortor aliquam nulla facilisi cras fermentum odio eu feugiat. Vitae nunc sed velit dignissim sodales ut eu sem integer. Viverra adipiscing at in tellus. Nunc scelerisque viverra mauris in aliquam sem fringilla ut morbi. Sed tempus urna et pharetra pharetra massa massa ultricies. Felis imperdiet proin fermentum leo. Felis eget velit aliquet sagittis id consectetur purus ut faucibus. Pellentesque sit amet porttitor eget. Turpis tincidunt id aliquet risus feugiat in."
+        ), published_at=datetime_2)
 
 
 def test_publish_one_not_dry_run_pleroma(queue_item_1: QueueItem):
@@ -86,7 +92,7 @@ def test_publish_one_not_dry_run_pleroma(queue_item_1: QueueItem):
     mocked_build_status_post = Mock()
     mocked_build_status_post.return_value = status_post
     mocked_config_get = Mock()
-    mocked_config_get.side_effect = [False, "pleroma"]
+    mocked_config_get.side_effect = [False, "pleroma", 500]
     with patch.object(Formatter, "build_status_post", new=mocked_build_status_post):
         with patch.object(Config, "get", new=mocked_config_get):
             result = publisher.publish_one(queue_item_1)
@@ -122,7 +128,7 @@ def test_publish_one_not_dry_run_mastodon(queue_item_1: QueueItem):
     mocked_build_status_post = Mock()
     mocked_build_status_post.return_value = status_post
     mocked_config_get = Mock()
-    mocked_config_get.side_effect = [False, "mastodon"]
+    mocked_config_get.side_effect = [False, "mastodon", 500]
     with patch.object(Formatter, "build_status_post", new=mocked_build_status_post):
         with patch.object(Config, "get", new=mocked_config_get):
             result = publisher.publish_one(queue_item_1)
@@ -136,6 +142,39 @@ def test_publish_one_not_dry_run_mastodon(queue_item_1: QueueItem):
     mocked_build_status_post.assert_called_once_with(queue_item_1.message)
     _mocked_mastodon_instance.status_post.assert_called_once_with(
         status=status_post.status,
+        in_reply_to_id=status_post.in_reply_to_id,
+        media_ids=status_post.media_ids,
+        sensitive=status_post.sensitive,
+        visibility=status_post.visibility,
+        spoiler_text=status_post.spoiler_text,
+        language=status_post.language,
+        idempotency_key=status_post.idempotency_key,
+        scheduled_at=status_post.scheduled_at,
+        poll=status_post.poll,
+    )
+    assert result == {"id": 123}
+
+def test_publish_one_not_dry_run_mastodon_too_long_text(queue_item_long: QueueItem):
+    status_post = StatusPost(status=queue_item_long.message.text)
+    publisher = get_instance()
+
+    mocked_build_status_post = Mock()
+    mocked_build_status_post.return_value = status_post
+    mocked_config_get = Mock()
+    mocked_config_get.side_effect = [False, "mastodon", 500]
+    with patch.object(Formatter, "build_status_post", new=mocked_build_status_post):
+        with patch.object(Config, "get", new=mocked_config_get):
+            result = publisher.publish_one(queue_item_long)
+
+    mocked_config_get.assert_has_calls(
+        [
+            call("app.run_control.dry_run"),
+            call("mastodon.instance_type", "mastodon"),
+        ]
+    )
+    mocked_build_status_post.assert_called_once_with(queue_item_long.message)
+    _mocked_mastodon_instance.status_post.assert_called_once_with(
+        status=status_post.status[:497] + "...",
         in_reply_to_id=status_post.in_reply_to_id,
         media_ids=status_post.media_ids,
         sensitive=status_post.sensitive,

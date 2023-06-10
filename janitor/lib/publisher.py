@@ -15,6 +15,8 @@ class Publisher:
     It is responsible to publish the queued status posts.
     '''
 
+    DEFAULT_MAX_LENGTH = 500
+
     def __init__(self, config: Config, mastodon: Mastodon) -> None:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
@@ -43,6 +45,12 @@ class Publisher:
             instance_type = MastodonHelper.valid_or_raise(
                 self._config.get("mastodon.instance_type", MastodonHelper.TYPE_MASTODON)
             )
+
+            max_length = self._config.get("mastodon.status_post.max_length", self.DEFAULT_MAX_LENGTH)
+            if len(status_post.status) > max_length:
+                self._logger.info(f"The status post is longer than the max length of {max_length}. Cutting...")
+                status_post.status = status_post.status[:max_length-3] + "..."
+
             if instance_type == MastodonHelper.TYPE_MASTODON:
                 self._logger.info("Publishing new post for Mastodon instance type")
                 return self._mastodon.status_post(

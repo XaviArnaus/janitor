@@ -97,9 +97,9 @@ def patched_parser_add_argument(self, *args, **kwargs):
 def get_instance_sys_info() -> ListenSysInfo:
     mocked_official_logger = Mock()
     mocked_official_logger.__class__ = PythonLogger
-    mocked_logger_getLogger = Mock()
-    mocked_logger_getLogger.return_value = mocked_official_logger
-    with patch.object(Logger, "getLogger", new=mocked_logger_getLogger):
+    mocked_logger_get_logger = Mock()
+    mocked_logger_get_logger.return_value = mocked_official_logger
+    with patch.object(Logger, "get_logger", new=mocked_logger_get_logger):
         return ListenSysInfo()
 
 
@@ -196,9 +196,9 @@ def test_post_data_comes_in_post_crossed_thresholds(collected_data):
 def get_instance_message() -> ListenMessage:
     mocked_official_logger = Mock()
     mocked_official_logger.__class__ = PythonLogger
-    mocked_logger_getLogger = Mock()
-    mocked_logger_getLogger.return_value = mocked_official_logger
-    with patch.object(Logger, "getLogger", new=mocked_logger_getLogger):
+    mocked_logger_get_logger = Mock()
+    mocked_logger_get_logger.return_value = mocked_official_logger
+    with patch.object(Logger, "get_logger", new=mocked_logger_get_logger):
         return ListenMessage()
 
 

@@ -1,7 +1,7 @@
 from pyxavi.logger import Logger
 from pyxavi.config import Config
-from lib.mastodon_helper import MastodonHelper
-from lib.publisher import Publisher
+from janitor.lib.mastodon_helper import MastodonHelper
+from janitor.lib.publisher import Publisher
 
 
 class PublishQueue:
@@ -11,7 +11,7 @@ class PublishQueue:
 
     def init(self):
         self._config = Config()
-        self._logger = Logger(self._config).getLogger()
+        self._logger = Logger(self._config).get_logger()
 
         return self
 

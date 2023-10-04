@@ -14,7 +14,7 @@ class Scheduler:
 
     def __init__(self):
         self._config = Config()
-        self._logger = Logger(self._config).getLogger()
+        self._logger = Logger(self._config).get_logger()
 
     def run(self):
         '''

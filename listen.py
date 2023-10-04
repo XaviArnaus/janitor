@@ -22,7 +22,7 @@ class ListenSysInfo(Resource):
 
     def __init__(self):
         self._config = Config()
-        self._logger = Logger(self._config).getLogger()
+        self._logger = Logger(self._config).get_logger()
         self._sys_info = SystemInfo(self._config)
         self._parser = reqparse.RequestParser()
         self._parser.add_argument(
@@ -73,7 +73,7 @@ class ListenMessage(Resource):
 
     def __init__(self):
         self._config = Config()
-        self._logger = Logger(self._config).getLogger()
+        self._logger = Logger(self._config).get_logger()
         self._parser = reqparse.RequestParser()
         self._parser.add_argument(
             'summary',

@@ -83,9 +83,9 @@ def patched_publisher_init(self, config, mastodon):
 def get_instance() -> RunLocal:
     mocked_official_logger = Mock()
     mocked_official_logger.__class__ = PythonLogger
-    mocked_logger_getLogger = Mock()
-    mocked_logger_getLogger.return_value = mocked_official_logger
-    with patch.object(Logger, "getLogger", new=mocked_logger_getLogger):
+    mocked_logger_get_logger = Mock()
+    mocked_logger_get_logger.return_value = mocked_official_logger
+    with patch.object(Logger, "get_logger", new=mocked_logger_get_logger):
         return RunLocal()
 
 

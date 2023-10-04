@@ -29,7 +29,9 @@ class Publisher:
         status_post = self._formatter.build_status_post(item.message)
 
         # Publish the StatusPost
-        if not self._config.get("app.run_control.dry_run"):
+        if self._config.get("app.run_control.dry_run"):
+            self._logger.debug("It's a Dry Run, stopping here.")
+        else:
             # posted_media = []
             # if "media" in item and item["media"]:
             #     self._logger.info("Publising first %s media items", len(item["media"]))
@@ -45,6 +47,7 @@ class Publisher:
             instance_type = MastodonHelper.valid_or_raise(
                 self._config.get("mastodon.instance_type", MastodonHelper.TYPE_MASTODON)
             )
+            self._logger.debug(f"Instance type is valid: {instance_type}")
 
             max_length = self._config.get(
                 "mastodon.status_post.max_length", self.DEFAULT_MAX_LENGTH
@@ -72,6 +75,23 @@ class Publisher:
                 )
             elif instance_type == MastodonHelper.TYPE_PLEROMA:
                 self._logger.info("Publishing new post for Pleroma instance type")
+                return self._mastodon.status_post(
+                    status=status_post.status,
+                    in_reply_to_id=status_post.in_reply_to_id,
+                    media_ids=status_post.media_ids,
+                    sensitive=status_post.sensitive,
+                    visibility=status_post.visibility,
+                    spoiler_text=status_post.spoiler_text,
+                    language=status_post.language,
+                    idempotency_key=status_post.idempotency_key,
+                    content_type=status_post.content_type,
+                    scheduled_at=status_post.scheduled_at,
+                    poll=status_post.poll,
+                    quote_id=status_post.quote_id,
+                    # media_ids=posted_media if posted_media else None # yapf: disable
+                )
+            elif instance_type == MastodonHelper.TYPE_FIREFISH:
+                self._logger.info("Publishing new post for Firefish instance type")
                 return self._mastodon.status_post(
                     status=status_post.status,
                     in_reply_to_id=status_post.in_reply_to_id,

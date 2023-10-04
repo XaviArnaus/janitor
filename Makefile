@@ -28,6 +28,10 @@ flake8:
 format:
 	make flake8; make yapf
 
+.PHONY: do-yapf
+do-yapf:
+	$(POETRY) run yapf -i -r .
+
 .PHONY: test
 test:
 	$(POETRY) run pytest
@@ -50,6 +54,10 @@ create_app:
 .PHONY: publish_queue
 publish_queue:
 	$(POETRY) run python publish_queue.py
+
+.PHONY: publish_test
+publish_test:
+	$(POETRY) run python publish_test.py
 
 .PHONY: listen
 listen:

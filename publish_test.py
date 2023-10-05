@@ -8,7 +8,7 @@ from janitor.objects.queue_item import QueueItem
 
 class PublishTest:
     '''
-    Runner that publishes the queue
+    Runner that publishes a test
     '''
 
     def init(self):
@@ -19,7 +19,7 @@ class PublishTest:
 
     def run(self):
         '''
-        Just publishes the queue
+        Just publish a test
         '''
         try:
             # All actions are done under a Mastodon API instance

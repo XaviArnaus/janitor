@@ -388,6 +388,39 @@ files = [
 python-dateutil = ">=2.7"
 
 [[package]]
+name = "gitdb"
+version = "4.0.10"
+description = "Git Object Database"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "gitdb-4.0.10-py3-none-any.whl", hash = "sha256:c286cf298426064079ed96a9e4a9d39e7f3e9bf15ba60701e95f5492f28415c7"},
+    {file = "gitdb-4.0.10.tar.gz", hash = "sha256:6eb990b69df4e15bad899ea868dc46572c3f75339735663b81de79b06f17eb9a"},
+]
+
+[package.dependencies]
+smmap = ">=3.0.1,<6"
+
+[[package]]
+name = "gitpython"
+version = "3.1.37"
+description = "GitPython is a Python library used to interact with Git repositories"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "GitPython-3.1.37-py3-none-any.whl", hash = "sha256:5f4c4187de49616d710a77e98ddf17b4782060a1788df441846bddefbb89ab33"},
+    {file = "GitPython-3.1.37.tar.gz", hash = "sha256:f9b9ddc0761c125d5780eab2d64be4873fc6817c2899cbcb34b02344bdc7bc54"},
+]
+
+[package.dependencies]
+gitdb = ">=4.0.1,<5"
+
+[package.extras]
+test = ["black", "coverage[toml]", "ddt (>=1.1.1,!=1.4.3)", "mypy", "pre-commit", "pytest", "pytest-cov", "pytest-sugar"]
+
+[[package]]
 name = "idna"
 version = "3.4"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -730,14 +763,14 @@ files = [
 
 [[package]]
 name = "pyxavi"
-version = "0.4.0"
+version = "0.4.1"
 description = "Set of utilities to assist on simple Python projects"
 category = "main"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "pyxavi-0.4.0-py3-none-any.whl", hash = "sha256:ecb27cf5f53d05f13ab87f8839fd84d65cf073df9c80b599082e725543bfb4fd"},
-    {file = "pyxavi-0.4.0.tar.gz", hash = "sha256:c155015fbf4e10854912561053bf24b6b3f6dea83c777a3e15b7605a458a979a"},
+    {file = "pyxavi-0.4.1-py3-none-any.whl", hash = "sha256:181e5c57411e8eb6fa526714824f18b839b41f8f00dad6d979c9575a2c588263"},
+    {file = "pyxavi-0.4.1.tar.gz", hash = "sha256:d18d3aeceb3c8788371f1bb2641a87071bb1eb12ad9a41bf29aeba88a90fd8b1"},
 ]
 
 [package.dependencies]
@@ -837,6 +870,18 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 files = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
     {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
+]
+
+[[package]]
+name = "smmap"
+version = "5.0.1"
+description = "A pure Python implementation of a sliding window memory map manager"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "smmap-5.0.1-py3-none-any.whl", hash = "sha256:e6d8668fa5f93e706934a62d7b4db19c8d9eb8cf2adbb75ef1b675aa332b69da"},
+    {file = "smmap-5.0.1.tar.gz", hash = "sha256:dceeb6c0028fdb6734471eb07c0cd2aae706ccaecab45965ee83f11c8d3b1f62"},
 ]
 
 [[package]]
@@ -959,4 +1004,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "1719899dfb5319cabac63a10ea43e429454e6dd5683c15d243564eedbd3abdaa"
+content-hash = "dabaf25bdc0dbf44c9305a6185d0a8cf4bf3380abd92061ef10a9cc7d5fb3e9f"

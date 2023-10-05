@@ -30,6 +30,29 @@ app:
       # [String] possible values: "sysinfo_local" | "sysinfo_remote"
       action: "sysinfo_local"
 
+# Git Monitor
+git_monitor:
+  # [String] Where to store it
+  file: "storage/git_monitor.yaml"
+  # [List] Repositories to monitor
+  repositories:
+    -
+      # Name of the project. Only used for displaying
+      name: pyxavi
+      # URL of the project. Only used to link it when displaying
+      url: https://github.com/XaviArnaus/pyxavi
+      # URL for the repository. Can be SSH or HTTPS,
+      #   but may require extra authentication in your side.
+      git: git@github.com:XaviArnaus/pyxavi.git
+      # Where to find or to clone the repository
+      path: "storage/repos/pyxavi"
+      # Which file contains the changelog
+      #   It is expected to be a Markdown file with:
+      #   - The title of each update is the version
+      #   - The body of each update is a list of changes
+      # @ToDo: Support Common Changelog
+      changelog: "CHANGELOG.md"
+
 # Sysntem Information config
 system_info:
   # Levels above (greater than) which an alarm should be triggered

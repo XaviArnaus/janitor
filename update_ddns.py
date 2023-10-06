@@ -19,7 +19,7 @@ class UpdateDdns:
         self._directnic = DirectnicDdns(self._config)
 
         return self
-    
+
     def _send_mastodon_message(self, text: str) -> None:
         self._logger.info("Initializing Mastodon tooling")
         mastodon = MastodonHelper.get_instance(self._config)
@@ -67,6 +67,7 @@ class UpdateDdns:
                 self._logger.exception(e)
         except Exception as e:
             self._logger.exception(e)
+
 
 if __name__ == '__main__':
     UpdateDdns().init().run()

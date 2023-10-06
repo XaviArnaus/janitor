@@ -6,6 +6,7 @@ import requests
 
 DEFAULT_FILENAME = "storage/external_ip.yaml"
 
+
 class DirectnicDdns:
 
     current_external_ip: str = None
@@ -14,7 +15,7 @@ class DirectnicDdns:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
         self._storage = Storage(self._config.get("directnic_ddns.file", DEFAULT_FILENAME))
-    
+
     def get_external_ip(self) -> str:
         if self.current_external_ip is None:
             self._logger.debug("Getting external IP from service")
@@ -23,23 +24,23 @@ class DirectnicDdns:
             self._logger.info(f"External IP is {self.current_external_ip}")
 
         return self.current_external_ip
-    
+
     def current_ip_is_different(self) -> bool:
         last_external_ip = self._storage.get("last_external_ip")
         self._logger.debug(f"Last external IP was {last_external_ip}")
 
         if last_external_ip != self.get_external_ip():
-            self._logger.info(f"Current external IP is different from the previous known.")
+            self._logger.info("Current external IP is different from the previous known.")
             return True
-        
-        self._logger.info(f"Current external IP is the same as the previous known.")
+
+        self._logger.info("Current external IP is the same as the previous known.")
         return False
-    
+
     def build_updating_link(self, partial_url: str) -> str:
         updating_url = f"{partial_url}{self.get_external_ip()}"
         self._logger.debug(f"Updating URL is {updating_url}")
         return updating_url
-    
+
     def send_update(self, updating_url: str) -> bool:
         self._logger.info("Sending update call")
         response = requests.get(url=updating_url)
@@ -50,7 +51,7 @@ class DirectnicDdns:
         else:
             self._logger.info("Update failed")
             return False
-    
+
     def save_current_ip(self) -> None:
         self._storage.set("last_external_ip", self.get_external_ip())
         self._storage.write_file()

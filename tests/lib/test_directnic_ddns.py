@@ -2,8 +2,7 @@ from pyxavi.config import Config
 from pyxavi.storage import Storage
 from pyxavi.network import Network
 from janitor.lib.directnic_ddns import DirectnicDdns
-from unittest.mock import patch, Mock, call
-import pytest
+from unittest.mock import patch, Mock
 from logging import Logger
 import requests
 
@@ -29,11 +28,13 @@ def patched_storage_write(self):
 def patched_storage_get(self, param_name: str = "", default_value: any = None) -> any:
     return []
 
+
 def get_instance() -> DirectnicDdns:
     with patch.object(Config, "__init__", new=patched_config_init):
         with patch.object(Config, "get", new=patched_config_get):
             with patch.object(Storage, "__init__", new=patched_storage_init):
                 return DirectnicDdns(config=Config())
+
 
 def test_initialize():
     updater = get_instance()
@@ -42,6 +43,7 @@ def test_initialize():
     assert isinstance(updater._config, Config)
     assert isinstance(updater._logger, Logger)
     assert isinstance(updater._storage, Storage)
+
 
 def test_get_external_ip_first_time():
     test_address = "1.1.1.1"
@@ -59,6 +61,7 @@ def test_get_external_ip_first_time():
         assert external_ip == test_address
         assert updater.current_external_ip == test_address
 
+
 def test_get_external_ip_second_time():
     test_address = "1.1.1.1"
 
@@ -72,6 +75,7 @@ def test_get_external_ip_second_time():
         mocked_get_ip.assert_not_called()
         assert external_ip == test_address
         assert updater.current_external_ip == test_address
+
 
 def test_current_ip_is_different_yes():
     test_address = "1.1.1.1"
@@ -89,6 +93,7 @@ def test_current_ip_is_different_yes():
             result = updater.current_ip_is_different()
             assert result is True
 
+
 def test_current_ip_is_different_no():
     test_address = "1.1.1.1"
     previous_address = "1.1.1.1"
@@ -105,6 +110,7 @@ def test_current_ip_is_different_no():
             result = updater.current_ip_is_different()
             assert result is False
 
+
 def test_build_updating_link():
     test_address = "1.1.1.1"
     link = "http://abc.de"
@@ -116,6 +122,7 @@ def test_build_updating_link():
     with patch.object(updater, "get_external_ip", new=mocked_get_ip):
         result = updater.build_updating_link(link)
         assert result == f"{link}{test_address}"
+
 
 def test_send_update_ok():
     url = "http://abc.de?ip=1.1.1.1"
@@ -133,13 +140,12 @@ def test_send_update_ok():
             self.reason = reason
 
     mocked_requests_request = Mock()
-    mocked_requests_request.return_value = Response(
-        status_code=200, text="OK"
-    )
+    mocked_requests_request.return_value = Response(status_code=200, text="OK")
     with patch.object(requests, "get", new=mocked_requests_request):
         result = updater.send_update(updating_url=url)
 
         assert result is True
+
 
 def test_send_update_ko():
     url = "http://abc.de?ip=1.1.1.1"
@@ -157,13 +163,12 @@ def test_send_update_ko():
             self.reason = reason
 
     mocked_requests_request = Mock()
-    mocked_requests_request.return_value = Response(
-        status_code=429, text="KO"
-    )
+    mocked_requests_request.return_value = Response(status_code=429, text="KO")
     with patch.object(requests, "get", new=mocked_requests_request):
         result = updater.send_update(updating_url=url)
 
         assert result is False
+
 
 def test_save_current_ip():
     test_address = "1.1.1.1"
@@ -178,10 +183,7 @@ def test_save_current_ip():
         with patch.object(updater._storage, "write_file", new=mocked_storage_write):
             with patch.object(updater, "get_external_ip", new=mocked_get_ip):
 
-                result = updater.save_current_ip()
+                _ = updater.save_current_ip()
 
-                mocked_storage_set.assert_called_once_with(
-                    "last_external_ip",
-                    test_address
-                )
+                mocked_storage_set.assert_called_once_with("last_external_ip", test_address)
                 mocked_storage_write.assert_called_once()

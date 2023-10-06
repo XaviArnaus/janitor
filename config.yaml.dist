@@ -30,6 +30,15 @@ app:
       # [String] possible values: "sysinfo_local" | "sysinfo_remote"
       action: "sysinfo_local"
 
+# Directnic's Dynamic DNS updater
+directnic_ddns:
+  # [String] Where to store it
+  file: "storage/directnic_ddns.yaml"
+  # [List] Items to update
+  updates:
+    - https://directnic.com/dns/gateway/abcdefg123456/?data=
+    - https://directnic.com/dns/gateway/987654abcdef5/?data=
+
 # Sysntem Information config
 system_info:
   # Levels above (greater than) which an alarm should be triggered

@@ -5,6 +5,7 @@ from datetime import datetime
 
 from run_local import RunLocal
 from run_remote import RunRemote
+from update_ddns import UpdateDdns
 
 
 class Scheduler:
@@ -36,6 +37,8 @@ class Scheduler:
             RunLocal().run()
         elif action == "sysinfo_remote":
             RunRemote().run()
+        elif action == "update_ddns":
+            UpdateDdns().run()
 
 
 if __name__ == '__main__':

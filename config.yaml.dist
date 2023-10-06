@@ -27,7 +27,7 @@ app:
     - name: "Heartbeat"
       # crontab format: minute hour day-of-month month day-of-week
       when: "* * * * *"
-      # [String] possible values: "sysinfo_local" | "sysinfo_remote"
+      # [String] possible values: "sysinfo_local" | "sysinfo_remote" | "update_ddns"
       action: "sysinfo_local"
 
 # Directnic's Dynamic DNS updater

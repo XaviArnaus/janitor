@@ -88,6 +88,7 @@ And now the app is ready to run!
 # Some configuration tips
 
 **Typical single mode instance**
+
 This mode checks the system and publishes to the social media platform, but does not make use of the client-server functionality.
 - `mastodon.api_base_url`: Sets the URL of the social media platform instance where the user that will publish the posts lives.
 - `mastodon.instance_type`: The type of social media platform that it is. All of them use the Mastodon API, but for instances different from Mastodon we need to set up some extras. This is all abstracted with this parameter. Set `mastodon` for a Mastodon instance or `pleroma` for Pleroma or Akkoma.
@@ -97,12 +98,14 @@ This mode checks the system and publishes to the social media platform, but does
 
 
 **API Listener mode instance**
+
 This mode publishes System Info reports and arbitrary messages that reach out thorugh the API endpoints, but does not collect own System Info data.
 
 - All the parameters defined in the _single mode instance_ above.
 - `app.service.listen`: What to listen. `host` at `0.0.0.0` listens from all IPs that reach out. `port` defines which port to listen to.
 
 **Remote mode where this instance collects the data and sends it to an API**
+
 This mode only collects the data and sends it away. Therefor, we only need to set up very basic parameters:
 - `app.service.remote_url`: Where to send the collected data.
 - `app.run_control.dry_run`: Set it to False when you're ready to start sending the data away. This lets you run the bot without an actual data sending.

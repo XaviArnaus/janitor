@@ -1,5 +1,14 @@
 # Janitor
-Bot in Python that collects system metrics and publishes them via a Mastodon-like API in case of crossing thresholds. Also publishes arbitrary messages in a client-server API fashion for generic monitoring.
+
+Bot meant to perform maintenance tasks in a crontab fashion and to report via a Mastodon-like API.
+The idea is to serve as a framework to keep adding tasks and have this bot as a companion, caring about the system for you.
+
+Current features:
+- Collect system metrics and compare them with given thresholds, publishing an alert in case these get grossed.
+- Sending the system metrics to another Janitor instance runnining in another host.
+- Listening for Janitor metrics cross the network.
+- Listening for arbitrary messages to be published to the set up Mastodon-like API, behaving as a generic publisher
+- Discovering the current external IP and updating the set up Directnic's Dynamic DNS if needed
 
 [![Tests](https://github.com/XaviArnaus/janitor/actions/workflows/tests.yml/badge.svg)](https://github.com/XaviArnaus/janitor/actions/workflows/tests.yml)
 [![yapf](https://github.com/XaviArnaus/janitor/actions/workflows/yapf.yml/badge.svg)](https://github.com/XaviArnaus/janitor/actions/workflows/yapf.yml)
@@ -29,7 +38,7 @@ This Python app uses the following libraries:
 - `flake8`: Linter
 - `toml`: tom files support
 
-# Installation
+# Generic Installation
 
 ### 0. Install Poetry
 Following [the official docs](https://python-poetry.org/docs/#installation), or skip this step if you already have it installed
@@ -58,28 +67,9 @@ nano config.yaml
 ```
 
 ### 5. Change the parameters that make sense to your configuration
-Depending on how you'll want this bot instance to behave, there are some mandatory parameters to set up. The config file is quite well documented. Later on this document there are sections explaining which modes can be set, what are they and how to set them up. Still, here are some tips, and other params are just ok by default:
+Depending on how you'll want this bot instance to behave, there are some mandatory parameters to set up. The config file is quite well documented. Later on this document there are sections explaining which modes can be set, what are they and how to set them up. 
 
-**Typical single mode instance**
-This mode checks the system and publishes to the social media platform, but does not make use of the client-server functionality.
-- `mastodon.api_base_url`: Sets the URL of the social media platform instance where the user that will publish the posts lives.
-- `mastodon.instance_type`: The type of social media platform that it is. All of them use the Mastodon API, but for instances different from Mastodon we need to set up some extras. This is all abstracted with this parameter. Set `mastodon` for a Mastodon instance or `pleroma` for Pleroma or Akkoma.
-- `mastodon.credentials.user`: Just set up the `user` and the `password` here. Will be used in the first run to generate the `user.secret` file and then these parameters can be cleared.
-- `app.run_control.dry_run`: Set it to False when you're ready to start publishing. This lets you run the bot without an actual publishing.
-- `status_post.content_type`: For Mastodon it needs to be `text/plain`. For Pleroma or Akkoma it can be any of the possible values defined in the comment.
-
-
-**API Listener mode instance**
-This mode publishes System Info reports and arbitrary messages that reach out thorugh the API endpoints, but does not collect own System Info data.
-
-- All the parameters defined in the _single mode instance_ above.
-- `app.service.listen`: What to listen. `host` at `0.0.0.0` listens from all IPs that reach out. `port` defines which port to listen to.
-
-**Remote mode where this instance collects the data and sends it to an API**
-This mode only collects the data and sends it away. Therefor, we only need to set up very basic parameters:
-- `app.service.remote_url`: Where to send the collected data.
-- `app.run_control.dry_run`: Set it to False when you're ready to start sending the data away. This lets you run the bot without an actual data sending.
-
+Check the section below to get some tips on which configuration would fit for you.
 
 ### 6. Install all Python dependencies
 ```
@@ -91,6 +81,34 @@ For the publishing into the Mastodon-like servers we need first to log in and se
 ```
 make create_app
 ```
+
+And now the app is ready to run!
+
+
+# Some configuration tips
+
+**Typical single mode instance**
+
+This mode checks the system and publishes to the social media platform, but does not make use of the client-server functionality.
+- `mastodon.api_base_url`: Sets the URL of the social media platform instance where the user that will publish the posts lives.
+- `mastodon.instance_type`: The type of social media platform that it is. All of them use the Mastodon API, but for instances different from Mastodon we need to set up some extras. This is all abstracted with this parameter. Set `mastodon` for a Mastodon instance or `pleroma` for Pleroma or Akkoma.
+- `mastodon.credentials.user`: Just set up the `user` and the `password` here. Will be used in the first run to generate the `user.secret` file and then these parameters can be cleared.
+- `app.run_control.dry_run`: Set it to False when you're ready to start publishing. This lets you run the bot without an actual publishing.
+- `status_post.content_type`: For Mastodon it needs to be `text/plain`. For Pleroma or Akkoma it can be any of the possible values defined in the comment.
+
+
+**API Listener mode instance**
+
+This mode publishes System Info reports and arbitrary messages that reach out thorugh the API endpoints, but does not collect own System Info data.
+
+- All the parameters defined in the _single mode instance_ above.
+- `app.service.listen`: What to listen. `host` at `0.0.0.0` listens from all IPs that reach out. `port` defines which port to listen to.
+
+**Remote mode where this instance collects the data and sends it to an API**
+
+This mode only collects the data and sends it away. Therefor, we only need to set up very basic parameters:
+- `app.service.remote_url`: Where to send the collected data.
+- `app.run_control.dry_run`: Set it to False when you're ready to start sending the data away. This lets you run the bot without an actual data sending.
 
 # Different run modes as per use case
 This section explains the different ways we can have this bot running dependining on the use case
@@ -276,3 +294,54 @@ This is another arbitrary message sent from the same bash script above. It only 
 
 ### Message 3: Warning
 This is an example of a periodic check of system metrics that identified an excess of CPU usage, publishing the current metrics for further analysis.
+
+
+# Directnic's Dynamic DNS update
+
+Janitor also can update your [Directnic's Dynamic DNS](https://directnic.com/knowledge/#/knowledge/article/3726) setup.
+
+## Configuration
+
+In the config file, search for the `directnic_ddns.updates` list parameter and just add a line with the URL given to you in Directnic's control panel. The URL looks like something like:
+
+```
+https://directnic.com/dns/gateway/123456abcdef678912346bdf53bd53bbee890dbf0227053ea877e0382a/?data=87.112.34.56
+```
+
+The IP address at the end is meant to be replaced with your current external IP, and this *Janitor* will do for you, so we simply remove the IP at the end.
+Therefor, edit the configuration so that the `directcni_ddns` section looks like something like the following:
+
+```
+# Directnic's Dynamic DNS updater
+directnic_ddns:
+  # [String] Where to store it
+  file: "storage/directnic_ddns.yaml"
+  # [List] Items to update
+  updates:
+    - https://directnic.com/dns/gateway/123456abcdef678912346bdf53bd53bbee890dbf0227053ea877e0382a/?data=
+```
+
+You can add all update links that you need, the bot will use them all adding your external IP.
+
+## Run
+
+To run it one time you can use the following commad:
+```bash
+make update_dns
+```
+
+You can also add it in the schedule. Actually it is meant to be run scheduled, so we make use of it.
+Search for the `app.schedules` section and add a list object like the following:
+
+```
+  # Manage the scheduling.
+  # Will be read by the scheduler (running every minute) to know what to do
+  schedules:
+    - name: "Directnic DDNS"
+      # crontab format: minute hour day-of-month month day-of-week
+      when: "* 2 * * *"
+      # [String] possible values: "sysinfo_local" | "sysinfo_remote" | "update_ddns"
+      action: "update_ddns"
+```
+
+With config, every day at 2AM the scheduler will trigger the DNS Update.

@@ -59,6 +59,10 @@ publish_queue:
 publish_test:
 	$(POETRY) run python publish_test.py
 
+.PHONY: update_ddns
+update_ddns:
+	$(POETRY) run python update_ddns.py
+
 .PHONY: listen
 listen:
 	nohup $(POETRY) run python listen.py > log/listen_in_background.log 2>&1 &

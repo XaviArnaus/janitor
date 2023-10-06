@@ -730,14 +730,14 @@ files = [
 
 [[package]]
 name = "pyxavi"
-version = "0.5.0"
+version = "0.5.1"
 description = "Set of utilities to assist on simple Python projects"
 category = "main"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "pyxavi-0.5.0-py3-none-any.whl", hash = "sha256:8c0176ecd01dfe1201be9f7222076ca9ea743dde40eb86ebd3a5c107d3d12a1c"},
-    {file = "pyxavi-0.5.0.tar.gz", hash = "sha256:dded621b2b034a073fceb4e220e854f29701044a14e2c0319bb11db9479479fe"},
+    {file = "pyxavi-0.5.1-py3-none-any.whl", hash = "sha256:9c141b85c7904e634a02cf9a8a69cf9ad3d3823f05081571d58a583375997c5c"},
+    {file = "pyxavi-0.5.1.tar.gz", hash = "sha256:71dccfa558947f80a1553f4dd3a34f3615661f5bd2ca1da94012277623ba8b72"},
 ]
 
 [package.dependencies]
@@ -959,4 +959,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "745ffa1e6df0573ef809c79030ee4b31455bcfcbd425c4066670843c95cd2478"
+content-hash = "2a77aabfe7a70a2625a9d0380c26ee6cdd9c496de7e175e74582c150719dae44"

@@ -51,6 +51,7 @@ class PublishGitChanges:
                 if message is None:
                     self._logger.info("No new version for repository " + repo_name)
                     continue
+                self._logger.info("New version for repository " + repo_name)
                 
                 # Publish the changes into the Updates account
                 self._publish_update(message=message)

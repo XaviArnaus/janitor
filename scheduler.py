@@ -28,6 +28,7 @@ class Scheduler:
 
             for schedule in schedules:
                 if croniter.match(schedule["when"], now_dt):
+                    self._logger.info("Running schedule " + schedule["name"])
                     self._execute_action(schedule["action"])
 
         except Exception as e:

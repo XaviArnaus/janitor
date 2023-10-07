@@ -6,6 +6,7 @@ from datetime import datetime
 from run_local import RunLocal
 from run_remote import RunRemote
 from update_ddns import UpdateDdns
+from publish_git_changes import PublishGitChanges
 
 
 class Scheduler:
@@ -39,6 +40,8 @@ class Scheduler:
             RunRemote().run()
         elif action == "update_ddns":
             UpdateDdns().run()
+        elif action == "publish_git_changes":
+            PublishGitChanges().run()
 
 
 if __name__ == '__main__':

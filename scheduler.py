@@ -35,13 +35,13 @@ class Scheduler:
 
     def _execute_action(self, action: str):
         if action == "sysinfo_local":
-            RunLocal().run()
+            RunLocal().init().run()
         elif action == "sysinfo_remote":
-            RunRemote().run()
+            RunRemote().init().run()
         elif action == "update_ddns":
-            UpdateDdns().run()
+            UpdateDdns().init().run()
         elif action == "publish_git_changes":
-            PublishGitChanges().run()
+            PublishGitChanges().init().run()
 
 
 if __name__ == '__main__':

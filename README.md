@@ -28,6 +28,7 @@ This Python app uses the following libraries:
 - `strenum`: Enrich string Enums
 - `flask` & `flask-restful`: Bring up an API for client-server communication
 - `cronizer`: Parse cron timmings
+- `python-slugify`: Get a slug out of any string
 - `pyxavi`: Encapsulate some common work
 
 ## Development

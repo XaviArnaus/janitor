@@ -1,6 +1,7 @@
 from __future__ import annotations
 from pyxavi.config import Config
 from pyxavi.firefish import Firefish
+from ..objects.mastodon_connection_params import MastodonConnectionParams
 from mastodon import Mastodon
 import logging
 import os
@@ -19,18 +20,21 @@ class MastodonHelper:
     WRAPPER = {TYPE_MASTODON: Mastodon, TYPE_PLEROMA: Mastodon, TYPE_FIREFISH: Firefish}
 
     @staticmethod
-    def get_instance(config: Config) -> Mastodon:
+    def get_instance(config: Config, connection_params: MastodonConnectionParams = None) -> Mastodon:
         logger = logging.getLogger(config.get("logger.name"))
-        instance_type = MastodonHelper.valid_or_raise(
-            config.get("mastodon.instance_type", MastodonHelper.TYPE_MASTODON)
-        )
+
+        if connection_params is None:
+            logger.warn("Getting instance without explicit connection params. Auto-discovering!")
+            connection_params = MastodonConnectionParams.from_dict(config.get("mastodon"))
+
+        instance_type = MastodonHelper.valid_or_raise(connection_params.instance_type)
 
         # All actions are done under a Mastodon API instance
         logger.info("Starting new Mastodon API instance")
-        if (os.path.exists(config.get("mastodon.credentials.user_file"))):
+        if (os.path.exists(connection_params.credentials.user_file)):
             logger.debug("Reusing stored User Credentials")
             mastodon = MastodonHelper.WRAPPER[instance_type](
-                access_token=config.get("mastodon.credentials.user_file"),
+                access_token=connection_params.credentials.user_file,
                 feature_set=MastodonHelper.FEATURE_SET_BY_INSTANCE_TYPE[instance_type]
                 if instance_type in [MastodonHelper.TYPE_MASTODON, MastodonHelper.TYPE_PLEROMA]
                 else None
@@ -38,8 +42,8 @@ class MastodonHelper:
         else:
             logger.debug("Using Client Credentials")
             mastodon = MastodonHelper.WRAPPER[instance_type](
-                client_id=config.get("mastodon.credentials.client_file"),
-                api_base_url=config.get("mastodon.api_base_url"),
+                client_id=connection_params.credentials.client_file,
+                api_base_url=connection_params.api_base_url,
                 feature_set=MastodonHelper.FEATURE_SET_BY_INSTANCE_TYPE[instance_type]
                 if instance_type in [MastodonHelper.TYPE_MASTODON, MastodonHelper.TYPE_PLEROMA]
                 else None
@@ -48,9 +52,9 @@ class MastodonHelper:
             # Logging in is required for all individual runs
             logger.debug("Logging in")
             mastodon.log_in(
-                config.get("mastodon.credentials.user.email"),
-                config.get("mastodon.credentials.user.password"),
-                to_file=config.get("mastodon.credentials.user_file")
+                connection_params.credentials.user.email,
+                connection_params.credentials.user.password,
+                to_file = connection_params.credentials.user_file
             )
 
         return mastodon

@@ -10,6 +10,7 @@ log/*
 # No user files
 storage/*.yaml
 storage/media/*
+storage/repos/*
 config.yaml
 !**/.keep
 

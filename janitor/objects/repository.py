@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+class Changelog:
+    file: str
+    
+
 class Repository:
     name: str
     url: str
@@ -18,7 +22,7 @@ class Repository:
 
         self.name = name
         self.url = url
-        self.git - git
+        self.git = git
         self.path = path
         self.changelog = changelog
 

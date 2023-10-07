@@ -49,7 +49,7 @@ class PublishGitChanges:
                 # Build the message to publish
                 message = monitor.build_update_message(parsed_content=parsed_content)
                 if message is None:
-                    self._logger.info("No new version for repository" + repo_name)
+                    self._logger.info("No new version for repository " + repo_name)
                     continue
                 
                 # Publish the changes into the Updates account
@@ -63,12 +63,13 @@ class PublishGitChanges:
                 # Save the current last known version
                 monitor.store_last_known_version(list(parsed_content.keys())[0])
 
-            self._publish_notification(
-                message=Message(
-                    text="Published an update for:\n\n" + 
-                        "\n".join(published_projects)
+            if len(published_projects) > 0:
+                self._publish_notification(
+                    message=Message(
+                        text="Published an update for:\n\n" + 
+                            "\n".join(published_projects)
+                    )
                 )
-            )
 
         except Exception as e:
             self._logger.exception(e)

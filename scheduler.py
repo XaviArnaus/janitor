@@ -27,7 +27,6 @@ class Scheduler:
             now_dt = datetime.now()
 
             for schedule in schedules:
-                self._logger.info("Is it time for " + schedule["name"] + "?")
                 if croniter.match(schedule["when"], now_dt):
                     self._logger.info("Running schedule " + schedule["name"])
                     self._execute_action(schedule["action"])
@@ -39,8 +38,7 @@ class Scheduler:
         if action == "sysinfo_local":
             RunLocal().run()
         elif action == "sysinfo_remote":
-            RunRemote()
-            .run()
+            RunRemote().run()
         elif action == "update_ddns":
             UpdateDdns().init().run()
         elif action == "publish_git_changes":

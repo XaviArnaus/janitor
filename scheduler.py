@@ -37,9 +37,10 @@ class Scheduler:
 
     def _execute_action(self, action: str):
         if action == "sysinfo_local":
-            RunLocal().init().run()
+            RunLocal().run()
         elif action == "sysinfo_remote":
-            RunRemote().init().run()
+            RunRemote()
+            .run()
         elif action == "update_ddns":
             UpdateDdns().init().run()
         elif action == "publish_git_changes":

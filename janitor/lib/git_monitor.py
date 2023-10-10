@@ -148,7 +148,7 @@ class GitMonitor:
         versions = [key for key in parsed_content.keys()]
         versions.reverse()
         if len(versions) == 1:
-            return versions
+            return versions[0]
         elif len(versions) > 1:
             all_but_last  = versions[:-1]
             return ", ".join(all_but_last) + " & " + versions[-1]

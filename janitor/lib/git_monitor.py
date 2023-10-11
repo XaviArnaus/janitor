@@ -7,7 +7,6 @@ from slugify import slugify
 import logging
 import os
 import re
-from pyxavi.debugger import dd
 
 DEFAULT_FILENAME = "storage/git_monitor.yaml"
 DEFAULT_VERSION_REGEX = "\[(v[0-9]+\.[0-9]+\.[0-9]+)\]"
@@ -59,7 +58,8 @@ class GitMonitor:
             raise RuntimeError("File not found in the repository")
     
     def __extract_version_from_section(self, section: str) -> str:
-        regex = self.repository_info["changelog"]["version_regex"] or DEFAULT_VERSION_REGEX
+        regex = self.repository_info["changelog"]["version_regex"]\
+            if "version_regex" in self.repository_info["changelog"] else DEFAULT_VERSION_REGEX
         matched = re.search(regex, section)
         return matched.group(1)
     
@@ -70,7 +70,8 @@ class GitMonitor:
         return f"{current_repo_id}.{param_name}"
     
     def parse_changelog(self, content: str) -> dict:
-        version_section_separator = self.repository_info["changelog"]["section_separator"] or DEFAULT_SECTION_SEPARATOR
+        version_section_separator = self.repository_info["changelog"]["section_separator"]\
+            if "section_separator" in self.repository_info["changelog"] else DEFAULT_SECTION_SEPARATOR
         last_version_param_name = self.__get_param_name("last_version")
         last_known_version = self._storage.get(last_version_param_name, None)
 

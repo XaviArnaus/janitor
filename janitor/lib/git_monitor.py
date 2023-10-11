@@ -26,11 +26,10 @@ class GitMonitor:
     
     def initiate_or_clone_repository(self, repository: dict) -> Repo:
         # Checking for mandatory parameters
-        if "path" not in repository\
-            or repository["path"] is None\
-            or "git" not in repository\
-            or repository["git"] is None:
-            raise RuntimeError("Mandatory parameters [path] and [git] are not present")
+        if ("path" not in repository or repository["path"] is None)\
+            and ("git" not in repository or repository["git"] is None\
+            or "path" not in repository or repository["path"] is None):
+            raise RuntimeError("Mandatory parameters [path] or [git] and [path] are not present")
 
         if os.path.exists(repository["path"]):
             self.current_repository = Repo.init(repository["path"])

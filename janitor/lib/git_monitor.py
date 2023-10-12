@@ -9,7 +9,7 @@ import os
 import re
 
 DEFAULT_FILENAME = "storage/git_monitor.yaml"
-DEFAULT_VERSION_REGEX = r"\[(v[0-9]+\.[0-9]+\.[0-9]+)\]"
+DEFAULT_VERSION_REGEX = r"\[(v[0-9]+\.[0-9]+\.?[0-9]?)\]"
 DEFAULT_SECTION_SEPARATOR = "\n## "
 TEMPLATE_UPDATE_TEXT = "**[$project]($link) $version** published!\n\n$text\n$tags\n"
 

@@ -178,6 +178,10 @@ def test_get_changelog_content_reads_file_when_isfile():
     mocked_open_file.assert_called_once_with(changelog_filename, 'r')
     assert returned_content == content
 
+@pytest.fixture
+def content_30():
+    return "## [v3.0.0](link.html)\n\n### Added\n\n- Action 33\n"
+
 
 @pytest.fixture
 def content_3():
@@ -204,6 +208,9 @@ def content_1():
         'last_version', 'expected_parsed', 'content1_name', 'content2_name', 'content3_name'
     ),
     argvalues=[
+        ("v2.0", {
+            "v3.0.0": "content_30"
+        }, "content_1", "content_2", "content_30"),
         ("v2.0", {
             "v3.0": "content_3"
         }, "content_1", "content_2", "content_3"),

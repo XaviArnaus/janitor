@@ -6,7 +6,6 @@ from unittest import TestCase
 import pytest
 from mastodon import Mastodon
 import os
-from pyxavi.debugger import dd
 
 CONFIG = {
     "logger.name": "logger_test",
@@ -70,7 +69,6 @@ def test_get_instance_mastodon_user_credentials_exists():
     with patch.object(os.path, "exists", new=mocked_path_exists):
         with patch.object(Mastodon, "__init__", new=mocked_mastodon_init):
             conn_params = MastodonConnectionParams.from_dict(CONFIG_MASTODON_CONN_PARAMS)
-            dd(conn_params)
             instance = MastodonHelper.get_instance(
                 config=Config(),
                 connection_params=conn_params

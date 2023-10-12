@@ -1,12 +1,13 @@
 from pyxavi.config import Config
 from pyxavi.storage import Storage
 from janitor.lib.git_monitor import GitMonitor
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, mock_open, MagicMock
 import pytest
 from unittest import TestCase
 from logging import Logger
 from git import Repo
 import os
+import builtins
 
 CONFIG = {"logger.name": "logger_test", "git_monitor.file": "storage/git_monitor.yaml"}
 REPOSITORY = {
@@ -94,14 +95,71 @@ def test_get_updates():
     mocked_remotes = Mock()
     mocked_origin = Mock()
     mocked_pull = Mock()
-    mocked_origin.return_value = mocked_pull
-    mocked_remotes.return_value = mocked_origin
-    mocked_repo.return_value = mocked_remotes
 
     monitor = get_instance()
     monitor.current_repository = mocked_repo
 
     with patch.object(mocked_origin, "pull", new=mocked_pull):
-        monitor.get_updates()
+        with patch.object(mocked_remotes, "origin", new=mocked_origin):
+            with patch.object(mocked_repo, "remotes", new=mocked_remotes):
+                monitor.get_updates()
     
     mocked_pull.assert_called_once()
+
+def test_get_changelog_content_exception_when_not_file():
+    changelog_filename = "this/is/a/changelog.md"
+    is_file = False
+    mocked_repo = Mock()
+    working_tree_dir = "test"
+
+    monitor = get_instance()
+    monitor.repository_info = REPOSITORY
+    monitor.current_repository = mocked_repo
+
+    mocked_working_tree_dir = Mock()
+    mocked_working_tree_dir.return_value = working_tree_dir
+    mocked_path_join = Mock()
+    mocked_path_join.return_value = changelog_filename
+    mocked_path_isfile = Mock()
+    mocked_path_isfile.return_value = is_file
+    with patch.object(mocked_repo, "working_tree_dir", new=mocked_working_tree_dir):
+        with patch.object(os.path, "join", new=mocked_path_join):
+            with patch.object(os.path, "isfile", new=mocked_path_isfile):
+                with TestCase.assertRaises(monitor, RuntimeError):
+                    monitor.get_changelog_content()
+    
+    mocked_path_join.assert_called_once_with(
+        mocked_working_tree_dir, REPOSITORY["changelog"]["file"]
+    )
+
+def test_get_changelog_content_reads_file_when_isfile():
+    changelog_filename = "this/is/a/changelog.md"
+    is_file = True
+    mocked_repo = Mock()
+    working_tree_dir = "test"
+    content = "test content"
+
+    monitor = get_instance()
+    monitor.repository_info = REPOSITORY
+    monitor.current_repository = mocked_repo
+
+    mocked_working_tree_dir = Mock()
+    mocked_working_tree_dir.return_value = working_tree_dir
+    mocked_path_join = Mock()
+    mocked_path_join.return_value = changelog_filename
+    mocked_path_isfile = Mock()
+    mocked_path_isfile.return_value = is_file
+    mocked_open_file = MagicMock()
+    with patch.object(mocked_repo, "working_tree_dir", new=mocked_working_tree_dir):
+        with patch.object(os.path, "join", new=mocked_path_join):
+            with patch.object(os.path, "isfile", new=mocked_path_isfile):
+                with patch.object(builtins, "open", mock_open(mock=mocked_open_file, read_data=content)):
+                    returned_content = monitor.get_changelog_content()
+    
+    mocked_path_join.assert_called_once_with(
+        mocked_working_tree_dir, REPOSITORY["changelog"]["file"]
+    )
+    mocked_open_file.assert_called_once_with(
+        changelog_filename, 'r'
+    )
+    assert returned_content == content

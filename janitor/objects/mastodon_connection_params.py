@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+
 class MastodonConnectionParams():
 
     TYPE_MASTODON = "mastodon"
@@ -32,11 +33,14 @@ class MastodonConnectionParams():
     @staticmethod
     def from_dict(connection_params_dict: dict) -> MastodonConnectionParams:
         return MastodonConnectionParams(
-            instance_type = connection_params_dict["instance_type"] if "instance_type" in connection_params_dict else None,
-            api_base_url = connection_params_dict["api_base_url"] if "api_base_url" in connection_params_dict else None,
-            credentials = MastodonCredentials.from_dict(connection_params_dict["credentials"])\
-                 if "credentials" in connection_params_dict else None
+            instance_type=connection_params_dict["instance_type"]
+            if "instance_type" in connection_params_dict else None,
+            api_base_url=connection_params_dict["api_base_url"]
+            if "api_base_url" in connection_params_dict else None,
+            credentials=MastodonCredentials.from_dict(connection_params_dict["credentials"])
+            if "credentials" in connection_params_dict else None
         )
+
 
 class MastodonCredentials():
 
@@ -53,7 +57,7 @@ class MastodonCredentials():
         self.user_file = user_file
         self.client_file = client_file
         self.user = user
-    
+
     def to_dict(self) -> dict:
         return {
             "user_file": self.user_file,
@@ -64,34 +68,30 @@ class MastodonCredentials():
     @staticmethod
     def from_dict(credentials_dict: dict) -> MastodonCredentials:
         return MastodonCredentials(
-            user_file = credentials_dict["user_file"] if "user_file" in credentials_dict else None,
-            client_file = credentials_dict["client_file"] if "client_file" in credentials_dict else None,
-            user = MastodonUser.from_dict(credentials_dict["user"]) if "user" in credentials_dict else None
+            user_file=credentials_dict["user_file"]
+            if "user_file" in credentials_dict else None,
+            client_file=credentials_dict["client_file"]
+            if "client_file" in credentials_dict else None,
+            user=MastodonUser.from_dict(credentials_dict["user"])
+            if "user" in credentials_dict else None
         )
-    
+
+
 class MastodonUser():
 
     email: str
     password: str
 
-    def __init__(
-        self,
-        email: str = None,
-        password: str = None
-    ) -> None:
+    def __init__(self, email: str = None, password: str = None) -> None:
         self.email = email
         self.password = password
-    
+
     def to_dict(self) -> dict:
-        return {
-            "email": self.email,
-            "password": self.password
-        }
+        return {"email": self.email, "password": self.password}
 
     @staticmethod
     def from_dict(credentials_dict: dict) -> MastodonUser:
         return MastodonUser(
-            email = credentials_dict["email"] if "email" in credentials_dict else None,
-            password = credentials_dict["password"] if "password" in credentials_dict else None
+            email=credentials_dict["email"] if "email" in credentials_dict else None,
+            password=credentials_dict["password"] if "password" in credentials_dict else None
         )
-    

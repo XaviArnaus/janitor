@@ -20,11 +20,15 @@ class MastodonHelper:
     WRAPPER = {TYPE_MASTODON: Mastodon, TYPE_PLEROMA: Mastodon, TYPE_FIREFISH: Firefish}
 
     @staticmethod
-    def get_instance(config: Config, connection_params: MastodonConnectionParams = None) -> Mastodon:
+    def get_instance(
+        config: Config, connection_params: MastodonConnectionParams = None
+    ) -> Mastodon:
         logger = logging.getLogger(config.get("logger.name"))
 
         if connection_params is None:
-            logger.warn("Getting instance without explicit connection params. Auto-discovering!")
+            logger.warn(
+                "Getting instance without explicit connection params. Auto-discovering!"
+            )
             connection_params = MastodonConnectionParams.from_dict(config.get("mastodon"))
 
         instance_type = MastodonHelper.valid_or_raise(connection_params.instance_type)
@@ -54,7 +58,7 @@ class MastodonHelper:
             mastodon.log_in(
                 connection_params.credentials.user.email,
                 connection_params.credentials.user.password,
-                to_file = connection_params.credentials.user_file
+                to_file=connection_params.credentials.user_file
             )
 
         return mastodon

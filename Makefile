@@ -22,7 +22,7 @@ flake8:
 		--show-source \
 		--statistics
 	# Full linter run.
-	$(POETRY) run flake8 --max-line-length=96 .
+	$(POETRY) run flake8 --max-line-length=96 --exclude storage .
 
 .PHONY: format
 format:

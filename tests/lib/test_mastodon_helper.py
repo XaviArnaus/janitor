@@ -70,13 +70,15 @@ def test_get_instance_mastodon_user_credentials_exists():
         with patch.object(Mastodon, "__init__", new=mocked_mastodon_init):
             conn_params = MastodonConnectionParams.from_dict(CONFIG_MASTODON_CONN_PARAMS)
             instance = MastodonHelper.get_instance(
-                config=Config(),
-                connection_params=conn_params
+                config=Config(), connection_params=conn_params
             )
 
-    mocked_path_exists.assert_called_once_with(CONFIG_MASTODON_CONN_PARAMS["credentials"]["user_file"])
+    mocked_path_exists.assert_called_once_with(
+        CONFIG_MASTODON_CONN_PARAMS["credentials"]["user_file"]
+    )
     mocked_mastodon_init.assert_called_once_with(
-        access_token=CONFIG_MASTODON_CONN_PARAMS["credentials"]["user_file"], feature_set="mainline"
+        access_token=CONFIG_MASTODON_CONN_PARAMS["credentials"]["user_file"],
+        feature_set="mainline"
     )
     assert isinstance(instance, Mastodon)
 
@@ -94,13 +96,15 @@ def test_get_instance_pleroma_user_credentials_exists():
         with patch.object(Mastodon, "__init__", new=mocked_mastodon_init):
             conn_params = MastodonConnectionParams.from_dict(CONFIG_MASTODON_CONN_PARAMS)
             instance = MastodonHelper.get_instance(
-                config=Config(),
-                connection_params=conn_params
+                config=Config(), connection_params=conn_params
             )
 
-    mocked_path_exists.assert_called_once_with(CONFIG_MASTODON_CONN_PARAMS["credentials"]["user_file"])
+    mocked_path_exists.assert_called_once_with(
+        CONFIG_MASTODON_CONN_PARAMS["credentials"]["user_file"]
+    )
     mocked_mastodon_init.assert_called_once_with(
-        access_token=CONFIG_MASTODON_CONN_PARAMS["credentials"]["user_file"], feature_set="pleroma"
+        access_token=CONFIG_MASTODON_CONN_PARAMS["credentials"]["user_file"],
+        feature_set="pleroma"
     )
     assert isinstance(instance, Mastodon)
 
@@ -120,11 +124,12 @@ def test_get_instance_mastodon_user_credentials_not_exists():
             with patch.object(Mastodon, "log_in", new=mocked_mastodon_log_in):
                 conn_params = MastodonConnectionParams.from_dict(CONFIG_MASTODON_CONN_PARAMS)
                 instance = MastodonHelper.get_instance(
-                    config=Config(),
-                    connection_params=conn_params
+                    config=Config(), connection_params=conn_params
                 )
 
-    mocked_path_exists.assert_called_once_with(CONFIG_MASTODON_CONN_PARAMS["credentials"]["user_file"])
+    mocked_path_exists.assert_called_once_with(
+        CONFIG_MASTODON_CONN_PARAMS["credentials"]["user_file"]
+    )
     mocked_mastodon_init.assert_called_once_with(
         client_id=CONFIG_MASTODON_CONN_PARAMS["credentials"]["client_file"],
         api_base_url=CONFIG_MASTODON_CONN_PARAMS["api_base_url"],
@@ -153,11 +158,12 @@ def test_get_instance_pleroma_user_credentials_not_exists():
             with patch.object(Mastodon, "log_in", new=mocked_mastodon_log_in):
                 conn_params = MastodonConnectionParams.from_dict(CONFIG_MASTODON_CONN_PARAMS)
                 instance = MastodonHelper.get_instance(
-                    config=Config(),
-                    connection_params=conn_params
+                    config=Config(), connection_params=conn_params
                 )
 
-    mocked_path_exists.assert_called_once_with(CONFIG_MASTODON_CONN_PARAMS["credentials"]["user_file"])
+    mocked_path_exists.assert_called_once_with(
+        CONFIG_MASTODON_CONN_PARAMS["credentials"]["user_file"]
+    )
     mocked_mastodon_init.assert_called_once_with(
         client_id=CONFIG_MASTODON_CONN_PARAMS["credentials"]["client_file"],
         api_base_url=CONFIG_MASTODON_CONN_PARAMS["api_base_url"],

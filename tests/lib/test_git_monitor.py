@@ -11,7 +11,6 @@ import os
 import builtins
 from slugify import slugify
 
-
 CONFIG = {"logger.name": "logger_test", "git_monitor.file": "storage/git_monitor.yaml"}
 REPOSITORY = {
     "name": "pyxavi",
@@ -62,13 +61,22 @@ def test_initialize():
     assert isinstance(monitor._logger, Logger)
     assert isinstance(monitor._storage, Storage)
 
+
 @pytest.mark.parametrize(
     argnames=('repository', 'path_exist', 'expected_exception'),
     argvalues=[
-        ({"none":"none"}, None, True),
-        ({"git":"yes"}, None, True),
-        ({"path":"yes"}, True, False),
-        ({"path":"yes", "git":"yes"}, False, False),
+        ({
+            "none": "none"
+        }, None, True),
+        ({
+            "git": "yes"
+        }, None, True),
+        ({
+            "path": "yes"
+        }, True, False),
+        ({
+            "path": "yes", "git": "yes"
+        }, False, False),
     ],
 )
 def test_initiate_existing_repository(repository, path_exist, expected_exception):
@@ -93,6 +101,7 @@ def test_initiate_existing_repository(repository, path_exist, expected_exception
                     monitor.initiate_or_clone_repository(repository=repository)
                 mocked_starter.assert_called_once_with(repository["git"], repository["path"])
 
+
 def test_get_updates():
     mocked_repo = Mock()
     mocked_remotes = Mock()
@@ -106,8 +115,9 @@ def test_get_updates():
         with patch.object(mocked_remotes, "origin", new=mocked_origin):
             with patch.object(mocked_repo, "remotes", new=mocked_remotes):
                 monitor.get_updates()
-    
+
     mocked_pull.assert_called_once()
+
 
 def test_get_changelog_content_exception_when_not_file():
     changelog_filename = "this/is/a/changelog.md"
@@ -130,10 +140,11 @@ def test_get_changelog_content_exception_when_not_file():
             with patch.object(os.path, "isfile", new=mocked_path_isfile):
                 with TestCase.assertRaises(monitor, RuntimeError):
                     monitor.get_changelog_content()
-    
+
     mocked_path_join.assert_called_once_with(
         mocked_working_tree_dir, REPOSITORY["changelog"]["file"]
     )
+
 
 def test_get_changelog_content_reads_file_when_isfile():
     changelog_filename = "this/is/a/changelog.md"
@@ -156,48 +167,70 @@ def test_get_changelog_content_reads_file_when_isfile():
     with patch.object(mocked_repo, "working_tree_dir", new=mocked_working_tree_dir):
         with patch.object(os.path, "join", new=mocked_path_join):
             with patch.object(os.path, "isfile", new=mocked_path_isfile):
-                with patch.object(builtins, "open", mock_open(mock=mocked_open_file, read_data=content)):
+                with patch.object(builtins,
+                                  "open",
+                                  mock_open(mock=mocked_open_file, read_data=content)):
                     returned_content = monitor.get_changelog_content()
-    
+
     mocked_path_join.assert_called_once_with(
         mocked_working_tree_dir, REPOSITORY["changelog"]["file"]
     )
-    mocked_open_file.assert_called_once_with(
-        changelog_filename, 'r'
-    )
+    mocked_open_file.assert_called_once_with(changelog_filename, 'r')
     assert returned_content == content
+
 
 @pytest.fixture
 def content_3():
     return "## [v3.0](link.html)\n\n### Added\n\n- Action 3\n"
 
+
 @pytest.fixture
 def content_3_fail():
     return "## [ABC](link.html)\n\n### Added\n\n- Action 3\n"
+
 
 @pytest.fixture
 def content_2():
     return "## [v2.0](link.html)\n\n### Changed\n\n- Action 2\n"
 
+
 @pytest.fixture
 def content_1():
     return "## [v1.0](link.html)\n\n### Removed\n\n- Action 1\n"
 
+
 @pytest.mark.parametrize(
-    argnames=('last_version', 'expected_parsed', 'content1_name', 'content2_name', 'content3_name'),
+    argnames=(
+        'last_version', 'expected_parsed', 'content1_name', 'content2_name', 'content3_name'
+    ),
     argvalues=[
-        ("v2.0", {"v3.0": "content_3"}, "content_1", "content_2", "content_3"),
-        ("v1.0", {"v3.0": "content_3", "v2.0": "content_2"}, "content_1", "content_2", "content_3"),
+        ("v2.0", {
+            "v3.0": "content_3"
+        }, "content_1", "content_2", "content_3"),
+        (
+            "v1.0", {
+                "v3.0": "content_3", "v2.0": "content_2"
+            },
+            "content_1",
+            "content_2",
+            "content_3"
+        ),
         (None, {}, "content_1", "content_2", "content_3"),
         (None, False, "content_1", "content_2", "content_3_fail"),
     ],
 )
-def test_parse_changelog(last_version, expected_parsed: dict, content1_name, content2_name, content3_name, request):
+def test_parse_changelog(
+    last_version, expected_parsed: dict, content1_name, content2_name, content3_name, request
+):
     content_1 = request.getfixturevalue(content1_name)
     content_2 = request.getfixturevalue(content2_name)
     content_3 = request.getfixturevalue(content3_name)
     if type(expected_parsed) == dict:
-        expected_parsed = {key: request.getfixturevalue(value).replace("## [", "[") for key, value in expected_parsed.items()}
+        expected_parsed = {
+            key: request.getfixturevalue(value).replace("## [", "[")
+            for key,
+            value in expected_parsed.items()
+        }
     # Remember that the Changelog comes from newer to older
     content = f"# Title\n\n{content_3}\n{content_2}\n{content_1}"
 
@@ -205,10 +238,7 @@ def test_parse_changelog(last_version, expected_parsed: dict, content1_name, con
     monitor.repository_info = REPOSITORY
 
     mocked_storage_get = Mock()
-    mocked_storage_get.side_effect = [
-        {},
-        last_version
-    ]
+    mocked_storage_get.side_effect = [{}, last_version]
     mocked_storage_set = Mock()
     mocked_storage_write_file = Mock()
     with patch.object(monitor._storage, "get", new=mocked_storage_get):
@@ -218,16 +248,21 @@ def test_parse_changelog(last_version, expected_parsed: dict, content1_name, con
                     with TestCase.assertRaises(monitor, RuntimeError):
                         monitor.parse_changelog(content=content)
                 else:
-                    with patch.object(monitor._storage, "write_file", new=mocked_storage_write_file):
+                    with patch.object(monitor._storage,
+                                      "write_file",
+                                      new=mocked_storage_write_file):
                         result = monitor.parse_changelog(content=content)
                         assert result == expected_parsed
-                        mocked_storage_set.assert_has_calls([
-                            call(slugify(REPOSITORY["git"]), {}),
-                            call(slugify(REPOSITORY["git"]) + ".last_version", "v3.0"),
-                        ])
+                        mocked_storage_set.assert_has_calls(
+                            [
+                                call(slugify(REPOSITORY["git"]), {}),
+                                call(slugify(REPOSITORY["git"]) + ".last_version", "v3.0"),
+                            ]
+                        )
                         mocked_storage_write_file.assert_called_once()
             else:
-                with patch.object(monitor._storage, "write_file", new=mocked_storage_write_file):
+                with patch.object(monitor._storage, "write_file",
+                                  new=mocked_storage_write_file):
                     result = monitor.parse_changelog(content=content)
                     assert result == expected_parsed
                     mocked_storage_set.assert_called_once_with(slugify(REPOSITORY["git"]), {})
@@ -245,10 +280,10 @@ def test_build_update_message_with_no_update():
 
 def test_build_update_message_with_one_update(content_3):
     parsed_content = {"v3.0": content_3.replace("## [", "[")}
-    expected_content = Message(text="**[pyxavi](https://github.com/XaviArnaus/pyxavi) v3.0** published!\n\n" +\
-        "[v3.0](link.html)\n\n" +\
-        "**Added**\n- Action 3\n\n" +\
-        "#Python #library\n")
+    expected_content = Message(
+        text="**[pyxavi](https://github.com/XaviArnaus/pyxavi) v3.0** published!\n\n" +
+        "[v3.0](link.html)\n\n**Added**\n- Action 3\n\n#Python #library\n"
+    )
 
     monitor = get_instance()
     monitor.repository_info = REPOSITORY
@@ -256,14 +291,16 @@ def test_build_update_message_with_one_update(content_3):
 
     assert message.to_dict() == expected_content.to_dict()
 
+
 def test_build_update_message_with_two_updates(content_3, content_2):
-    parsed_content = {"v3.0": content_3.replace("## [", "["), "v2.0": content_2.replace("## [", "[")}
-    expected_content = Message(text="**[pyxavi](https://github.com/XaviArnaus/pyxavi) v2.0 & v3.0** published!\n\n" +\
-        "[v3.0](link.html)\n\n" +\
-        "**Added**\n- Action 3\n\n" +\
-        "[v2.0](link.html)\n\n" +\
-        "**Changed**\n- Action 2\n\n" +\
-        "#Python #library\n")
+    parsed_content = {
+        "v3.0": content_3.replace("## [", "["), "v2.0": content_2.replace("## [", "[")
+    }
+    expected_content = Message(
+        text="**[pyxavi](https://github.com/XaviArnaus/pyxavi) " +
+        "v2.0 & v3.0** published!\n\n[v3.0](link.html)\n\n**Added**\n- Action 3\n\n" +
+        "[v2.0](link.html)\n\n**Changed**\n- Action 2\n\n#Python #library\n"
+    )
 
     monitor = get_instance()
     monitor.repository_info = REPOSITORY

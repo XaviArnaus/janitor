@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+
 class Changelog:
     file: str
-    
+
 
 class Repository:
     name: str
@@ -18,7 +19,7 @@ class Repository:
         git: str = None,
         path: str = None,
         changelog: str = None
-        ) -> None:
+    ) -> None:
 
         self.name = name
         self.url = url
@@ -38,9 +39,9 @@ class Repository:
     @staticmethod
     def from_dict(repository_dict: dict) -> Repository:
         return Repository(
-            name = repository_dict["name"] if "name" in repository_dict else None,
-            url = repository_dict["url"] if "url" in repository_dict else None,
-            git = repository_dict["git"] if "git" in repository_dict else None,
-            path = repository_dict["path"] if "path" in repository_dict else None,
-            changelog = repository_dict["changelog"] if "changelog" in repository_dict else None
+            name=repository_dict["name"] if "name" in repository_dict else None,
+            url=repository_dict["url"] if "url" in repository_dict else None,
+            git=repository_dict["git"] if "git" in repository_dict else None,
+            path=repository_dict["path"] if "path" in repository_dict else None,
+            changelog=repository_dict["changelog"] if "changelog" in repository_dict else None
         )

@@ -32,7 +32,7 @@ force_grid_wrap = 3
 
 [tool.pytest.ini_options]
 minversion = "6.2"
-addopts = "-ra -q -vvv"
+addopts = "-ra -q -vvv --ignore-glob=storage*"
 markers = ["slow"]
 pythonpath = [
   "."
@@ -51,6 +51,11 @@ split_before_expression_after_opening_paren = 1
 split_before_first_argument = 1
 split_before_logical_operator = 0
 
+[tool.yapfignore]
+ignore_patterns = [
+    "storage/*"
+]
+
 [tool.coverage.report]
 skip_empty = true
 branch = true
@@ -59,7 +64,8 @@ branch = true
 omit = [
     "*/setup.py",
     "*/__main__.py",
-    "*/__init__.py"
+    "*/__init__.py",
+    "storage/*"
 ]
 
 [build-system]

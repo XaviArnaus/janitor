@@ -52,7 +52,7 @@ class PublishGitChanges:
                     self._logger.info("No new version for repository " + repo_name)
                     continue
                 self._logger.info("New version for repository " + repo_name)
-                
+
                 # Publish the changes into the Updates account
                 self._publish_update(message=message)
 
@@ -67,8 +67,7 @@ class PublishGitChanges:
             if len(published_projects) > 0:
                 self._publish_notification(
                     message=Message(
-                        text="Published an update for:\n\n" + 
-                            "\n".join(published_projects)
+                        text="Published an update for:\n\n" + "\n".join(published_projects)
                     )
                 )
 
@@ -76,10 +75,9 @@ class PublishGitChanges:
             self._logger.exception(e)
 
             self._publish_notification(
-                message=Message(
-                    text="Error while publishing updates:\n\n" + str(e))
+                message=Message(text="Error while publishing updates:\n\n" + str(e))
             )
-    
+
     def _publish_update(self, message: Message):
         # We want to publish to a different account,
         #   which only publishes updates.
@@ -91,31 +89,26 @@ class PublishGitChanges:
         #   create app action.
         if not os.path.exists(conn_params.credentials.client_file):
             MastodonHelper.create_app(
-                instance_type = conn_params.instance_type,
-                client_name = self._config.get("git_monitor.mastodon.app_name"),
-                api_base_url = conn_params.api_base_url,
-                to_file = conn_params.credentials.client_file
+                instance_type=conn_params.instance_type,
+                client_name=self._config.get("git_monitor.mastodon.app_name"),
+                api_base_url=conn_params.api_base_url,
+                to_file=conn_params.credentials.client_file
             )
         # Now get the instance
         mastodon_instance = MastodonHelper.get_instance(
-            config = self._config,
-            connection_params = conn_params
+            config=self._config, connection_params=conn_params
         )
         # Now publish the message
-        _ = Publisher(self._config, mastodon_instance).publish_one(
-            QueueItem(message)
-        )
-    
+        _ = Publisher(self._config, mastodon_instance).publish_one(QueueItem(message))
+
     def _publish_notification(self, message: Message):
         # This is the notification that we publish to
         #   the usual account, just to say who the action went.
-        
+
         # Get the instance. Everything is by default
         mastodon_instance = MastodonHelper.get_instance(self._config)
         # Now publish the message
-        _ = Publisher(self._config, mastodon_instance).publish_one(
-            QueueItem(message)
-        )
+        _ = Publisher(self._config, mastodon_instance).publish_one(QueueItem(message))
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 from pyxavi.config import Config
 from pyxavi.storage import Storage
 from janitor.lib.git_monitor import GitMonitor
+from janitor.objects.message import Message
 from unittest.mock import patch, Mock, mock_open, MagicMock, call
 import pytest
 from unittest import TestCase
@@ -231,3 +232,41 @@ def test_parse_changelog(last_version, expected_parsed: dict, content1_name, con
                     assert result == expected_parsed
                     mocked_storage_set.assert_called_once_with(slugify(REPOSITORY["git"]), {})
                     mocked_storage_write_file.assert_not_called()
+
+
+def test_build_update_message_with_no_update():
+    parsed_content = {}
+
+    monitor = get_instance()
+    message = monitor.build_update_message(parsed_content=parsed_content)
+
+    assert message is None
+
+
+def test_build_update_message_with_one_update(content_3):
+    parsed_content = {"v3.0": content_3.replace("## [", "[")}
+    expected_content = Message(text="**[pyxavi](https://github.com/XaviArnaus/pyxavi) v3.0** published!\n\n" +\
+        "[v3.0](link.html)\n\n" +\
+        "**Added**\n- Action 3\n\n" +\
+        "#Python #library\n")
+
+    monitor = get_instance()
+    monitor.repository_info = REPOSITORY
+    message = monitor.build_update_message(parsed_content=parsed_content)
+
+    assert message.to_dict() == expected_content.to_dict()
+
+def test_build_update_message_with_two_updates(content_3, content_2):
+    parsed_content = {"v3.0": content_3.replace("## [", "["), "v2.0": content_2.replace("## [", "[")}
+    expected_content = Message(text="**[pyxavi](https://github.com/XaviArnaus/pyxavi) v2.0 & v3.0** published!\n\n" +\
+        "[v3.0](link.html)\n\n" +\
+        "**Added**\n- Action 3\n\n" +\
+        "[v2.0](link.html)\n\n" +\
+        "**Changed**\n- Action 2\n\n" +\
+        "#Python #library\n")
+
+    monitor = get_instance()
+    monitor.repository_info = REPOSITORY
+    message = monitor.build_update_message(parsed_content=parsed_content)
+
+    assert message.to_dict() == expected_content.to_dict()

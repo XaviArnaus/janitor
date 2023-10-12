@@ -1,13 +1,15 @@
 from pyxavi.config import Config
 from pyxavi.storage import Storage
 from janitor.lib.git_monitor import GitMonitor
-from unittest.mock import patch, Mock, mock_open, MagicMock
+from unittest.mock import patch, Mock, mock_open, MagicMock, call
 import pytest
 from unittest import TestCase
 from logging import Logger
 from git import Repo
 import os
 import builtins
+from slugify import slugify
+
 
 CONFIG = {"logger.name": "logger_test", "git_monitor.file": "storage/git_monitor.yaml"}
 REPOSITORY = {
@@ -18,8 +20,8 @@ REPOSITORY = {
     "path": "storage/repos/pyxavi",
     "changelog": {
         "file": "CHANGELOG.md",
-        "section_separator": r"\n## ",
-        "version_regex": r"\[(v[0-9]+\.[0-9]+\.[0-9]+)\]"
+        "section_separator": "\n## ",
+        "version_regex": r"\[(v[0-9]+\.[0-9]+\.?[0-9]?)\]"
     }
 }
 
@@ -163,3 +165,69 @@ def test_get_changelog_content_reads_file_when_isfile():
         changelog_filename, 'r'
     )
     assert returned_content == content
+
+@pytest.fixture
+def content_3():
+    return "## [v3.0](link.html)\n\n### Added\n\n- Action 3\n"
+
+@pytest.fixture
+def content_3_fail():
+    return "## [ABC](link.html)\n\n### Added\n\n- Action 3\n"
+
+@pytest.fixture
+def content_2():
+    return "## [v2.0](link.html)\n\n### Changed\n\n- Action 2\n"
+
+@pytest.fixture
+def content_1():
+    return "## [v1.0](link.html)\n\n### Removed\n\n- Action 1\n"
+
+@pytest.mark.parametrize(
+    argnames=('last_version', 'expected_parsed', 'content1_name', 'content2_name', 'content3_name'),
+    argvalues=[
+        ("v2.0", {"v3.0": "content_3"}, "content_1", "content_2", "content_3"),
+        ("v1.0", {"v3.0": "content_3", "v2.0": "content_2"}, "content_1", "content_2", "content_3"),
+        (None, {}, "content_1", "content_2", "content_3"),
+        (None, False, "content_1", "content_2", "content_3_fail"),
+    ],
+)
+def test_parse_changelog(last_version, expected_parsed: dict, content1_name, content2_name, content3_name, request):
+    content_1 = request.getfixturevalue(content1_name)
+    content_2 = request.getfixturevalue(content2_name)
+    content_3 = request.getfixturevalue(content3_name)
+    if type(expected_parsed) == dict:
+        expected_parsed = {key: request.getfixturevalue(value).replace("## [", "[") for key, value in expected_parsed.items()}
+    # Remember that the Changelog comes from newer to older
+    content = f"# Title\n\n{content_3}\n{content_2}\n{content_1}"
+
+    monitor = get_instance()
+    monitor.repository_info = REPOSITORY
+
+    mocked_storage_get = Mock()
+    mocked_storage_get.side_effect = [
+        {},
+        last_version
+    ]
+    mocked_storage_set = Mock()
+    mocked_storage_write_file = Mock()
+    with patch.object(monitor._storage, "get", new=mocked_storage_get):
+        with patch.object(monitor._storage, "set", new=mocked_storage_set):
+            if last_version is None:
+                if expected_parsed is False:
+                    with TestCase.assertRaises(monitor, RuntimeError):
+                        monitor.parse_changelog(content=content)
+                else:
+                    with patch.object(monitor._storage, "write_file", new=mocked_storage_write_file):
+                        result = monitor.parse_changelog(content=content)
+                        assert result == expected_parsed
+                        mocked_storage_set.assert_has_calls([
+                            call(slugify(REPOSITORY["git"]), {}),
+                            call(slugify(REPOSITORY["git"]) + ".last_version", "v3.0"),
+                        ])
+                        mocked_storage_write_file.assert_called_once()
+            else:
+                with patch.object(monitor._storage, "write_file", new=mocked_storage_write_file):
+                    result = monitor.parse_changelog(content=content)
+                    assert result == expected_parsed
+                    mocked_storage_set.assert_called_once_with(slugify(REPOSITORY["git"]), {})
+                    mocked_storage_write_file.assert_not_called()

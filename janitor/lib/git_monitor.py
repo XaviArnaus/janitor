@@ -60,6 +60,8 @@ class GitMonitor:
         regex = self.repository_info["changelog"]["version_regex"]\
             if "version_regex" in self.repository_info["changelog"] else DEFAULT_VERSION_REGEX
         matched = re.search(regex, section)
+        if matched is None:
+            return None
         return matched.group(1)
     
     def __get_param_name(self, param_name: str) -> str:

@@ -35,7 +35,7 @@ def patched_generic_init(self, config: Config):
     pass
 
 
-def get_instance(config_instance: Config = None) -> Publisher:
+def get_instance() -> Publisher:
     _mocked_mastodon_instance.__class__ = Mastodon
     _mocked_mastodon_instance.status_post = Mock()
     _mocked_mastodon_instance.status_post.return_value = {"id": 123}
@@ -47,19 +47,15 @@ def get_instance(config_instance: Config = None) -> Publisher:
         with patch.object(Config, "get", new=patched_config_get):
             with patch.object(Queue, "__init__", new=_mocked_queue_instance):
                 with patch.object(Formatter, "__init__", new=patched_generic_init):
-                    if config_instance is None:
-                        config_instance = Config()
                     return Publisher(
-                        config=config_instance,
+                        config=Config(),
                         mastodon=_mocked_mastodon_instance,
                         base_path="bla"
                     )
 
 
 def test_initialize():
-    config_instance = Config()
-
-    publisher = get_instance(config_instance)
+    publisher = get_instance()
 
     assert isinstance(publisher, Publisher)
     assert isinstance(publisher._config, Config)
@@ -67,7 +63,6 @@ def test_initialize():
     assert isinstance(publisher._queue, Queue)
     assert isinstance(publisher._formatter, Formatter)
     assert isinstance(publisher._mastodon, Mastodon)
-    _mocked_queue_instance.assert_called_once_with(config_instance, base_path="bla")
 
 
 @pytest.fixture

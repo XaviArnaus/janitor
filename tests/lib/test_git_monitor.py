@@ -26,6 +26,31 @@ REPOSITORY = {
 }
 
 
+@pytest.fixture
+def content_30():
+    return "## [v3.0.0](link.html)\n\n### Added\n\n- Action 33\n"
+
+
+@pytest.fixture
+def content_3():
+    return "## [v3.0](link.html)\n\n### Added\n\n- Action 3\n"
+
+
+@pytest.fixture
+def content_3_fail():
+    return "## [ABC](link.html)\n\n### Added\n\n- Action 3\n"
+
+
+@pytest.fixture
+def content_2():
+    return "## [v2.0](link.html)\n\n### Changed\n\n- Action 2\n"
+
+
+@pytest.fixture
+def content_1():
+    return "## [v1.0](link.html)\n\n### Removed\n\n- Action 1\n"
+
+
 def patched_config_init(self):
     pass
 
@@ -177,31 +202,6 @@ def test_get_changelog_content_reads_file_when_isfile():
     )
     mocked_open_file.assert_called_once_with(changelog_filename, 'r')
     assert returned_content == content
-
-
-@pytest.fixture
-def content_30():
-    return "## [v3.0.0](link.html)\n\n### Added\n\n- Action 33\n"
-
-
-@pytest.fixture
-def content_3():
-    return "## [v3.0](link.html)\n\n### Added\n\n- Action 3\n"
-
-
-@pytest.fixture
-def content_3_fail():
-    return "## [ABC](link.html)\n\n### Added\n\n- Action 3\n"
-
-
-@pytest.fixture
-def content_2():
-    return "## [v2.0](link.html)\n\n### Changed\n\n- Action 2\n"
-
-
-@pytest.fixture
-def content_1():
-    return "## [v1.0](link.html)\n\n### Removed\n\n- Action 1\n"
 
 
 @pytest.mark.parametrize(

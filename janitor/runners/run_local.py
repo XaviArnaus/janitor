@@ -53,6 +53,3 @@ class RunLocal(RunnerProtocol):
             **self._sys_info.get_disk_data()
         }
 
-
-if __name__ == '__main__':
-    RunLocal().run()

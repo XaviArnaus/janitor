@@ -70,6 +70,3 @@ class UpdateDdns(RunnerProtocol):
         except Exception as e:
             self._logger.exception(e)
 
-
-if __name__ == '__main__':
-    UpdateDdns().run()

@@ -28,6 +28,3 @@ class CreateApp(RunnerProtocol):
         )
         self._logger.info("Finished Create App")
 
-
-if __name__ == '__main__':
-    CreateApp().run()

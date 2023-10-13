@@ -37,14 +37,11 @@ class Scheduler(RunnerProtocol):
 
     def _execute_action(self, action: str):
         if action == "sysinfo_local":
-            RunLocal().run()
+            RunLocal(config=self._config, logger=self._logger).run()
         elif action == "sysinfo_remote":
-            RunRemote().run()
+            RunRemote(config=self._config, logger=self._logger).run()
         elif action == "update_ddns":
-            UpdateDdns().run()
+            UpdateDdns(config=self._config, logger=self._logger).run()
         elif action == "git_changes":
-            GitChanges().run()
+            GitChanges(config=self._config, logger=self._logger).run()
 
-
-if __name__ == '__main__':
-    Scheduler().run()

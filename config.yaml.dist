@@ -14,6 +14,9 @@ app:
       host: 0.0.0.0
       # [String] Port to listen to.
       port: 5000
+      # [Bool] If the listener server will run in debug mode (more and explicit logging)
+      #   defaults to false.
+      debug: false
     # [String] URL (and maybe port) to send the POST request to.
     remote_url: http://localhost:5000
   # Control of the app runners

@@ -1,29 +1,31 @@
-from pyxavi.logger import Logger
 from pyxavi.config import Config
 from janitor.lib.mastodon_helper import MastodonHelper
 from janitor.lib.publisher import Publisher
 from janitor.objects.message import Message
 from janitor.objects.queue_item import QueueItem
 from janitor.lib.directnic_ddns import DirectnicDdns
+from janitor.runners.runner_protocol import RunnerProtocol
+from definitions import ROOT_DIR
+import logging
 
 
-class UpdateDdns:
+class UpdateDdns(RunnerProtocol):
     '''
     Runner that gets the current external IP and updates
         Directnic's Dynamic DNS entries
     '''
 
-    def init(self):
-        self._config = Config()
-        self._logger = Logger(self._config).get_logger()
+    def __init__(self, config: Config = None, logger: logging = None) -> None:
+        self._config = config
+        self._logger = logger
         self._directnic = DirectnicDdns(self._config)
 
         return self
 
     def _send_mastodon_message(self, text: str) -> None:
         self._logger.info("Initializing Mastodon tooling")
-        mastodon = MastodonHelper.get_instance(self._config)
-        publisher = Publisher(self._config, mastodon)
+        mastodon = MastodonHelper.get_instance(self._config, base_path=ROOT_DIR)
+        publisher = Publisher(self._config, mastodon, base_path=ROOT_DIR)
         queue_item = QueueItem(message=Message(text=text))
         self._logger.info("Publishing Mastodon message")
         _ = publisher.publish_one(queue_item)
@@ -70,4 +72,4 @@ class UpdateDdns:
 
 
 if __name__ == '__main__':
-    UpdateDdns().init().run()
+    UpdateDdns().run()

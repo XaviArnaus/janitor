@@ -1,22 +1,23 @@
-from pyxavi.logger import Logger
 from pyxavi.config import Config
 from croniter import croniter
 from datetime import datetime
+from janitor.runners.runner_protocol import RunnerProtocol
+import logging
 
-from run_local import RunLocal
-from run_remote import RunRemote
-from update_ddns import UpdateDdns
-from publish_git_changes import PublishGitChanges
+from janitor.runners.run_local import RunLocal
+from janitor.runners.run_remote import RunRemote
+from janitor.runners.update_ddns import UpdateDdns
+from janitor.runners.publish_git_changes import PublishGitChanges
 
 
-class Scheduler:
+class Scheduler(RunnerProtocol):
     '''
     Runner for scheduled actions
     '''
 
-    def __init__(self):
-        self._config = Config()
-        self._logger = Logger(self._config).get_logger()
+    def __init__(self, config: Config = None, logger: logging = None) -> None:
+        self._config = config
+        self._logger = logger
 
     def run(self):
         '''
@@ -40,9 +41,9 @@ class Scheduler:
         elif action == "sysinfo_remote":
             RunRemote().run()
         elif action == "update_ddns":
-            UpdateDdns().init().run()
+            UpdateDdns().run()
         elif action == "publish_git_changes":
-            PublishGitChanges().init().run()
+            PublishGitChanges().run()
 
 
 if __name__ == '__main__':

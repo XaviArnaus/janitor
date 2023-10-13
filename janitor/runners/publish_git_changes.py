@@ -1,4 +1,3 @@
-from pyxavi.logger import Logger
 from pyxavi.config import Config
 from janitor.lib.mastodon_helper import MastodonHelper
 from janitor.objects.mastodon_connection_params import MastodonConnectionParams
@@ -6,20 +5,21 @@ from janitor.lib.publisher import Publisher
 from janitor.objects.message import Message
 from janitor.objects.queue_item import QueueItem
 from janitor.lib.git_monitor import GitMonitor
+from janitor.runners.runner_protocol import RunnerProtocol
+from definitions import ROOT_DIR
 import os
+import logging
 
 
-class PublishGitChanges:
+class PublishGitChanges(RunnerProtocol):
     '''
     Runner that goes through all monitored git repositories and detect changes,
     publishing them into the mastodon-like defined account
     '''
 
-    def init(self):
-        self._config = Config()
-        self._logger = Logger(self._config).get_logger()
-
-        return self
+    def __init__(self, config: Config = None, logger: logging = None) -> None:
+        self._config = config
+        self._logger = logger
 
     def run(self):
         '''
@@ -85,21 +85,23 @@ class PublishGitChanges:
         conn_params = MastodonConnectionParams.from_dict(
             self._config.get("git_monitor.mastodon")
         )
+        client_file = os.path.join(ROOT_DIR, conn_params.credentials.client_file)
         # If the client_file does not exist we need to trigger the
         #   create app action.
-        if not os.path.exists(conn_params.credentials.client_file):
+        if not os.path.exists(client_file):
             MastodonHelper.create_app(
                 instance_type=conn_params.instance_type,
                 client_name=self._config.get("git_monitor.mastodon.app_name"),
                 api_base_url=conn_params.api_base_url,
-                to_file=conn_params.credentials.client_file
+                to_file=client_file
             )
         # Now get the instance
         mastodon_instance = MastodonHelper.get_instance(
             config=self._config, connection_params=conn_params
         )
         # Now publish the message
-        _ = Publisher(self._config, mastodon_instance).publish_one(QueueItem(message))
+        _ = Publisher(self._config, mastodon_instance, base_path=ROOT_DIR)\
+            .publish_one(QueueItem(message))
 
     def _publish_notification(self, message: Message):
         # This is the notification that we publish to
@@ -108,8 +110,9 @@ class PublishGitChanges:
         # Get the instance. Everything is by default
         mastodon_instance = MastodonHelper.get_instance(self._config)
         # Now publish the message
-        _ = Publisher(self._config, mastodon_instance).publish_one(QueueItem(message))
+        _ = Publisher(self._config, mastodon_instance, base_path=ROOT_DIR)\
+            .publish_one(QueueItem(message))
 
 
 if __name__ == '__main__':
-    PublishGitChanges().init().run()
+    PublishGitChanges().run()

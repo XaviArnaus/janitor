@@ -178,6 +178,7 @@ def test_get_changelog_content_reads_file_when_isfile():
     mocked_open_file.assert_called_once_with(changelog_filename, 'r')
     assert returned_content == content
 
+
 @pytest.fixture
 def content_30():
     return "## [v3.0.0](link.html)\n\n### Added\n\n- Action 33\n"

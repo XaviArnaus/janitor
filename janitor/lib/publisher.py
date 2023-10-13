@@ -17,10 +17,10 @@ class Publisher:
 
     DEFAULT_MAX_LENGTH = 500
 
-    def __init__(self, config: Config, mastodon: Mastodon) -> None:
+    def __init__(self, config: Config, mastodon: Mastodon, base_path: str = None) -> None:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
-        self._queue = Queue(config)
+        self._queue = Queue(config, base_path=base_path)
         self._formatter = Formatter(config)
         self._mastodon = mastodon
 

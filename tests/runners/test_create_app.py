@@ -1,9 +1,11 @@
 from pyxavi.config import Config
 from pyxavi.logger import Logger
-from create_app import CreateApp
+from janitor.runners.create_app import CreateApp
 from unittest.mock import patch, Mock, call
 from janitor.lib.mastodon_helper import MastodonHelper
 from logging import Logger as PythonLogger
+from definitions import ROOT_DIR
+import os
 
 
 def patched_generic_init(self):
@@ -14,6 +16,10 @@ def patched_generic_init_with_config(self, config):
     pass
 
 
+def patched_root_dir():
+    return "bla"
+
+
 @patch.object(Config, "__init__", new=patched_generic_init)
 @patch.object(Logger, "__init__", new=patched_generic_init_with_config)
 def get_instance() -> CreateApp:
@@ -22,7 +28,7 @@ def get_instance() -> CreateApp:
     mocked_logger_get_logger = Mock()
     mocked_logger_get_logger.return_value = mocked_official_logger
     with patch.object(Logger, "get_logger", new=mocked_logger_get_logger):
-        return CreateApp()
+        return CreateApp(config=Config(), logger=mocked_official_logger)
 
 
 def test_init():
@@ -49,7 +55,10 @@ def test_create_app():
             runner.run()
 
     mocked_create_app.assert_called_once_with(
-        instance_type, app_name, api_base_url=base_url, to_file=client_file
+        instance_type,
+        app_name,
+        api_base_url=base_url,
+        to_file=os.path.join(ROOT_DIR, client_file)
     )
     mocked_config_get.assert_has_calls(
         [

@@ -6,7 +6,7 @@ from janitor.lib.publisher import Publisher
 from janitor.lib.mastodon_helper import MastodonHelper
 from janitor.objects.message import Message
 from janitor.objects.queue_item import QueueItem
-from run_local import RunLocal
+from janitor.runners.run_local import RunLocal
 from unittest.mock import patch, Mock
 import pytest
 from logging import Logger as PythonLogger
@@ -69,11 +69,11 @@ def patched_generic_init_with_config(self, config):
     pass
 
 
-def patched_mastodon_get_instance(config):
+def patched_mastodon_get_instance(config, base_path):
     pass
 
 
-def patched_publisher_init(self, config, mastodon):
+def patched_publisher_init(self, config, mastodon, base_path):
     pass
 
 
@@ -86,7 +86,7 @@ def get_instance() -> RunLocal:
     mocked_logger_get_logger = Mock()
     mocked_logger_get_logger.return_value = mocked_official_logger
     with patch.object(Logger, "get_logger", new=mocked_logger_get_logger):
-        return RunLocal()
+        return RunLocal(config=Config(), logger=mocked_official_logger)
 
 
 def test_init():

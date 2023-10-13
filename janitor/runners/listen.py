@@ -1,18 +1,50 @@
 from pyxavi.config import Config
-from pyxavi.logger import Logger
 from janitor.lib.system_info import SystemInfo
 from janitor.lib.system_info_templater import SystemInfoTemplater
 from janitor.lib.publisher import Publisher
 from janitor.lib.mastodon_helper import MastodonHelper
 from janitor.objects.queue_item import QueueItem
 from janitor.objects.message import Message, MessageType
+from janitor.runners.runner_protocol import RunnerProtocol
+from definitions import ROOT_DIR
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
+import logging
 
 app = Flask(__name__)
 api = Api(app)
 
 DEFAULT_MESSAGE_TYPE = str(MessageType.NONE)
+CONFIG_FILE = "../config.yaml"
+
+
+class Listen(RunnerProtocol):
+
+    def __init__(self, config: Config = None, logger: logging = None) -> None:
+        self._config = config
+        self._logger = logger
+
+    def run(self):
+        api.add_resource(
+            ListenSysInfo,
+            '/sysinfo',
+            resource_class_kwargs={
+                "config": self._config, "logger": self._logger
+            }
+        )
+        api.add_resource(
+            ListenMessage,
+            '/message',
+            resource_class_kwargs={
+                "config": self._config, "logger": self._logger
+            }
+        )
+
+        app.run(
+            debug=self._config.get("app.service.listen.debug"),
+            host=self._config.get("app.service.listen.host"),
+            port=self._config.get("app.service.listen.port")
+        )
 
 
 class ListenSysInfo(Resource):
@@ -20,9 +52,9 @@ class ListenSysInfo(Resource):
     Listener from remote SysInfo Report requests to log
     '''
 
-    def __init__(self):
-        self._config = Config()
-        self._logger = Logger(self._config).get_logger()
+    def __init__(self, config: Config = None, logger: logging = None) -> None:
+        self._config = config
+        self._logger = logger
         self._sys_info = SystemInfo(self._config)
         self._parser = reqparse.RequestParser()
         self._parser.add_argument(
@@ -57,8 +89,8 @@ class ListenSysInfo(Resource):
         message = SystemInfoTemplater(self._config).process_report(sys_data)
 
         # Publish the queue
-        mastodon = MastodonHelper.get_instance(self._config)
-        publisher = Publisher(self._config, mastodon)
+        mastodon = MastodonHelper.get_instance(self._config, base_path=ROOT_DIR)
+        publisher = Publisher(self._config, mastodon, base_path=ROOT_DIR)
         self._logger.info("Publishing one message")
         publisher.publish_one(QueueItem(message))
 
@@ -71,9 +103,9 @@ class ListenMessage(Resource):
     Listener from remote Message requests to log
     '''
 
-    def __init__(self):
-        self._config = Config()
-        self._logger = Logger(self._config).get_logger()
+    def __init__(self, config: Config = None, logger: logging = None) -> None:
+        self._config = config
+        self._logger = logger
         self._parser = reqparse.RequestParser()
         self._parser.add_argument(
             'summary',
@@ -145,20 +177,10 @@ class ListenMessage(Resource):
             message = Message(summary=f"{icon} {hostname}:\n\n{summary}", text=f"{text}")
 
         # Publish the queue
-        mastodon = MastodonHelper.get_instance(self._config)
-        publisher = Publisher(self._config, mastodon)
+        mastodon = MastodonHelper.get_instance(self._config, base_path=ROOT_DIR)
+        publisher = Publisher(self._config, mastodon, base_path=ROOT_DIR)
         self._logger.info("Publishing one message")
         publisher.publish_one(QueueItem(message))
 
         self._logger.info("End.")
         return 200
-
-
-api.add_resource(ListenSysInfo, '/sysinfo')
-api.add_resource(ListenMessage, '/message')
-
-if __name__ == '__main__':
-    app.run(
-        host=Config().get("app.service.listen.host"),
-        port=Config().get("app.service.listen.port")
-    )

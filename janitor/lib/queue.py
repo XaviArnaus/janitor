@@ -2,16 +2,20 @@ from pyxavi.config import Config
 from pyxavi.storage import Storage
 from janitor.objects.queue_item import QueueItem
 import logging
+import os
 
 
 class Queue:
 
     _queue = []
 
-    def __init__(self, config: Config) -> None:
+    def __init__(self, config: Config, base_path: str = None) -> None:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
-        self._queue_manager = Storage(self._config.get("queue_storage.file"))
+        file_name = self._config.get("queue_storage.file")
+        if base_path is not None:
+            file_name = os.path.join(base_path, file_name)
+        self._queue_manager = Storage(filename=file_name)
         self._queue = list(
             map(lambda x: QueueItem.from_dict(x), self._queue_manager.get("queue", []))
         )

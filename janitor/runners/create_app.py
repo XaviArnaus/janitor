@@ -1,17 +1,19 @@
 from pyxavi.config import Config
-from pyxavi.logger import Logger
 from janitor.lib.mastodon_helper import MastodonHelper
+from janitor.runners.runner_protocol import RunnerProtocol
+from definitions import ROOT_DIR
+import logging
+import os
+
 
 #######
 # This is meant to be run just once.
 ##
+class CreateApp(RunnerProtocol):
 
-
-class CreateApp:
-
-    def __init__(self):
-        self._config = Config()
-        self._logger = Logger(self._config).get_logger()
+    def __init__(self, config: Config = None, logger: logging = None) -> None:
+        self._config = config
+        self._logger = logger
         self._logger.info("Run Create App")
 
     def run(self):
@@ -20,7 +22,9 @@ class CreateApp:
             self._config.get("mastodon.instance_type"),
             self._config.get("mastodon.app_name"),
             api_base_url=self._config.get("mastodon.api_base_url"),
-            to_file=self._config.get("mastodon.credentials.client_file")
+            to_file=os.path.join(
+                ROOT_DIR, self._config.get("mastodon.credentials.client_file")
+            )
         )
         self._logger.info("Finished Create App")
 

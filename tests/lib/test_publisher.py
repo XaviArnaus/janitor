@@ -48,9 +48,7 @@ def get_instance() -> Publisher:
             with patch.object(Queue, "__init__", new=_mocked_queue_instance):
                 with patch.object(Formatter, "__init__", new=patched_generic_init):
                     return Publisher(
-                        config=Config(),
-                        mastodon=_mocked_mastodon_instance,
-                        base_path="bla"
+                        config=Config(), mastodon=_mocked_mastodon_instance, base_path="bla"
                     )
 
 

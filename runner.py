@@ -7,6 +7,7 @@ from pyxavi.logger import Logger
 import os
 from definitions import ROOT_DIR
 from pyxavi.debugger import full_stack
+from string import Template
 
 from janitor.runners.create_app import CreateApp
 from janitor.runners.run_local import RunLocal
@@ -16,38 +17,102 @@ from janitor.runners.scheduler import Scheduler
 from janitor.runners.publish_queue import PublishQueue
 from janitor.runners.publish_test import PublishTest
 from janitor.runners.update_ddns import UpdateDdns
-from janitor.runners.publish_git_changes import PublishGitChanges
+from janitor.runners.git_changes import GitChanges
 
 PROGRAM_NAME = "janitor"
-PROGRAM_DESC = "CLI command to trigger the runners"
-PROGRAM_VERS = pkg_resources.get_distribution(PROGRAM_NAME).version
+PROGRAM_DESC = "CLI command to execute runners and tasks"
+PROGRAM_EPILOG = f"Use [{PROGRAM_NAME} commands] to get a list of available commands."
+PROGRAM_VERSION = pkg_resources.get_distribution(PROGRAM_NAME).version
 SUBCOMMAND_TOKEN = "#SUBCOMMAND#"
+HELP_TOKEN = "#HELP#"
 COMMAND_MAP = {
-    "create_app": CreateApp,
-    "sys_info": SUBCOMMAND_TOKEN,
-    "listen": Listen,
-    "scheduler": Scheduler,
-    "publish_test": PublishTest,
-    "publish_queue": PublishQueue,
-    "update_ddns": UpdateDdns,
-    "publish_git_changes": PublishGitChanges
+    "commands": (HELP_TOKEN, "Shows the list of available commands and subcommands"),
+    "mastodon": (SUBCOMMAND_TOKEN, "Performs tasks related to the Mastodon-like API"),
+    "sys_info": (SUBCOMMAND_TOKEN, "Performs tasks related to the System Info gathering"),
+    "listen": (
+        Listen,
+        "Starts the server side listener, that receives System Info and arbitrary messages"
+    ),
+    "scheduler": (Scheduler, "Perform scheduled tasks, set up in the config file"),
+    "update_ddns": (
+        UpdateDdns,
+        "Discovers the current external IP and updates the Directnic Dynamic DNS registers"
+    ),
+    "git_changes": (
+        GitChanges, "Discovers changes in the monitored Git repositories and publishes them"
+    )
 }
 
 SUBCOMMAND_MAP = {
     "sys_info": {
-        "local": RunLocal,
-        "remote": RunRemote,
+        "local": (
+            RunLocal,
+            "Gathers the local System Info, compares with thresholds and publishes if crossed."
+        ),
+        "remote": (
+            RunRemote,
+            "Gathers the local System Info and sends them to a listening server to be processed"
+        ),
+    },
+    "mastodon": {
+        "create_app": (CreateApp, "Creates the Mastodon-like API application session file"),
+        "test": (
+            PublishTest,
+            "Publishes a test message to the Mastodon-like API to ensure that all is set up ok."
+        ),
+        "publish_queue": (
+            PublishQueue,
+            "Publishes the current queue to the Mastodon-like API, attending the config file."
+        ),
     }
 }
 
 
-def _get_runner__by_command(args: Namespace) -> RunnerProtocol:
+def print_command_list():
+    main_template = "\n$title\n\nusage: $example_use\n\nCommand list:\n\n$command_list\n"
+    title_template = f"{TerminalColor.ORANGE_BRIGHT}$name v$version{TerminalColor.END}"
+    example_template = f"$name {TerminalColor.YELLOW_BRIGHT}command{TerminalColor.END} " +\
+        "[{TerminalColor.CYAN_BRIGHT}subcommand]{TerminalColor.END}"
+    command_template = f"{TerminalColor.YELLOW_BRIGHT}$command$description{TerminalColor.END}"
+    subcommand_template = f"  {TerminalColor.CYAN_BRIGHT}$subcommand$description" +\
+        "{TerminalColor.END}"
+    command_max_width = 20
+    subcommand_max_width = 18
+
+    commands_list = []
+    for command, pair in COMMAND_MAP.items():
+        action, description = pair
+        commands_list.append(
+            Template(command_template).substitute(
+                command=command.ljust(command_max_width), description=description
+            )
+        )
+        if command in SUBCOMMAND_MAP:
+            for subcommand, subpair in SUBCOMMAND_MAP[command].items():
+                subaction, subdescription = subpair
+                commands_list.append(
+                    Template(subcommand_template).substitute(
+                        subcommand=subcommand.ljust(subcommand_max_width),
+                        description=subdescription
+                    )
+                )
+
+    content = Template(main_template).substitute(
+        title=Template(title_template
+                       ).substitute(name=PROGRAM_NAME.capitalize(), version=PROGRAM_VERSION),
+        example_use=Template(example_template).substitute(name=PROGRAM_NAME),
+        command_list="\n".join(commands_list)
+    )
+    print(content)
+
+
+def _get_runner_by_command(args: Namespace) -> RunnerProtocol:
     command_candidate = args.command
 
     if command_candidate in COMMAND_MAP:
         # So we have this command registered.
         #   It can be a direct Runner or forwarding to a subcommand
-        if COMMAND_MAP[command_candidate] == SUBCOMMAND_TOKEN:
+        if COMMAND_MAP[command_candidate][0] == SUBCOMMAND_TOKEN:
             # Search it then inside the subcommands list
             if command_candidate in SUBCOMMAND_MAP:
                 # Now get the subcommand
@@ -55,7 +120,13 @@ def _get_runner__by_command(args: Namespace) -> RunnerProtocol:
                 if subcommand_candidate in SUBCOMMAND_MAP[command_candidate]:
                     # It is a direct Runner.
                     # DO NOT return the instance, let it be in the main.
-                    return SUBCOMMAND_MAP[command_candidate][subcommand_candidate]
+                    return SUBCOMMAND_MAP[command_candidate][subcommand_candidate][0]
+                elif subcommand_candidate is None:
+                    # A subcommand is expected
+                    raise RuntimeError(
+                        f"The requested command '{command_candidate}' expects a" +
+                        " subcommand, that is not present. Please type also a subcommand."
+                    )
                 else:
                     # Oops! It's not here, return an error
                     raise RuntimeError(
@@ -71,7 +142,7 @@ def _get_runner__by_command(args: Namespace) -> RunnerProtocol:
         else:
             # It is a direct Runner.
             # DO NOT return the instance, let it be in the main.
-            return COMMAND_MAP[command_candidate]
+            return COMMAND_MAP[command_candidate][0]
     else:
         # Oops! It's not here, return an error
         raise RuntimeError(f"The requested command '{command_candidate}' does not exist")
@@ -79,7 +150,7 @@ def _get_runner__by_command(args: Namespace) -> RunnerProtocol:
 
 def setup_parser() -> ArgumentParser:
 
-    parser = ArgumentParser(prog=PROGRAM_NAME, description=PROGRAM_DESC)
+    parser = ArgumentParser(prog=PROGRAM_NAME, description=PROGRAM_DESC, epilog=PROGRAM_EPILOG)
 
     # First argument is the command
     parser.add_argument("command", action="store")
@@ -88,7 +159,7 @@ def setup_parser() -> ArgumentParser:
     parser.add_argument("subcommand", nargs='?', default=None)
 
     # Ability to show the version
-    parser.add_argument("--version", action="version", version=PROGRAM_VERS)
+    parser.add_argument("--version", action="version", version=PROGRAM_VERSION)
     return parser
 
 
@@ -103,8 +174,13 @@ def run():
         # Get the arguments
         args = parser.parse_args()
 
+        # This prints the list of available commands and leaves.
+        if args.command == "commands":
+            print_command_list()
+            exit(0)
+
         # Find the command to execute. It is ready to be instantiated
-        runner = _get_runner__by_command(args=args)(config=config, logger=logger)
+        runner = _get_runner_by_command(args=args)(config=config, logger=logger)
 
         # Execute the runner
         runner.run()

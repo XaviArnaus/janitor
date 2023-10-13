@@ -7,7 +7,7 @@ import logging
 from janitor.runners.run_local import RunLocal
 from janitor.runners.run_remote import RunRemote
 from janitor.runners.update_ddns import UpdateDdns
-from janitor.runners.publish_git_changes import PublishGitChanges
+from janitor.runners.git_changes import GitChanges
 
 
 class Scheduler(RunnerProtocol):
@@ -42,8 +42,8 @@ class Scheduler(RunnerProtocol):
             RunRemote().run()
         elif action == "update_ddns":
             UpdateDdns().run()
-        elif action == "publish_git_changes":
-            PublishGitChanges().run()
+        elif action == "git_changes":
+            GitChanges().run()
 
 
 if __name__ == '__main__':

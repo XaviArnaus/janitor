@@ -11,7 +11,7 @@ import os
 import logging
 
 
-class PublishGitChanges(RunnerProtocol):
+class GitChanges(RunnerProtocol):
     '''
     Runner that goes through all monitored git repositories and detect changes,
     publishing them into the mastodon-like defined account
@@ -112,7 +112,3 @@ class PublishGitChanges(RunnerProtocol):
         # Now publish the message
         _ = Publisher(self._config, mastodon_instance, base_path=ROOT_DIR)\
             .publish_one(QueueItem(message))
-
-
-if __name__ == '__main__':
-    PublishGitChanges().run()

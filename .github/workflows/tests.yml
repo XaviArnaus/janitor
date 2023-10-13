@@ -21,7 +21,7 @@ jobs:
         uses: Gr1N/setup-poetry@v8
         with:
           poetry-preview: true
-          poetry-version: "1.5.2"
+          poetry-version: "1.6.1"
 
       - name: Install Dependencies
         run: |

@@ -44,4 +44,3 @@ class Scheduler(RunnerProtocol):
             UpdateDdns(config=self._config, logger=self._logger).run()
         elif action == "git_changes":
             GitChanges(config=self._config, logger=self._logger).run()
-

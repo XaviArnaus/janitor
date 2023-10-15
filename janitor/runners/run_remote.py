@@ -45,4 +45,3 @@ class RunRemote(RunnerProtocol):
             **self._sys_info.get_mem_data(),
             **self._sys_info.get_disk_data(),
         }
-

@@ -30,4 +30,3 @@ class PublishQueue(RunnerProtocol):
             publisher.publish_all_from_queue()
         except Exception as e:
             self._logger.exception(e)
-

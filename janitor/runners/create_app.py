@@ -27,4 +27,3 @@ class CreateApp(RunnerProtocol):
             )
         )
         self._logger.info("Finished Create App")
-

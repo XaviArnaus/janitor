@@ -69,4 +69,3 @@ class UpdateDdns(RunnerProtocol):
                 self._logger.exception(e)
         except Exception as e:
             self._logger.exception(e)
-

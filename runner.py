@@ -68,16 +68,22 @@ SUBCOMMAND_MAP = {
 }
 
 
-def print_command_list():
+def print_command_list(with_colors: bool = True):
     main_template = "\n$title\n\nusage: $example_use\n\nCommand list:\n\n$command_list\n"
-    title_template = f"{TerminalColor.ORANGE_BRIGHT}$name v$version{TerminalColor.END}"
-    example_template = f"$name {TerminalColor.YELLOW_BRIGHT}command{TerminalColor.END} " +\
-        "[{TerminalColor.CYAN_BRIGHT}subcommand]{TerminalColor.END}"
-    command_template = f"{TerminalColor.YELLOW_BRIGHT}$command$description{TerminalColor.END}"
-    subcommand_template = f"  {TerminalColor.CYAN_BRIGHT}$subcommand$description" +\
-        "{TerminalColor.END}"
+    title_template = "$name v$version"
+    example_template = "$name command [subcommand]"
+    command_template = "$command$description"
+    subcommand_template = "  $subcommand$description"
     command_max_width = 20
     subcommand_max_width = 18
+
+    if with_colors:
+        title_template = f"{TerminalColor.ORANGE_BRIGHT}{title_template}{TerminalColor.END}"
+        example_template = f"$name {TerminalColor.YELLOW_BRIGHT}command{TerminalColor.END} " +\
+            f"[{TerminalColor.CYAN_BRIGHT}subcommand{TerminalColor.END}]"
+        command_template = f"{TerminalColor.YELLOW_BRIGHT}{command_template}{TerminalColor.END}"
+        subcommand_template = f"{TerminalColor.CYAN_BRIGHT}{subcommand_template}" +\
+            "{TerminalColor.END}"
 
     commands_list = []
     for command, pair in COMMAND_MAP.items():
@@ -140,14 +146,23 @@ def _get_runner_by_command(args: Namespace) -> RunnerProtocol:
                     + " but these are not set up. Mostly a Runner setup error."
                 )
         else:
-            # It is a direct Runner.
-            # DO NOT return the instance, let it be in the main.
-            return COMMAND_MAP[command_candidate][0]
+            # Rather than ignoring the subcommand, complain for the unexpected argument
+            subcommand_candidate = args.subcommand
+            if subcommand_candidate is not None:
+                raise RuntimeError(
+                    f"The requested command '{command_candidate}' is does not expect" +
+                    "  subcommands but one is received. Stopping."
+                )
+            else:
+                # It is a direct Runner.
+                # DO NOT return the instance, let it be in the main.
+                return COMMAND_MAP[command_candidate][0]
     else:
         # Oops! It's not here, return an error
         raise RuntimeError(f"The requested command '{command_candidate}' does not exist")
 
 
+@staticmethod
 def setup_parser() -> ArgumentParser:
 
     parser = ArgumentParser(prog=PROGRAM_NAME, description=PROGRAM_DESC, epilog=PROGRAM_EPILOG)

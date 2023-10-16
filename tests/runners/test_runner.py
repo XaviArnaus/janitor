@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 from runner import print_command_list, _get_runner_by_command, setup_parser, run,\
                     PROGRAM_NAME, PROGRAM_DESC, PROGRAM_EPILOG, PROGRAM_VERSION,\
-                    SUBCOMMAND_TOKEN
+                    SUBCOMMAND_TOKEN, CLI_NAME
 from unittest.mock import patch, Mock, call
 import pytest
 from unittest import TestCase
@@ -34,7 +34,7 @@ def test_setup_parser():
             _ = setup_parser()
 
     mocked_argument_parser.assert_called_once_with(
-        prog=PROGRAM_NAME, description=PROGRAM_DESC, epilog=PROGRAM_EPILOG
+        prog=CLI_NAME, description=PROGRAM_DESC, epilog=PROGRAM_EPILOG
     )
     mocked_add_argument.assert_has_calls(
         [
@@ -112,7 +112,7 @@ def test_print_command_list(capsys):
     captured = capsys.readouterr()
 
     assert captured.out == f"\n{PROGRAM_NAME.capitalize()} v{PROGRAM_VERSION}\n\n" +\
-        "usage: janitor command [subcommand]\n\n" +\
+        "usage: jan command [subcommand]\n\n" +\
         "Command list:\n\n" +\
         "command_1           description_1\n" +\
         "command_2           description_2\n" +\

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+POETRY_PATH=$(which poetry)
+$POETRY_PATH run main $@

@@ -20,8 +20,9 @@ from janitor.runners.update_ddns import UpdateDdns
 from janitor.runners.git_changes import GitChanges
 
 PROGRAM_NAME = "janitor"
+CLI_NAME = "jan"
 PROGRAM_DESC = "CLI command to execute runners and tasks"
-PROGRAM_EPILOG = f"Use [{PROGRAM_NAME} commands] to get a list of available commands."
+PROGRAM_EPILOG = f"Use [{CLI_NAME} commands] to get a list of available commands."
 PROGRAM_VERSION = pkg_resources.get_distribution(PROGRAM_NAME).version
 SUBCOMMAND_TOKEN = "#SUBCOMMAND#"
 HELP_TOKEN = "#HELP#"
@@ -83,7 +84,7 @@ def print_command_list(with_colors: bool = True):
             f"[{TerminalColor.CYAN_BRIGHT}subcommand{TerminalColor.END}]"
         command_template = f"{TerminalColor.YELLOW_BRIGHT}{command_template}{TerminalColor.END}"
         subcommand_template = f"{TerminalColor.CYAN_BRIGHT}{subcommand_template}" +\
-            "{TerminalColor.END}"
+            f"{TerminalColor.END}"
 
     commands_list = []
     for command, pair in COMMAND_MAP.items():
@@ -106,7 +107,7 @@ def print_command_list(with_colors: bool = True):
     content = Template(main_template).substitute(
         title=Template(title_template
                        ).substitute(name=PROGRAM_NAME.capitalize(), version=PROGRAM_VERSION),
-        example_use=Template(example_template).substitute(name=PROGRAM_NAME),
+        example_use=Template(example_template).substitute(name=CLI_NAME),
         command_list="\n".join(commands_list)
     )
     print(content)
@@ -165,7 +166,7 @@ def _get_runner_by_command(args: Namespace) -> RunnerProtocol:
 @staticmethod
 def setup_parser() -> ArgumentParser:
 
-    parser = ArgumentParser(prog=PROGRAM_NAME, description=PROGRAM_DESC, epilog=PROGRAM_EPILOG)
+    parser = ArgumentParser(prog=CLI_NAME, description=PROGRAM_DESC, epilog=PROGRAM_EPILOG)
 
     # First argument is the command
     parser.add_argument("command", action="store")

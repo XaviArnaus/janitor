@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 from runner import print_command_list, _get_runner_by_command, setup_parser, run,\
                     PROGRAM_NAME, PROGRAM_DESC, PROGRAM_EPILOG, PROGRAM_VERSION,\
-                    SUBCOMMAND_TOKEN, CLI_NAME
+                    SUBCOMMAND_TOKEN, CLI_NAME, IMPLEMENTED_IN_BASH_TOKEN
 from unittest.mock import patch, Mock, call
 import pytest
 from unittest import TestCase
@@ -13,12 +13,14 @@ from janitor.runners.runner_protocol import RunnerProtocol
 
 test_command_map = {
     "command_1": ("runner_1", "description_1"),
-    "command_2": (SUBCOMMAND_TOKEN, "description_2")
+    "command_2": (SUBCOMMAND_TOKEN, "description_2"),
+    "command_3": (IMPLEMENTED_IN_BASH_TOKEN, "description_3")
 }
 test_subcommand_map = {
     "command_2": {
         "subcommand_a": ("runner_a", "description_a"),
-        "subcommand_b": ("runner_b", "description_b")
+        "subcommand_b": ("runner_b", "description_b"),
+        "subcommand_c": (IMPLEMENTED_IN_BASH_TOKEN, "description_c")
     }
 }
 
@@ -54,6 +56,8 @@ def test_setup_parser():
         (None, None, False),
         ("command_2", None, False),
         ("command_1", "command_2", False),
+        ("command_2", "subcommmand_d", False),
+        ("command_3", None, False),
         ("command_2", "subcommmand_c", False),
     ],
 )
@@ -117,7 +121,9 @@ def test_print_command_list(capsys):
         "command_1           description_1\n" +\
         "command_2           description_2\n" +\
         "  subcommand_a      description_a\n" +\
-        "  subcommand_b      description_b\n\n"
+        "  subcommand_b      description_b\n" +\
+        "  subcommand_c      description_c\n" +\
+        "command_3           description_3\n\n"
 
 
 def test_run_command():

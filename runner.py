@@ -26,13 +26,15 @@ PROGRAM_EPILOG = f"Use [{CLI_NAME} commands] to get a list of available commands
 PROGRAM_VERSION = pkg_resources.get_distribution(PROGRAM_NAME).version
 SUBCOMMAND_TOKEN = "#SUBCOMMAND#"
 HELP_TOKEN = "#HELP#"
+IMPLEMENTED_IN_BASH_TOKEN = "#BASH#"
 COMMAND_MAP = {
     "commands": (HELP_TOKEN, "Shows the list of available commands and subcommands"),
     "mastodon": (SUBCOMMAND_TOKEN, "Performs tasks related to the Mastodon-like API"),
     "sys_info": (SUBCOMMAND_TOKEN, "Performs tasks related to the System Info gathering"),
-    "listen": (
-        Listen,
-        "Starts the server side listener, that receives System Info and arbitrary messages"
+    "listener": (
+        SUBCOMMAND_TOKEN,
+        "Perform tasks related to the Server side listener," +
+        "that receives System Info and arbitrary messages"
     ),
     "scheduler": (Scheduler, "Perform scheduled tasks, set up in the config file"),
     "update_ddns": (
@@ -41,6 +43,9 @@ COMMAND_MAP = {
     ),
     "git_changes": (
         GitChanges, "Discovers changes in the monitored Git repositories and publishes them"
+    ),
+    "validate_config": (
+        IMPLEMENTED_IN_BASH_TOKEN, "Validates the config.yaml Configuration file"
     )
 }
 
@@ -65,6 +70,14 @@ SUBCOMMAND_MAP = {
             PublishQueue,
             "Publishes the current queue to the Mastodon-like API, attending the config file."
         ),
+    },
+    "listener": {
+        "start": (Listen, "Starts the listener."),
+        "status": (
+            IMPLEMENTED_IN_BASH_TOKEN,
+            "Requests the status of the listener. Will print the PID if running"
+        ),
+        "stop": (IMPLEMENTED_IN_BASH_TOKEN, "Stops the listener.")
     }
 }
 
@@ -125,9 +138,18 @@ def _get_runner_by_command(args: Namespace) -> RunnerProtocol:
                 # Now get the subcommand
                 subcommand_candidate = args.subcommand
                 if subcommand_candidate in SUBCOMMAND_MAP[command_candidate]:
-                    # It is a direct Runner.
-                    # DO NOT return the instance, let it be in the main.
-                    return SUBCOMMAND_MAP[command_candidate][subcommand_candidate][0]
+                    if SUBCOMMAND_MAP[command_candidate][subcommand_candidate][
+                            0] == IMPLEMENTED_IN_BASH_TOKEN:
+                        # It is not implemented in the Python side. We should never hit here!
+                        raise RuntimeError(
+                            f"The requested subcommand '{subcommand_candidate}' is meant to" +
+                            " run in Bash but reached the Python side. " +
+                            "Mostly a Runner setup error."
+                        )
+                    else:
+                        # It is a direct Runner.
+                        # DO NOT return the instance, let it be in the main.
+                        return SUBCOMMAND_MAP[command_candidate][subcommand_candidate][0]
                 elif subcommand_candidate is None:
                     # A subcommand is expected
                     raise RuntimeError(
@@ -146,6 +168,12 @@ def _get_runner_by_command(args: Namespace) -> RunnerProtocol:
                     f"The requested command '{command_candidate}' is set up to have subcommands"
                     + " but these are not set up. Mostly a Runner setup error."
                 )
+        elif COMMAND_MAP[command_candidate][0] == IMPLEMENTED_IN_BASH_TOKEN:
+            # It is not implemented in the Python side. We should never hit here!
+            raise RuntimeError(
+                f"The requested command '{command_candidate}' is meant to run in Bash" +
+                " but reached the Python side. Mostly a Runner setup error."
+            )
         else:
             # Rather than ignoring the subcommand, complain for the unexpected argument
             subcommand_candidate = args.subcommand

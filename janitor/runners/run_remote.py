@@ -1,17 +1,18 @@
 from pyxavi.config import Config
-from pyxavi.logger import Logger
 from janitor.lib.system_info import SystemInfo
+from janitor.runners.runner_protocol import RunnerProtocol
 import requests
+import logging
 
 
-class RunRemote:
+class RunRemote(RunnerProtocol):
     '''
     Main runner of the app
     '''
 
-    def __init__(self):
-        self._config = Config()
-        self._logger = Logger(self._config).get_logger()
+    def __init__(self, config: Config = None, logger: logging = None) -> None:
+        self._config = config
+        self._logger = logger
         self._sys_info = SystemInfo(self._config)
         self._logger.info("Init Remote Runner")
 
@@ -44,7 +45,3 @@ class RunRemote:
             **self._sys_info.get_mem_data(),
             **self._sys_info.get_disk_data(),
         }
-
-
-if __name__ == '__main__':
-    RunRemote().run()

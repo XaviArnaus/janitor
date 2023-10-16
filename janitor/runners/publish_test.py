@@ -1,36 +1,36 @@
-from pyxavi.logger import Logger
 from pyxavi.config import Config
 from janitor.lib.mastodon_helper import MastodonHelper
 from janitor.lib.publisher import Publisher
 from janitor.objects.message import Message
 from janitor.objects.queue_item import QueueItem
+from janitor.runners.runner_protocol import RunnerProtocol
+from definitions import ROOT_DIR
+import logging
 
 
-class PublishTest:
+class PublishTest(RunnerProtocol):
     '''
-    Runner that publishes the queue
+    Runner that publishes a test
     '''
 
-    def init(self):
-        self._config = Config()
-        self._logger = Logger(self._config).get_logger()
-
-        return self
+    def __init__(self, config: Config = None, logger: logging = None) -> None:
+        self._config = config
+        self._logger = logger
 
     def run(self):
         '''
-        Just publishes the queue
+        Just publish a test
         '''
         try:
             # All actions are done under a Mastodon API instance
             instance_type = self._config.get("mastodon.instance_type")
             self._logger.info(f"Defined instance type: {instance_type}")
-            mastodon = MastodonHelper.get_instance(self._config)
+            mastodon = MastodonHelper.get_instance(self._config, base_path=ROOT_DIR)
             wrapper = type(mastodon)
             self._logger.info(f"Loaded wrapper: {wrapper}")
 
             # Prepare the Publisher
-            publisher = Publisher(self._config, mastodon)
+            publisher = Publisher(self._config, mastodon, base_path=ROOT_DIR)
 
             # Prepare a test message
             self._logger.info("Preparing a test message")
@@ -46,7 +46,3 @@ class PublishTest:
 
         except Exception as e:
             self._logger.exception(e)
-
-
-if __name__ == '__main__':
-    PublishTest().init().run()

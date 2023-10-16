@@ -1,7 +1,7 @@
 from pyxavi.config import Config
 from pyxavi.logger import Logger
 from janitor.lib.system_info import SystemInfo
-from run_remote import RunRemote
+from janitor.runners.run_remote import RunRemote
 from unittest.mock import patch, Mock, call
 import requests
 import pytest
@@ -74,7 +74,7 @@ def get_instance() -> RunRemote:
     mocked_logger_get_logger = Mock()
     mocked_logger_get_logger.return_value = mocked_official_logger
     with patch.object(Logger, "get_logger", new=mocked_logger_get_logger):
-        return RunRemote()
+        return RunRemote(config=Config(), logger=mocked_official_logger)
 
 
 def test_init():

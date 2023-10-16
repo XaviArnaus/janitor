@@ -1,6 +1,6 @@
 from pyxavi.config import Config
 from pyxavi.logger import Logger
-from scheduler import Scheduler
+from janitor.runners.scheduler import Scheduler
 from unittest.mock import patch, Mock
 from croniter import croniter
 from freezegun import freeze_time
@@ -26,7 +26,7 @@ def get_instance() -> Scheduler:
     mocked_logger_get_logger = Mock()
     mocked_logger_get_logger.return_value = mocked_official_logger
     with patch.object(Logger, "get_logger", new=mocked_logger_get_logger):
-        return Scheduler()
+        return Scheduler(config=Config(), logger=mocked_official_logger)
 
 
 def test_init():

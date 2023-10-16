@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "janitor"
-version = "0.3.0"
+version = "0.4.0"
 description = "Bot for performing common tasks and monitor the system."
 authors = ["Xavier Arnaus <xavi@arnaus.net>"]
 
@@ -12,8 +12,12 @@ strenum = "^v0.4.9"
 flask = "^2.2.3"
 flask-restful = "^0.3.9"
 croniter = "^1.3.8"
-pyxavi = "^0.5.1"
+gitpython = "^3.1.37"
+pyxavi = "^0.5.2"
+python-slugify = "^7.0.0"
 
+[tool.poetry.scripts]
+main = "runner:run"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.0"
@@ -30,7 +34,7 @@ force_grid_wrap = 3
 
 [tool.pytest.ini_options]
 minversion = "6.2"
-addopts = "-ra -q -vvv"
+addopts = "-ra -q -vvv --ignore-glob=storage*"
 markers = ["slow"]
 pythonpath = [
   "."
@@ -49,6 +53,11 @@ split_before_expression_after_opening_paren = 1
 split_before_first_argument = 1
 split_before_logical_operator = 0
 
+[tool.yapfignore]
+ignore_patterns = [
+    "storage/*"
+]
+
 [tool.coverage.report]
 skip_empty = true
 branch = true
@@ -57,7 +66,8 @@ branch = true
 omit = [
     "*/setup.py",
     "*/__main__.py",
-    "*/__init__.py"
+    "*/__init__.py",
+    "storage/*"
 ]
 
 [build-system]

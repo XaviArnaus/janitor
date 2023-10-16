@@ -1,20 +1,22 @@
 from pyxavi.config import Config
-from pyxavi.logger import Logger
 from janitor.lib.system_info import SystemInfo
 from janitor.lib.system_info_templater import SystemInfoTemplater
 from janitor.lib.publisher import Publisher
 from janitor.lib.mastodon_helper import MastodonHelper
 from janitor.objects.queue_item import QueueItem
+from janitor.runners.runner_protocol import RunnerProtocol
+from definitions import ROOT_DIR
+import logging
 
 
-class RunLocal:
+class RunLocal(RunnerProtocol):
     '''
     Main runner of the app
     '''
 
-    def __init__(self):
-        self._config = Config()
-        self._logger = Logger(self._config).get_logger()
+    def __init__(self, config: Config = None, logger: logging = None) -> None:
+        self._config = config
+        self._logger = logger
         self._sys_info = SystemInfo(self._config)
         self._logger.info("Init Local Runner")
 
@@ -33,8 +35,8 @@ class RunLocal:
         message = SystemInfoTemplater(self._config).process_report(sys_data)
 
         # Publish the queue
-        mastodon = MastodonHelper.get_instance(self._config)
-        publisher = Publisher(self._config, mastodon)
+        mastodon = MastodonHelper.get_instance(self._config, base_path=ROOT_DIR)
+        publisher = Publisher(self._config, mastodon, base_path=ROOT_DIR)
         self._logger.info("Publishing the whole queue")
         queue_item = QueueItem(message)
         publisher.publish_one(queue_item)
@@ -50,7 +52,3 @@ class RunLocal:
             **self._sys_info.get_mem_data(),
             **self._sys_info.get_disk_data()
         }
-
-
-if __name__ == '__main__':
-    RunLocal().run()

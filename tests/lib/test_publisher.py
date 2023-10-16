@@ -20,6 +20,7 @@ CONFIG = {
 }
 
 _mocked_mastodon_instance: Mastodon = Mock()
+_mocked_queue_instance = Mock()
 
 
 def patched_config_init(self):
@@ -40,12 +41,15 @@ def get_instance() -> Publisher:
     _mocked_mastodon_instance.status_post.return_value = {"id": 123}
     _mocked_mastodon_instance.media_post = Mock()
     _mocked_mastodon_instance.media_post.return_value = {"id": 456}
+    _mocked_queue_instance.return_value = None
 
     with patch.object(Config, "__init__", new=patched_config_init):
         with patch.object(Config, "get", new=patched_config_get):
-            with patch.object(Queue, "__init__", new=patched_generic_init):
+            with patch.object(Queue, "__init__", new=_mocked_queue_instance):
                 with patch.object(Formatter, "__init__", new=patched_generic_init):
-                    return Publisher(config=Config(), mastodon=_mocked_mastodon_instance)
+                    return Publisher(
+                        config=Config(), mastodon=_mocked_mastodon_instance, base_path="bla"
+                    )
 
 
 def test_initialize():

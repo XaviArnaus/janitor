@@ -7,6 +7,7 @@ from unittest.mock import patch, Mock
 import pytest
 from logging import Logger
 from datetime import datetime
+import os
 
 CONFIG = {"logger.name": "logger_test", "queue_storage.file": "queue.yaml"}
 
@@ -77,6 +78,23 @@ def test_initialize():
     assert isinstance(queue._logger, Logger)
     assert isinstance(queue._queue_manager, Storage)
     assert isinstance(queue._queue, list)
+
+
+def test_initialize_with_base_path():
+    mocked_storage_init = Mock()
+    mocked_storage_init.return_value = None
+    with patch.object(Config, "__init__", new=patched_config_init):
+        with patch.object(Config, "get", new=patched_config_get):
+            with patch.object(Storage, "__init__", new=mocked_storage_init):
+                with patch.object(Storage, "get", new=patched_storage_get):
+                    queue = Queue(config=Config(), base_path="bla")
+
+    assert isinstance(queue, Queue)
+    assert isinstance(queue._config, Config)
+    assert isinstance(queue._logger, Logger)
+    assert isinstance(queue._queue_manager, Storage)
+    assert isinstance(queue._queue, list)
+    mocked_storage_init.assert_called_once_with(filename=os.path.join("bla", "queue.yaml"))
 
 
 def test_append():

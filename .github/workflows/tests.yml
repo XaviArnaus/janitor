@@ -8,7 +8,7 @@ jobs:
     runs-on: [ubuntu-latest]
     strategy:
       matrix:
-        python-version: ["3.9"]
+        python-version: ["3.10"]
     steps:
       - uses: actions/checkout@v2
 
@@ -21,7 +21,7 @@ jobs:
         uses: Gr1N/setup-poetry@v8
         with:
           poetry-preview: true
-          poetry-version: "1.4.1"
+          poetry-version: "1.6.1"
 
       - name: Install Dependencies
         run: |

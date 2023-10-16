@@ -6,7 +6,7 @@ from janitor.lib.publisher import Publisher
 from janitor.lib.mastodon_helper import MastodonHelper
 from janitor.objects.message import Message, MessageType
 from janitor.objects.queue_item import QueueItem
-from listen import ListenMessage, ListenSysInfo
+from janitor.runners.listen import ListenMessage, ListenSysInfo
 from unittest.mock import patch, Mock, call
 import pytest
 from logging import Logger as PythonLogger
@@ -78,11 +78,11 @@ def patched_generic_init_with_config(self, config):
     pass
 
 
-def patched_mastodon_get_instance(config):
+def patched_mastodon_get_instance(config, base_path):
     pass
 
 
-def patched_publisher_init(self, config, mastodon):
+def patched_publisher_init(self, config, mastodon, base_path):
     pass
 
 
@@ -100,7 +100,7 @@ def get_instance_sys_info() -> ListenSysInfo:
     mocked_logger_get_logger = Mock()
     mocked_logger_get_logger.return_value = mocked_official_logger
     with patch.object(Logger, "get_logger", new=mocked_logger_get_logger):
-        return ListenSysInfo()
+        return ListenSysInfo(config=Config(), logger=mocked_official_logger)
 
 
 def test_init_sys_info():
@@ -199,7 +199,7 @@ def get_instance_message() -> ListenMessage:
     mocked_logger_get_logger = Mock()
     mocked_logger_get_logger.return_value = mocked_official_logger
     with patch.object(Logger, "get_logger", new=mocked_logger_get_logger):
-        return ListenMessage()
+        return ListenMessage(config=Config(), logger=mocked_official_logger)
 
 
 def test_init_message():

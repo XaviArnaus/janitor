@@ -14,7 +14,7 @@ elif [ $1 = "listener" ]; then
         LISTENER=$(pgrep -f "listen");
         if [ ! -z "$LISTENER" ]
         then
-            echo "Listener already running with PID: $LISTENER. Stop."
+            echo "Listener already running with PID: $LISTENER. Skipping."
         else
             nohup $POETRY_PATH run main $@ > log/listen_in_background.log 2>&1 &
             ./$0 listener status

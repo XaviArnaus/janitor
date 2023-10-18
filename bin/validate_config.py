@@ -4,7 +4,6 @@ import os
 from definitions import CONFIG_DIR
 from pyxavi.terminal_color import TerminalColor
 
-
 config_files = glob.glob(os.path.join(CONFIG_DIR, "*.yaml"))
 for file in config_files:
     try:

@@ -26,14 +26,6 @@ app:
     # [Bool] Performs a dry run: the queue is untouched and no re-toot is really done
     # Check the logs/stdout to see the results
     dry_run: True
-  # Manage the scheduling.
-  # Will be read by the scheduler (running every minute) to know what to do
-  schedules:
-    - name: "Heartbeat"
-      # crontab format: minute hour day-of-month month day-of-week
-      when: "* * * * *"
-      # [String] possible values: "sysinfo_local" | "sysinfo_remote" | "update_ddns" | "publish_git_changes"
-      action: "sysinfo_local"
 
 # Logging config
 logger:

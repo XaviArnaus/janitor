@@ -6,9 +6,10 @@ The idea is to serve as a framework to keep adding tasks and have this bot as a 
 Current features:
 - Collect system metrics and compare them with given thresholds, publishing an alert in case these get grossed.
 - Sending the system metrics to another Janitor instance runnining in another host.
-- Listening for Janitor metrics cross the network.
+- Listening for Janitor metrics across the network.
 - Listening for arbitrary messages to be published to the set up Mastodon-like API, behaving as a generic publisher
 - Discovering the current external IP and updating the set up Directnic's Dynamic DNS if needed
+- Monitor Git repositories and publish their changes
 
 [![Tests](https://github.com/XaviArnaus/janitor/actions/workflows/tests.yml/badge.svg)](https://github.com/XaviArnaus/janitor/actions/workflows/tests.yml)
 [![yapf](https://github.com/XaviArnaus/janitor/actions/workflows/yapf.yml/badge.svg)](https://github.com/XaviArnaus/janitor/actions/workflows/yapf.yml)

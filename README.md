@@ -6,40 +6,21 @@ The idea is to serve as a framework to keep adding tasks and have this bot as a 
 Current features:
 - Collect system metrics and compare them with given thresholds, publishing an alert in case these get grossed.
 - Sending the system metrics to another Janitor instance runnining in another host.
-- Listening for Janitor metrics cross the network.
+- Listening for Janitor metrics across the network.
 - Listening for arbitrary messages to be published to the set up Mastodon-like API, behaving as a generic publisher
 - Discovering the current external IP and updating the set up Directnic's Dynamic DNS if needed
+- Monitor Git repositories and publish their changes
 
 [![Tests](https://github.com/XaviArnaus/janitor/actions/workflows/tests.yml/badge.svg)](https://github.com/XaviArnaus/janitor/actions/workflows/tests.yml)
 [![yapf](https://github.com/XaviArnaus/janitor/actions/workflows/yapf.yml/badge.svg)](https://github.com/XaviArnaus/janitor/actions/workflows/yapf.yml)
 [![flake8](https://github.com/XaviArnaus/janitor/actions/workflows/flake8.yml/badge.svg)](https://github.com/XaviArnaus/janitor/actions/workflows/flake8.yml)
 ---
 
-# Requirements
+## ⭐️ Requirements
 - Python 3.9
-- Poetry (`poetry-core>=1.5.2`)
+- Poetry
 
-# Dependencies
-This Python app uses the following libraries:
-
-## Execution
-- `Mastodon.py`: Communication with the API of the Mastodon/Pleroma/Akkoma server of oyur preference
-- `psutil`: To get some internal system metrics
-- `strenum`: Enrich string Enums
-- `flask` & `flask-restful`: Bring up an API for client-server communication
-- `cronizer`: Parse cron timmings
-- `python-slugify`: Get a slug out of any string
-- `pyxavi`: Encapsulate some common work
-
-## Development
-- `pytest`: Tests
-- `pytest-cov`: Test coverage analysis
-- `freezegun`: Datetime freezings for tests
-- `yapf`: Autoformatter
-- `flake8`: Linter
-- `toml`: tom files support
-
-# Generic Installation
+## ⭐️ Installation
 
 ### 0. Install Poetry
 Following [the official docs](https://python-poetry.org/docs/#installation), or skip this step if you already have it installed
@@ -85,354 +66,30 @@ make create_app
 
 And now the app is ready to run!
 
+## ⭐️ Features and configuration
 
-# Some configuration tips
+These are the current features and how to set them up.
 
-**Typical single mode instance**
+### 🔍 System metrics collection and alerting
 
-This mode checks the system and publishes to the social media platform, but does not make use of the client-server functionality.
-- `mastodon.api_base_url`: Sets the URL of the social media platform instance where the user that will publish the posts lives.
-- `mastodon.instance_type`: The type of social media platform that it is. All of them use the Mastodon API, but for instances different from Mastodon we need to set up some extras. This is all abstracted with this parameter. Set `mastodon` for a Mastodon instance or `pleroma` for Pleroma or Akkoma.
-- `mastodon.credentials.user`: Just set up the `user` and the `password` here. Will be used in the first run to generate the `user.secret` file and then these parameters can be cleared.
-- `app.run_control.dry_run`: Set it to False when you're ready to start publishing. This lets you run the bot without an actual publishing.
-- `status_post.content_type`: For Mastodon it needs to be `text/plain`. For Pleroma or Akkoma it can be any of the possible values defined in the comment.
+Janitor was initially designed as a bot that collects system metrics periodically, compares the values to a given set of thresholds, and publishes a message to a Mastodon-like API in case they are crossed.
 
+- Read the [System metrics collection and alerting](./docs/sysinfo.md) page
 
-**API Listener mode instance**
+### 🔃 Directnic's Dynamic DNS Updater
 
-This mode publishes System Info reports and arbitrary messages that reach out thorugh the API endpoints, but does not collect own System Info data.
+Janitor can discover the current external IP and monitor for changes, and then update Directnic's Dynaminc DNS registers.
 
-- All the parameters defined in the _single mode instance_ above.
-- `app.service.listen`: What to listen. `host` at `0.0.0.0` listens from all IPs that reach out. `port` defines which port to listen to.
+- Read the [Directnic's Dynamic DNS Updater](./docs/ddns_update.md) page
 
-**Remote mode where this instance collects the data and sends it to an API**
+### 💻 Git repositories monitor
 
-This mode only collects the data and sends it away. Therefor, we only need to set up very basic parameters:
-- `app.service.remote_url`: Where to send the collected data.
-- `app.run_control.dry_run`: Set it to False when you're ready to start sending the data away. This lets you run the bot without an actual data sending.
+Janitor can monitor changes to CHANGELOG files from given Git repositories and alert via a Mastodon-like API about the changes. This is a gret tool to automatically announce code changes and also to monitor external repositories to be on top of updates to fetch.
 
-# Different run modes as per use case
-This section explains the different ways we can have this bot running dependining on the use case
+- Read the [Git rempositories monitor](./docs/git_monitor.md) page
 
-## Run in "local" mode, single mode instance
-This is a typical run-all. Once we have the corresponding parameters set up (see the Installation point 5 above) it should be as simple as:
-```
-make run_local
-```
+### ⏱️ Scheduler
 
-If the parameter `logger.loglevel` is set to `20` (INFO), this is the usual output:
-```
-[2023-03-17 08:24:57,891] INFO     janitor Init Local Runner
-[2023-03-17 08:24:57,891] INFO     janitor Run local app
-[2023-03-17 08:24:58,893] INFO     janitor No issues found. Ending here.
-```
+Once Janitor can perform multiple tasks, makes sense to proxy the periodicity by having a single Scheduler that sets up the diverse tasks. The Scheduler will read the `crontab` fashion time setup from the configuration file and trigger the defined tasks accordingly.
 
-## A client-server environment
-This architecture has a host with one instance of this bot listening through some API endpoints and one or many other instance of this same bot sending data to it. Therefor we need to set up at least 2 hosts:
-
-### Host that Listens
-This host is in charge to spawn an API, listen for incoming reports, check the thresholds, format a message and publish it to the social media instance.
-
-Basically it does the exact same job than the "local mode" but besides collecting the data it receives the data from a remote client.
-
-Once we have the corresponding parameters set up (see the Installation point 5 above), run:
-```
-make listen
-```
-This spawns a small Flask server listening to the defined IP and Port. It runs in background so you could close the SSH window.
-
-To finish the listener, you should discover what is the process ID and kill it.
-This should give you the process. Get the ID from it. Let's say it is 1234:
-```
-ps aux | grep listen.py | grep -v grep
-```
-
-This kills the process ID
-```
-kill -9 1234
-```
-
-### Host that sends the collected data
-This host is in charge to collect the local System metrics and send them to the listener.
-
-It does nothing else, so that the parameters to set up are very minimal. Once we have the corresponding parameters set up (see the Installation point 5 above), run:
-```
-make run_remote
-```
-
-If the parameter `logger.loglevel` is set to `20`, this is the usual output:
-```
-[2023-03-17 08:24:57,891] INFO     janitor Init Remote Runner
-[2023-03-17 08:24:57,891] INFO     janitor Run remote app
-[2023-03-17 08:24:58,893] INFO     janitor Sending sys_data away
-```
-
-### Sending arbitrary messages
-The Listener also accepts receiving arbitrary messages that will get published. It has an endpoint `message` that accepts a `POST` message with the following fields:
-- `hostname`: Mandatory. Defines who sends the message.
-- `message`: Mandatory. The message itself to publish
-- `summary`: Optional. If present, the published post will have the `summary` as Spoiler Text, having this "show more" button.
-- `message_type`: Optional. If present it will present an emoji according to the type of message (see the table below). If `summary` is also present, the emoji will appear in the beginning of the Spoiler Text, otherwise it will appear in the beginning of the main text.
-
-| message_type | Emoji |
-|---|---|
-| `none` | (none) |
-| `info` | ℹ️ |
-| `warning` | ⚠️ |
-| `error` | 🔥 |
-| `alarm` | 🚨 |
-
-To send a minimal message from a linux shell you could run something like:
-```
-curl -X POST -d "hostname=MyHostname&message=This+is+a+test+message" http://server:5000/message
-```
-
-You can also enrich it a bit more, like:
-```
-curl -X POST -d "hostname=MyHostname&message=This+is+the+deep+dump+of+the+incident&summary=We+had+an+warning!&message_type=warning" http://server:5000/message
-```
-
-## Setting it up as a Scheduled task (cron)
-This is most likely the intended purpose of this bot, to run periodically. To easy the set up, and also intending to settle a set up for further implementations, there is another "scheduler" mode that can be used.
-
-### 1. Define the schedule that should run
-In the config file there is a `app.schedules` parameter that accepts a list of objects representing each task to perform:
-- `name` is just to describe what is this task
-- `when` is a `crontab` expression defining when this task will be triggered.
-- `action` is one of the possible values: "sysinfo_local" or "sysinfo_remote", at this point.
-
-### 2. Add our scheduler into the crontab
-Yes, it is all moved by the crontab in your system. Once your crontab pings this scheduler, all the rest of the set up can be done here.
-
-1. Edit the crontab in your system
-```
-crontab -e
-```
-
-2. Add the following line
-```
-* * * * * cd /path/to/the/repository/janitor; make scheduler
-```
-
-3. Save and exit.
-
-Now every minute our scheduler is triggered and it will perform the tasks whenever it is needed.
-
-
-# Other configuration
-This bot is implemented thinking as much as possible about parametrization. The config file tries to be self explanatory. Still, here comes some sections explaining some of the bot's functionality.
-
-## System Info thresholds
-The System Info data gathering provides a set of metrics. Each metric is a value that can be analysed in case this value crosses a certain threshold. If so then we raise an alert.
-
-The definition of these thresholds is done in the `system_info.thresholds` config file parameter. Every subobject works as follows:
-- `[name_of_the_metric]`: The name of the metric is the key of the object. It is the metric that will be analysed.
-- `value`: It is the threshold value against the what the metric is compared. **The comparison is greater than**.
-- `message_type`: This is the level of severity of the raise we will do. It can be one of the following: "none", "info", "warning", "error" or "alarm", and will become a slighly different post template when publishing it.
-
-The bot comes with 3 metric thresholds relating to the percentage of CPU, memory and disk. Technically, anything that can be compared in a _greather than_ way can be placed here. All default metrics are floats or integers, so one could add several thresholds.
-
-## System Info metric titles
-As we're publishing metrics in a social media instance, we can also replace the metric name string itself with a descriptive title. Set these titles in the `formatting.system_info.report_item_names_map` config file parameter.
-
-## System Info human readable values
-The values shown are "humanized". To add a metric in the list of execptions use the `formatting.system_info.human_readable_exceptions` list in the config file parameter. If you want to totally deactivate it then set `formatting.system_info.human_readable` to `False`
-
-# Use cases examples
-As explained in the section above [Different run modes as per use case](#different-run-modes-as-per-use-case) we can run this bot in a variety of ways depending on the behaviour we want to achieve. This section presents some useful examples to start using it straight away
-
-## Local mode
-Clone the repo, adjust the configuration and install the dependencies [as explained above](#installation). Be sure that your schedule item points the action to `run_local`. Then edit your crontab [as explained](#2-add-our-scheduler-into-the-crontab) to set up the scheduler.
-
-## Client-Server mode
-In both server and client machines, clone the repo, adjust the configuration and install the dependencies [as explained above](#installation). Be sure that you set up the host and port to listen. 
-
-### In the Server machine
-Run the `make listen` command [as explained](#host-that-listens).
-
-### In the Client machine for a periodic check of system metrics
-Be sure that your schedule item points the action to `run_remote`. Then edit your crontab [as explained](#2-add-our-scheduler-into-the-crontab) to set up the scheduler.
-
-### In the client machine for an arbitrary message send
-Here the things are a bit more interesting. You have most likely a script, maybe a bash script, that performs any particular job. You want to capture the output and to send the execution report (or not) to the listener to be published.
-
-As an example, take a look at this "auto `git pull`" script:
-```
-#! /bin/bash
-
-urlencode() {
-  python3 -c 'import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1], sys.argv[2]))' \
-    "$1" "$urlencode_safe"
-}
-
-cd /var/www/folder/of-my-project
-OUTPUT=$(git pull 2>&1)
-ret=$?
-if [ $ret -ne 0 ]; then
-	encoded=$(urlencode "$OUTPUT")
-        curl -X POST -d "hostname=Auto+Git+Pull+at+myhostname&message=$encoded&message_type=error" http://server:5000/message
-else
-	if [[ "$OUTPUT" != "Already up to date." ]]; then
-		encoded=$(urlencode "$OUTPUT")
-        	curl -X POST -d "hostname=Auto+Git+Pull+at+myhostname&message=👍+Done:+$encoded&message_type=info" http://server:5000/message
-	fi
-fi
-```
-
-This script just executes a normal `git pull` from which we capture the output and the returning code of it. Depending on the returning code we know if it worked or not, and then we send a message to the listener with an url-encoded text and a defined Message Type that will lead to a related emoji.
-At the end of the day we only perform a POST CURL request to our listener with a defined set of parameters that will be posted in the Mastodon-API.
-
-
-# How does it look like
-In the following screenshot we have 3 examples of posts published into an Akkoma instance:
-![Screenshot of some alerts in an Akkoma instance](./docs/akkoma-screenshot.png "Screenshot of some alerts in an Akkoma instance")
-
-### Message 1: Error
-This is an arbitrary message sent from the bash script above. It actually happened that [GitHub changed the RSA keys](https://github.blog/2023-03-23-we-updated-our-rsa-ssh-host-key/) and the bot captured the failure.
-
-### Message 2: Info
-This is another arbitrary message sent from the same bash script above. It only communicates that a `git pull` that carried on some changes was done successfully.
-
-### Message 3: Warning
-This is an example of a periodic check of system metrics that identified an excess of CPU usage, publishing the current metrics for further analysis.
-
-
-# Directnic's Dynamic DNS update
-
-Janitor also can update your [Directnic's Dynamic DNS](https://directnic.com/knowledge/#/knowledge/article/3726) setup.
-
-## Configuration
-
-In the config file, search for the `directnic_ddns.updates` list parameter and just add a line with the URL given to you in Directnic's control panel. The URL looks like something like:
-
-```
-https://directnic.com/dns/gateway/123456abcdef678912346bdf53bd53bbee890dbf0227053ea877e0382a/?data=87.112.34.56
-```
-
-The IP address at the end is meant to be replaced with your current external IP, and this *Janitor* will do for you, so we simply remove the IP at the end.
-Therefor, edit the configuration so that the `directcni_ddns` section looks like something like the following:
-
-```
-# Directnic's Dynamic DNS updater
-directnic_ddns:
-  # [String] Where to store it
-  file: "storage/directnic_ddns.yaml"
-  # [List] Items to update
-  updates:
-    - https://directnic.com/dns/gateway/123456abcdef678912346bdf53bd53bbee890dbf0227053ea877e0382a/?data=
-```
-
-You can add all update links that you need, the bot will use them all adding your external IP.
-
-## Run
-
-To run it one time you can use the following commad:
-```bash
-make update_dns
-```
-
-You can also add it in the schedule. Actually it is meant to be run scheduled, so we make use of it.
-Search for the `app.schedules` section and add a list object like the following:
-
-```
-  # Manage the scheduling.
-  # Will be read by the scheduler (running every minute) to know what to do
-  schedules:
-    - name: "Directnic DDNS"
-      # crontab format: minute hour day-of-month month day-of-week
-      when: "* 2 * * *"
-      # [String] possible values: "sysinfo_local" | "sysinfo_remote" | "update_ddns"
-      action: "update_ddns"
-```
-
-With config, every day at 2AM the scheduler will trigger the DNS Update.
-
-# Git Monitor
-
-Janitor can monitor one or more Git repositories and publish a post to a Mastodon API - like when a change in the `CHANGELOG.md` is identified.
-
-## Configuration
-
-In the config file there is teh `git_monitor` section with all the possible parameters. There are 3 main ones:
-- `git_monitor.file` identifies which file will handle the state for the last known version per repository
-- `git_monitor.repositories` is a list of objects where each one represents all the parameters for a repository to monitor. Below we'll go deeper on this.
-- `git_monitor.mastodon` is an object very similar to the main `mastodon` one that contains the Mastodon instance parameters and credentials for the account that will be used to publish the updates. This means that the there can be a different user responsible for the change updates, different from the common Janitor one.
-
-### Repository configuration
-
-The following is the configuration params responsible to set up one repository to monitor. I've used real life values.
-```yaml
-      # [String] Name of the project. Only used for displaying
-      name: pyxavi
-      # [String] URL of the project. Only used to link it when displaying
-      url: https://github.com/XaviArnaus/pyxavi
-      # [List] of Strings that will be added to the message body as a list of Tags
-      tags: ["#Python", "#library"]
-      # [String] URL for the repository. Can be SSH or HTTPS,
-      #   but may require extra authentication in your side.
-      git: git@github.com:XaviArnaus/pyxavi.git
-      # [String] Where to find or to clone the repository
-      path: "storage/repos/pyxavi"
-      # Parameters to parse the Changelog
-      changelog:
-        # [String] Which file contains the changelog
-        #   It is expected to be a Markdown file with:
-        #   - The title of each update is the version
-        #   - The body of each update is a list of changes
-        # Note: Trying to support Common Changelog
-        file: "CHANGELOG.md"
-        # [String] Separator used to split sections
-        #   defaults to "\n## "
-        section_separator: "\n## "
-        # [String] Regex to extract the version from the section title
-        # Note: backslashes need to be doubled
-        #   defaults to "\\[(v[0-9]+\\.[0-9]+\\.?[0-9]?)\\]"
-        version_regex: "\\[(v[0-9]+\\.[0-9]+\\.?[0-9]?)\\]"  
-```
-
-Remember that this is a set of parameters that represent a repository. It goes set up inside `git_monitor.repositories`, which is a list. It is meant to handle several repositories, for example:
-
-```yaml
-git_monitor:
-  file: "storage/git_monitor.yaml"
-  repositories:
-    -
-      name: pyxavi
-      url: https://github.com/XaviArnaus/pyxavi
-      tags: ["#Python", "#library"]
-      git: git@github.com:XaviArnaus/pyxavi.git
-      path: "storage/repos/pyxavi"
-      changelog:
-        file: "CHANGELOG.md"
-    -
-      name: Janitor
-      url: https://github.com/XaviArnaus/janitor
-      tags: ["#Python", "#bot"]
-      git: git@github.com:XaviArnaus/janitor.git
-      path: "storage/repos/janitor"
-      changelog:
-        file: "CHANGELOG.md"
-```
-
-## Run
-
-To run it one time you can use the following commad:
-```bash
-make publish_git_changes
-```
-
-You can also add it in the schedule. Actually it is meant to be run scheduled, so we make use of it.
-Search for the `app.schedules` section and add a list object like the following:
-
-```
-  # Manage the scheduling.
-  # Will be read by the scheduler (running every minute) to know what to do
-  schedules:
-    - name: "Publish Git changes"
-      # crontab format: minute hour day-of-month month day-of-week
-      when: "* 2 * * *"
-      # [String] possible values: "sysinfo_local" | "sysinfo_remote" | "update_ddns" | "publish_git_changes"
-      action: "publish_git_changes"
-```
-
-With config, every day at 2AM the scheduler will trigger the DNS Update.
+- Read the [Scheduler](./docs/scheduler.md) page

@@ -1,14 +1,16 @@
 from argparse import ArgumentParser
 from runner import print_command_list, _get_runner_by_command, setup_parser, run,\
+                    load_config_files,\
                     PROGRAM_NAME, PROGRAM_DESC, PROGRAM_EPILOG, PROGRAM_VERSION,\
                     SUBCOMMAND_TOKEN, CLI_NAME, IMPLEMENTED_IN_BASH_TOKEN
 from unittest.mock import patch, Mock, call
 import pytest
 from unittest import TestCase
-from definitions import ROOT_DIR
-from pyxavi.config import Config
+from definitions import CONFIG_DIR
 from pyxavi.logger import Logger
+from pyxavi.storage import Storage
 import os
+import glob
 from janitor.runners.runner_protocol import RunnerProtocol
 
 test_command_map = {
@@ -45,6 +47,49 @@ def test_setup_parser():
             call("--version", action="version", version=PROGRAM_VERSION)
         ]
     )
+
+
+def test_load_config_files():
+    files = {
+        "main.yaml": {
+            "param1": "value1", "param2": "value2"
+        },
+        "second.yaml": {
+            "param2": "value2b"
+        },
+        "third.yaml": {
+            "param3": "value3"
+        },
+    }
+
+    mocked_glob = Mock()
+    mocked_glob.return_value = list(files.keys())
+    mocked_path_exists = Mock()
+    mocked_path_exists.return_value = True
+    mocked_load_file_contents = Mock()
+    mocked_load_file_contents.side_effect = [
+        list(files.values())[0],
+        list(files.values())[0],
+        list(files.values())[1],
+        list(files.values())[2],
+    ]
+    with patch.object(glob, "glob", new=mocked_glob):
+        with patch.object(os.path, "exists", new=mocked_path_exists):
+            with patch.object(Storage, "_load_file_contents", new=mocked_load_file_contents):
+                config = load_config_files()
+
+    mocked_load_file_contents.assert_has_calls(
+        [
+            call(os.path.join(CONFIG_DIR, "main.yaml")),
+            call(os.path.join(CONFIG_DIR, "main.yaml")),
+            call(os.path.join(CONFIG_DIR, "second.yaml")),
+            call(os.path.join(CONFIG_DIR, "third.yaml")),
+        ]
+    )
+
+    assert config.get("param1") == "value1"
+    assert config.get("param2") == "value2b"
+    assert config.get("param3") == "value3"
 
 
 @pytest.mark.parametrize(
@@ -137,8 +182,7 @@ def test_run_command():
             self.subcommad = subcommand
 
     parsed_args = Namespace("command_1")
-    mocked_config_init = Mock()
-    mocked_config_init.return_value = None
+    mocked_config_load = Mock()
     mocked_logger_init = Mock()
     mocked_logger_init.return_value = None
     mocked_get_logger = Mock()
@@ -153,7 +197,7 @@ def test_run_command():
     mocked_returned_runner.return_value = mocked_runner_run
     mocked_get_runner = Mock(name="get_runner")
     mocked_get_runner.return_value = mocked_returned_runner
-    with patch.object(Config, "__init__", new=mocked_config_init):
+    with patch("runner.load_config_files", new=mocked_config_load):
         with patch.object(Logger, "__init__", new=mocked_logger_init):
             with patch.object(Logger, "get_logger", new=mocked_get_logger):
                 with patch("runner.setup_parser", new=mocked_setup_parser):
@@ -167,7 +211,7 @@ def test_run_command():
                                                   new=mocked_runner_run):
                                     run()
 
-    mocked_config_init.assert_called_once_with(filename=os.path.join(ROOT_DIR, "config.yaml"))
+    mocked_config_load.assert_called_once()
     mocked_logger_init.assert_called()
     mocked_setup_parser.assert_called_once()
     mocked_parse_args.assert_called_once()

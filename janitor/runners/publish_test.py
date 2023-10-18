@@ -6,6 +6,7 @@ from janitor.objects.queue_item import QueueItem
 from janitor.runners.runner_protocol import RunnerProtocol
 from definitions import ROOT_DIR
 import logging
+from pyxavi.debugger import dd
 
 
 class PublishTest(RunnerProtocol):
@@ -14,6 +15,7 @@ class PublishTest(RunnerProtocol):
     '''
 
     def __init__(self, config: Config = None, logger: logging = None) -> None:
+        dd(config)
         self._config = config
         self._logger = logger
 

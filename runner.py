@@ -5,9 +5,11 @@ from pyxavi.terminal_color import TerminalColor
 from pyxavi.config import Config
 from pyxavi.logger import Logger
 import os
-from definitions import ROOT_DIR
+from definitions import ROOT_DIR, CONFIG_DIR
 from pyxavi.debugger import full_stack
 from string import Template
+import glob
+from pyxavi.debugger import dd
 
 from janitor.runners.create_app import CreateApp
 from janitor.runners.run_local import RunLocal
@@ -24,6 +26,7 @@ CLI_NAME = "jan"
 PROGRAM_DESC = "CLI command to execute runners and tasks"
 PROGRAM_EPILOG = f"Use [{CLI_NAME} commands] to get a list of available commands."
 PROGRAM_VERSION = pkg_resources.get_distribution(PROGRAM_NAME).version
+
 SUBCOMMAND_TOKEN = "#SUBCOMMAND#"
 HELP_TOKEN = "#HELP#"
 IMPLEMENTED_IN_BASH_TOKEN = "#BASH#"
@@ -207,9 +210,26 @@ def setup_parser() -> ArgumentParser:
     return parser
 
 
+def load_config_files() -> Config:
+    """
+    Loads all configs existing in CONFIG_DIR.
+
+    This is a merge-all-to-one approach, so may be the case that later objects
+        overwrite older ones
+    """
+    config_files = glob.glob(os.path.join(CONFIG_DIR, "*.yaml"))
+
+    # Yes, technically we're loading main.yaml twice
+    config = Config(filename=os.path.join(CONFIG_DIR, "main.yaml"))
+    for file in config_files:
+        config.merge_from_file(filename=os.path.join(CONFIG_DIR, file))
+
+    return config
+
+
 def run():
     try:
-        config = Config(filename=os.path.join(ROOT_DIR, "config.yaml"))
+        config = load_config_files()
         logger = Logger(config=config, base_path=ROOT_DIR).get_logger()
 
         # Set up the parser

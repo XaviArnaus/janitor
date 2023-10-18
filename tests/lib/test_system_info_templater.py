@@ -19,7 +19,7 @@ CONFIG = {
             "value": 80.0, "type": "alarm"
         },
     },
-    "formatting.system_info.human_readable_exceptions": [
+    "system_info.formatting.human_readable_exceptions": [
         "cpu_percent", "cpu_count", "memory_percent", "disk_usage_percent"
     ]
 }
@@ -162,7 +162,7 @@ def test_process_report():
     # and the second the exceptions
     mocked_config_get.side_effect = [
         CONFIG["system_info.thresholds"],
-        CONFIG["formatting.system_info.human_readable_exceptions"],
+        CONFIG["system_info.formatting.human_readable_exceptions"],
     ]
     mocked_build_line = Mock()
     mocked_build_line.side_effect = [

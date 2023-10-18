@@ -76,9 +76,9 @@ The configuration file comes with a set of default values that just works. You c
 
 Once again, the configuration file comes with a set of default values that just works. You can fine tune them through the following parameters:
 
-- `formatting.system_info.report_item_names_map.[metric]`: These are the labels that will be used to display every metric.
-- `formatting.system_info.human_readable`: Setting it to `True`, it makes the values round and to a human scale when displaying.
-- `formatting.system_info.human_readable_exceptions`: If the previous parameter is `True`, we can add here exceptions where the metric value won't be touched.
+- `system_info.formatting.report_item_names_map.[metric]`: These are the labels that will be used to display every metric.
+- `system_info.formatting.human_readable`: Setting it to `True`, it makes the values round and to a human scale when displaying.
+- `system_info.formatting.human_readable_exceptions`: If the previous parameter is `True`, we can add here exceptions where the metric value won't be touched.
 
 ### Mastodon API set up
 

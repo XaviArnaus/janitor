@@ -24,11 +24,8 @@ system_info:
       value: 80.0
       # [String] MessageType in case of crossing: "none" | "info" | "warning" | "error" | "alarm"
       message_type: "alarm"
-
-# Formatting configs
-formatting:
-  # Related to the SystemInfo
-  system_info:
+  # Formatting configs
+  formatting:
     # A string that will be used to display the metric itself
     report_item_names_map:
       cpu_percent: "CPU %"

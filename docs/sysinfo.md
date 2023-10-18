@@ -1,4 +1,4 @@
-# System metrics collection and alerting
+# 🔍 System metrics collection and alerting
 
 As the initial Janitor's goal, it is designed to collect system metrics in a periodical fashion, compare them to a given set of thresholds, and publish an alert to a Mastodon-like API in case they are crossed.
 

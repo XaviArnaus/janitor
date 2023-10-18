@@ -1,4 +1,4 @@
-# Directnic's Dynamic DNS update
+# 🔃 Directnic's Dynamic DNS update
 
 Janitor also can update your [Directnic's Dynamic DNS](https://directnic.com/knowledge/#/knowledge/article/3726) setup.
 

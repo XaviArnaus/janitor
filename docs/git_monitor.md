@@ -1,4 +1,4 @@
-# Git rempositories monitor
+# 💻 Git rempositories monitor
 
 Janitor can monitor one or more Git repositories and publish a post to a Mastodon API - like when a change in the `CHANGELOG.md` is identified.
 

@@ -69,25 +69,25 @@ And now the app is ready to run!
 
 These are the current features and how to set them up.
 
-## System metrics collection and alerting
+## 🔍 System metrics collection and alerting
 
 Janitor was initially designed as a bot that collects system metrics periodically, compares the values to a given set of thresholds, and publishes a message to a Mastodon-like API in case they are crossed.
 
 - Read the [System metrics collection and alerting](./docs/sysinfo.md) page
 
-## Directnic's Dynamic DNS Updater
+## 🔃 Directnic's Dynamic DNS Updater
 
 Janitor can discover the current external IP and monitor for changes, and then update Directnic's Dynaminc DNS registers.
 
 - Read the [Directnic's Dynamic DNS Updater](./docs/ddns_update.md) page
 
-## Git rempositories monitor
+## 💻 Git repositories monitor
 
 Janitor can monitor changes to CHANGELOG files from given Git repositories and alert via a Mastodon-like API about the changes. This is a gret tool to automatically announce code changes and also to monitor external repositories to be on top of updates to fetch.
 
 - Read the [Git rempositories monitor](./docs/git_monitor.md) page
 
-## Scheduler
+## ⏱️ Scheduler
 
 Once Janitor can perform multiple tasks, makes sense to proxy the periodicity by having a single Scheduler that sets up the diverse tasks. The Scheduler will read the `crontab` fashion time setup from the configuration file and trigger the defined tasks accordingly.
 

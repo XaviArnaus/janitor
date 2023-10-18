@@ -38,8 +38,10 @@ elif [ $1 = "listener" ]; then
         ./$0 listener status
     fi
 elif [ $1 = "validate_config" ]; then
-    # Yeah, this could be implemented directly inside the python, taking the expected config.
-    $PYTHON -c 'import yaml;yaml.safe_load(open("config.yaml"))' > /dev/null && echo -e "\033[0;32mThe Config is correct\033[0m" || echo -e "\033[0;31mThe Config has an error\033[0m"
+    # Implemented as a side Python script so that does not get into the loading config flow
+    # This is meant to be run from the root of the project by doing
+    #   bin/jan validate_config
+    $PYTHON -m bin.validate_config
 else
     # For the rest, just forward to the proper python script
     $POETRY_PATH run main $@

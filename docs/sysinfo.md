@@ -249,20 +249,25 @@ To set up Janitor to be run scheduled, follow the [Scheduler set up](./scheduler
 - `sysinfo_local`: Gathers the local System Info, compares with thresholds and publishes if crossed.
 - `sysinfo_remote`: Gathers the local System Info and sends them to a listening server to be processed
 
-## Use cases examples
-As explained in the section above [Different run modes as per use case](#different-run-modes-as-per-use-case) we can run this bot in a variety of ways depending on the behaviour we want to achieve. This section presents some useful examples to start using it straight away
+## 🔧 Use cases examples
+We can run this bot in a variety of ways depending on the behaviour we want to achieve. This section presents some useful examples to start using it straight away
 
 ### Local mode
-Clone the repo, adjust the configuration and install the dependencies [as explained above](#installation). Be sure that your schedule item points the action to `run_local`. Then edit your crontab [as explained](#2-add-our-scheduler-into-the-crontab) to set up the scheduler.
+1. Clone the repo
+2. Adjust the configuration and install the dependencies
+3. Add the scheduler into your `crontab` and ensure that you have an entry in your `schedules` config that points to `run_local`
 
 ### Client-Server mode
-In both server and client machines, clone the repo, adjust the configuration and install the dependencies [as explained above](#installation). Be sure that you set up the host and port to listen. 
+In both server and client machines:
+1. Clone the repo
+2. Adjust the configuration and install the dependencies
 
 #### In the Server machine
-Run the `make listen` command [as explained](#host-that-listens).
+1. Ensure that you have setup the host and port to listen in the configuration file
+2. Run the listener with `bin/jan listener start`
 
 #### In the Client machine for a periodic check of system metrics
-Be sure that your schedule item points the action to `run_remote`. Then edit your crontab [as explained](#2-add-our-scheduler-into-the-crontab) to set up the scheduler.
+1. Add the scheduler into your `crontab` and ensure that you have an entry in your `schedules` config that points to `run_remote`
 
 #### In the client machine for an arbitrary message send
 Here the things are a bit more interesting. You have most likely a script, maybe a bash script, that performs any particular job. You want to capture the output and to send the execution report (or not) to the listener to be published.
@@ -296,7 +301,7 @@ At the end of the day we only perform a POST CURL request to our listener with a
 
 ## How does it look like
 In the following screenshot we have 3 examples of posts published into an Akkoma instance:
-![Screenshot of some alerts in an Akkoma instance](./docs/akkoma-screenshot.png "Screenshot of some alerts in an Akkoma instance")
+![Screenshot of some alerts in an Akkoma instance](./akkoma-screenshot.png "Screenshot of some alerts in an Akkoma instance")
 
 #### Message 1: Error
 This is an arbitrary message sent from the bash script above. It actually happened that [GitHub changed the RSA keys](https://github.blog/2023-03-23-we-updated-our-rsa-ssh-host-key/) and the bot captured the failure.

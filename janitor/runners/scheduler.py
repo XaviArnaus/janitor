@@ -24,7 +24,7 @@ class Scheduler(RunnerProtocol):
         Read and react to schedules
         '''
         try:
-            schedules = list(self._config.get("app.schedules"))
+            schedules = list(self._config.get("schedules"))
             now_dt = datetime.now()
 
             for schedule in schedules:

@@ -9,7 +9,6 @@ from definitions import ROOT_DIR, CONFIG_DIR
 from pyxavi.debugger import full_stack
 from string import Template
 import glob
-from pyxavi.debugger import dd
 
 from janitor.runners.create_app import CreateApp
 from janitor.runners.run_local import RunLocal

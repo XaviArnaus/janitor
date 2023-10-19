@@ -39,9 +39,7 @@ elif [ $1 = "listener" ]; then
     fi
 elif [ $1 = "validate_config" ]; then
     # Implemented as a side Python script so that does not get into the loading config flow
-    # This is meant to be run from the root of the project by doing
-    #   bin/jan validate_config
-    $PYTHON -m bin.validate_config
+    $POETRY_PATH run validate_config
 elif [ $1 = "migrate_config" ]; then
     # Implemented as a side Python script as it is just a one-time migration tool
     $POETRY_PATH run migrate_config

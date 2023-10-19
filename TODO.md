@@ -12,6 +12,8 @@
     - Make `QueueItem` just a protocol
 - Move `MastodonHelper` to `pyxavi`
 - Move the Mastodon publish related classes to `pyxavi`
+- Make the `git_monitor` to monitor git tags and not only CHANGELOG changes.
+- Make a PyPI monitor
 
 # Done
 

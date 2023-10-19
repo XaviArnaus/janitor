@@ -31,7 +31,9 @@ class MastodonHelper:
             logger.warn(
                 "Getting instance without explicit connection params. Auto-discovering!"
             )
-            connection_params = MastodonConnectionParams.from_dict(config.get("mastodon"))
+            connection_params = MastodonConnectionParams.from_dict(
+                config.get("mastodon.per_name.default")
+            )
 
         instance_type = MastodonHelper.valid_or_raise(connection_params.instance_type)
         user_file = connection_params.credentials.user_file

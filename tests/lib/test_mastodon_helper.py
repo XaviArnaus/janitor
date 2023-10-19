@@ -9,12 +9,12 @@ import os
 
 CONFIG = {
     "logger.name": "logger_test",
-    "mastodon.instance_type": "mastodon",
-    "mastodon.credentials.user_file": "user.secret",
-    "mastodon.credentials.client_file": "client.secret",
-    "mastodon.api_base_url": "https://mastodont.cat",
-    "mastodon.credentials.user.email": "bot+syscheck@my-fancy.site",
-    "mastodon.credentials.user.password": "SuperSecureP4ss",
+    "mastodon.per_name.default.instance_type": "mastodon",
+    "mastodon.per_name.default.credentials.user_file": "user.secret",
+    "mastodon.per_name.default.credentials.client_file": "client.secret",
+    "mastodon.per_name.default.api_base_url": "https://mastodont.cat",
+    "mastodon.per_name.default.credentials.user.email": "bot+syscheck@my-fancy.site",
+    "mastodon.per_name.default.credentials.user.password": "SuperSecureP4ss",
 }
 
 CONFIG_MASTODON_CONN_PARAMS = {

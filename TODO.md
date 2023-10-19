@@ -1,7 +1,5 @@
 # ToDo
 
-- Fix `Makefile` target `background`.
-- Make that the runner `listen` publishes a message when starts listening
 - New `Makefile` target `update` or `reload` that: 
     1. brings down the listener
     2. `git pull`
@@ -12,9 +10,16 @@
 - Simplify the messaging:
     - Merge `Message` and `QueueItem`.
     - Make `QueueItem` just a protocol
-- Organize better the code:
+- Move `MastodonHelper` to `pyxavi`
+- Move the Mastodon publish related classes to `pyxavi`
+
+# Done
+
+✅ Fix `Makefile` target `background`.
+    ➡️ Moved from targets in `Makefile` to a main runner with commands
+✅ Make that the runner `listen` publishes a message when starts listening
+    ➡️ the new main runner is more verbose
+✅ Organize better the code:
     - Directory for Runners
     - Directory for Configs
     - Split the configs per Common & each Runner and read all together at init
-- Move `MastodonHelper` to `pyxavi`
-- Move the Mastodon publish related classes to `pyxavi`

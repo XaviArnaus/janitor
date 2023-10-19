@@ -1,10 +1,11 @@
 # pre-Changelog
 
-## [v0.4.1](https://github.com/XaviArnaus/janitor/releases/tag/v0.4.1)
+## [v0.5.0](https://github.com/XaviArnaus/janitor/releases/tag/v0.5.0)
 
 ### Added
 
 - A *config migration tool* that converts the single old config file into the sliced new ones.
+- A `UPGRADING.md` document to assist on Upgrading from version to version
 
 ### Changed
 

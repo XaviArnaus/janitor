@@ -48,7 +48,8 @@ COMMAND_MAP = {
     ),
     "validate_config": (
         IMPLEMENTED_IN_BASH_TOKEN, "Validates the config.yaml Configuration file"
-    )
+    ),
+    "migrate_config": (SUBCOMMAND_TOKEN, "Migrates the configuration file(s) between versions")
 }
 
 SUBCOMMAND_MAP = {
@@ -80,6 +81,9 @@ SUBCOMMAND_MAP = {
             "Requests the status of the listener. Will print the PID if running"
         ),
         "stop": (IMPLEMENTED_IN_BASH_TOKEN, "Stops the listener.")
+    },
+    "migrate_config": {
+        "v0.5.0": (IMPLEMENTED_IN_BASH_TOKEN, "Migrates from v0.4.0 to v0.5.0")
     }
 }
 

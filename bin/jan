@@ -42,7 +42,15 @@ elif [ $1 = "validate_config" ]; then
     $POETRY_PATH run validate_config
 elif [ $1 = "migrate_config" ]; then
     # Implemented as a side Python script as it is just a one-time migration tool
-    $POETRY_PATH run migrate_config
+    if [ -z "$2" ]; then
+        echo "ERROR: Version to migrate to is needed but not defined"
+    else
+        if [ $2 = "v0.5.0" ]; then
+            $POETRY_PATH run migrate_config_0_5_0
+        else
+            echo "ERROR: Version unknown"
+        fi
+    fi
 else
     # For the rest, just forward to the proper python script
     $POETRY_PATH run main $@

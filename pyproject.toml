@@ -19,7 +19,7 @@ python-slugify = "^7.0.0"
 [tool.poetry.scripts]
 main = "runner:run"
 validate_config = "scripts.validate_config:run"
-migrate_config = "scripts.migrate_config:run"
+migrate_config_0_5_0 = "scripts.migrate_config_0_5_0:run"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.0"

@@ -39,7 +39,7 @@ cd janitor
 ```
 
 ### 3. Settle your config from the example
-From version 0.4.1 onwards, the configuration is split in several files:
+From version 0.5.0 onwards, the configuration is split in several files:
 - **main**: General parameters. Includes listener and generic storage parameters
 - **mastodon**: Parameters regarding the main Mastodon API instance configuration for publishing.
 - **schedules**: Scheduler parameters, like which tasks to run and when to do so.

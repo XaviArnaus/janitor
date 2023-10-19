@@ -16,19 +16,28 @@ MAP_OLD_TO_NEW = {
     "queue_storage": ("main.yaml", "queue_storage"),
     "publisher": ("main.yaml", "publisher"),
     "system_info": ("sysinfo.yaml", "system_info"),
-    "formatting.system_info.report_item_names_map": ("sysinfo.yaml", "system_info.formatting.report_item_names_map"),
-    "formatting.system_info.human_readable": ("sysinfo.yaml", "system_info.formatting.human_readable"),
-    "formatting.system_info.human_readable_exceptions": ("sysinfo.yaml", "system_info.formatting.human_readable_exceptions"),
+    "formatting.system_info.report_item_names_map": (
+        "sysinfo.yaml", "system_info.formatting.report_item_names_map"
+    ),
+    "formatting.system_info.human_readable": (
+        "sysinfo.yaml", "system_info.formatting.human_readable"
+    ),
+    "formatting.system_info.human_readable_exceptions": (
+        "sysinfo.yaml", "system_info.formatting.human_readable_exceptions"
+    ),
     "directnic_ddns": ("directnic_ddns.yaml", "directnic_ddns"),
     "git_monitor": ("git_monitor.yaml", "git_monitor"),
     "mastodon": ("mastodon.yaml", "mastodon"),
 }
 
+
 def run():
     # Get the origin
-    config_path = input(Template(REQUEST_CONFIG_NAME).substitute(
-        path=os.path.join(ROOT_DIR, DEFAULT_CONFIG_FILE_NAME)
-    ))
+    config_path = input(
+        Template(REQUEST_CONFIG_NAME).substitute(
+            path=os.path.join(ROOT_DIR, DEFAULT_CONFIG_FILE_NAME)
+        )
+    )
     if config_path == "":
         config_path = os.path.join(ROOT_DIR, DEFAULT_CONFIG_FILE_NAME)
 
@@ -51,7 +60,9 @@ def run():
             if target_file not in target_storage:
                 # Ensure that the target file does not already exist
                 if os.path.exists(target_path):
-                    raise RuntimeError(f"The target config file [{target_path}] already exists. Should not.")
+                    raise RuntimeError(
+                        f"The target config file [{target_path}] already exists. Should not."
+                    )
 
                 # Instantiate the storage, which already creates the file
                 target_storage[target_file] = Storage(filename=target_path)
@@ -69,7 +80,9 @@ def run():
             parents = ""
             for piece in target_key_pieces:
                 # Get current target value
-                current_target_value = target_storage[target_file].get(f"{parents}{piece}", None)
+                current_target_value = target_storage[target_file].get(
+                    f"{parents}{piece}", None
+                )
 
                 # So if this object does not exist we have to create something.
                 if current_target_value is None:
@@ -83,20 +96,22 @@ def run():
 
                 # Update the parents path to the next child object
                 parents = f"{parents}{piece}."
-            
-            # At this point, the value for the old parameter and the value for the new parameter should match.
+
+            # At this point, the value for the old parameter
+            #   and the value for the new parameter should match.
             target_value = target_storage[target_file].get(target_key, None)
             if origin_value != target_value:
-                raise ValueError(f"They copy from key {origin_key} into {target_file}:{target_key} was unsuccessful")
-        
+                raise ValueError(
+                    f"They copy from key {origin_key} into"
+                    f" {target_file}:{target_key} was unsuccessful"
+                )
+
         # At this point we only need to write what we hold in memory
         for file, storage_object in target_storage.items():
             storage_object.write_file()
-            print(f"{TerminalColor.GREEN_BRIGHT}Config file {file} has been writen{TerminalColor.GREEN_BRIGHT}")
+            print(
+                f"{TerminalColor.GREEN_BRIGHT}Config file {file}"
+                f" has been writen{TerminalColor.GREEN_BRIGHT}"
+            )
     except Exception as e:
         print(f"{TerminalColor.RED_BRIGHT}{e}{TerminalColor.END}")
-
-
-
-
-

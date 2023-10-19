@@ -52,7 +52,7 @@ def test_run_time_does_not_match():
             with patch.object(runner, "_execute_action", new=mocked_action_execution):
                 runner.run()
 
-    mocked_config_get.assert_called_once_with("app.schedules")
+    mocked_config_get.assert_called_once_with("schedules")
     mocked_croniter_match.assert_called_once_with(SCHEDULES[0]["when"], now)
     mocked_action_execution.assert_not_called()
 
@@ -72,6 +72,6 @@ def test_run_time_does_match():
             with patch.object(runner, "_execute_action", new=mocked_action_execution):
                 runner.run()
 
-    mocked_config_get.assert_called_once_with("app.schedules")
+    mocked_config_get.assert_called_once_with("schedules")
     mocked_croniter_match.assert_called_once_with(SCHEDULES[0]["when"], now)
     mocked_action_execution.assert_called_once_with(SCHEDULES[0]["action"])

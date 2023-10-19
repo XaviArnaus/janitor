@@ -4,7 +4,7 @@ Janitor can monitor one or more Git repositories and publish a post to a Mastodo
 
 ## ⚙️ Configuration
 
-In the config file there is the `git_monitor` section with all the possible parameters. There are 3 main ones:
+In the `git_monitor.yaml` config file there is the `git_monitor` section with all the possible parameters. There are 3 main ones:
 - `git_monitor.file` identifies which file will handle the state for the last known version per repository
 - `git_monitor.repositories` is a list of objects where each one represents all the parameters for a repository to monitor. Below we'll go deeper on this.
 - `git_monitor.mastodon` is an object very similar to the main `mastodon` one that contains the Mastodon instance parameters and credentials for the account that will be used to publish the updates. This means that the there can be a different user responsible for the change updates, different from the common Janitor one.

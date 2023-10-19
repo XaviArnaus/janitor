@@ -1,5 +1,7 @@
 # Changelog
 
+ℹ️ If you're upgrading between versions, please see the document [Upgrading Guide](UPGRADING.md).
+
 ## [v0.4.0](https://github.com/XaviArnaus/janitor/releases/tag/v0.4.0)
 
 ### Added

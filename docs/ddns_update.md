@@ -4,7 +4,7 @@ Janitor also can update your [Directnic's Dynamic DNS](https://directnic.com/kno
 
 ## ⚙️ Configuration
 
-In the config file, search for the `directnic_ddns.updates` list parameter and just add a line with the URL given to you in Directnic's control panel. The URL looks like something like:
+In the `directnic_ddns.yaml` config file, search for the `directnic_ddns.updates` list parameter and just add a line with the URL given to you in Directnic's control panel. The URL looks like something like:
 
 ```
 https://directnic.com/dns/gateway/123456abcdef678912346bdf53bd53bbee890dbf0227053ea877e0382a/?data=87.112.34.56

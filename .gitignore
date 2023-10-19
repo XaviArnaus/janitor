@@ -11,8 +11,11 @@ log/*
 storage/*.yaml
 storage/media/*
 storage/repos/*
-config.yaml
 !**/.keep
+
+# No user config files
+config.yaml
+config/*.yaml
 
 # No coverage
 .coverage

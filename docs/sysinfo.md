@@ -61,28 +61,32 @@ The set up is made through the configuration file. The parameters for every mode
     - Mastodon API set up
     - Listener set up
 
+Just keep in mind that, as the functionality actually touches several key parts of Janitor, the parameters are spread through several configuration files. In the following sub sections there should be some clarity about it.
+
 ### General Janitor set up
+
+The configuration file is `main.yaml`.
 
 - `app.run_control.dry_run`: Set it to `False` when you're ready to start publishing. This lets you run the bot without an actual publishing. It also relates to the ability to send data away for the *Remote* mode, so with `False` it won't send anything.
 
 ### Thresholds set up
 
-The configuration file comes with a set of default values that just works. You can fine tune them through the following parameters:
+The configuration file comes is `sysinfo.yaml` and with a set of default values that just works. You can fine tune them through the following parameters:
 
 - `system_info.thresholds.[metric].value`: This is the value that will be compared to in a *greater than* fashion.
 - `system_info.thresholds.[metric].message_type`: This is the type of the message when sending. The idea is that every type means a severity and will be formatted accordingly.
 
 ### Publish Formatting set up
 
-Once again, the configuration file comes with a set of default values that just works. You can fine tune them through the following parameters:
+Once again, the configuration file is `sysinfo.yaml` is comes with a set of default values that just works. You can fine tune them through the following parameters:
 
-- `formatting.system_info.report_item_names_map.[metric]`: These are the labels that will be used to display every metric.
-- `formatting.system_info.human_readable`: Setting it to `True`, it makes the values round and to a human scale when displaying.
-- `formatting.system_info.human_readable_exceptions`: If the previous parameter is `True`, we can add here exceptions where the metric value won't be touched.
+- `system_info.formatting.report_item_names_map.[metric]`: These are the labels that will be used to display every metric.
+- `system_info.formatting.human_readable`: Setting it to `True`, it makes the values round and to a human scale when displaying.
+- `system_info.formatting.human_readable_exceptions`: If the previous parameter is `True`, we can add here exceptions where the metric value won't be touched.
 
 ### Mastodon API set up
 
-Here is where we have the major configuration. This whole `mastodon` parameter set is shared with all other Janitor functionalities that publish through the Mastodon-like API.
+Here is where we have the major configuration. The file is `mastodon.yaml`. This whole `mastodon` parameter set is shared with all other Janitor functionalities that publish through the Mastodon-like API.
 
 At the moment, Janitor is able to publish in the following APIs:
 - Mastodon
@@ -121,9 +125,13 @@ Let's go through the parameters:
 
 ### Remote URL set up
 
+This is set in the `main.yaml` configuration file.
+
 - `app.service.remote_url`: URL where to send the collected metrics to.
 
 ### Listener set up
+
+This is also set in the `main.yaml` configuration file.
 
 - `app.service.listen.host`: From which host do we listen to. With `127.0.0.1` Janitor will listen only from localhost. With `0.0.0.0` listens from all IPs that reach out.
 - `app.service.listen.port`: Which port to listen to.

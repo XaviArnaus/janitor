@@ -1,0 +1,63 @@
+###########################
+#         Janitor         #
+#-------------------------#
+#       Git Monitor       #
+###########################
+
+# Git Monitor
+git_monitor:
+  # [String] Where to store the info regarding the last known versions
+  file: "storage/git_monitor.yaml"
+  # [List] Repositories to monitor
+  repositories:
+    -
+      # [String] Name of the project. Only used for displaying
+      name: "My Great Project"
+      # [String] URL of the project. Only used to link it when displaying
+      url: https://github.com/MyUser/my-great-project
+      # [List] of Strings that will be added to the message body as a list of Tags
+      tags: ["#Python", "#library"]
+      # [String] URL for the repository. Can be SSH or HTTPS,
+      #   but may require extra authentication in your side.
+      git: git@github.com:MyUser/my-great-project.git
+      # [String] Where to find or to clone the repository
+      path: "storage/repos/my-great-project"
+      # Parameters to parse the Changelog
+      changelog: 
+        # [String] Which file contains the changelog
+        #   It is expected to be a Markdown file with:
+        #   - The title of each update is the version
+        #   - The body of each update is a list of changes
+        # Note: Trying to support Common Changelog
+        file: "CHANGELOG.md"
+        # [String] Separator used to split sections
+        #   defaults to "\n## "
+        section_separator: "\n## "
+        # [String] Regex to extract the version from the section title
+        # Note: backslashes need to be doubled
+        #   defaults to "\\[(v[0-9]+\\.[0-9]+\\.[0-9]+)\\]"
+        version_regex: "\\[(v[0-9]+\\.[0-9]+\\.[0-9]+)\\]"
+  # Configuration regarding the connection with Mastodon API
+  mastodon:
+    # [String] This will be the name of the bot
+    app_name: "Janitor"
+    # [String] Where to connecto to deliver the statuses
+    api_base_url: "https://mastodon.social"
+    # [String] Type of instance: 
+    #   "mastodon" for Mastodon
+    #   "pleroma" for Pleroma / Akkoma
+    #   "firefish" for Firefish / Calckey
+    instance_type: "pleroma"
+    # Credentials files to be generated
+    credentials:
+      # [String] Generated when creating the app. Contains Client ID and Client Secret
+      client_file: "client.secret"
+      # [String] Generated at first login. Contains the User Secret to be reused in further runs.
+      user_file: "user.secret"
+      # The User credentials. Used only during the first run.
+      # Should be Ok to delete the values once we have the "user.secret" generated
+      user:
+        # [String] email to be used to log in. For instance_type "firefish" it is ignored.
+        email: "bot+janitor@my-fancy.site"
+        # [String] Password to be used to log in. For instance_type "firefish" it is the Bearer token.
+        password: "SuperSecureP4ss"

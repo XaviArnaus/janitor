@@ -39,7 +39,7 @@ class SystemInfoTemplater:
     def process_report(self, system_info_data: dict) -> Message:
         thresholds = dict(self._config.get("system_info.thresholds"))
         humansize_exceptions = list(
-            self._config.get("formatting.system_info.human_readable_exceptions")
+            self._config.get("system_info.formatting.human_readable_exceptions")
         )
         hostname = system_info_data.pop("hostname") if "hostname" in system_info_data\
             else "unknown host"
@@ -87,7 +87,7 @@ class SystemInfoTemplater:
     ) -> str:
 
         title = self._config.get(
-            "formatting.system_info.report_item_names_map." + item_name, item_name
+            "system_info.formatting.report_item_names_map." + item_name, item_name
         )
         self._logger.debug(f"Will receive the title [{title}]")
         template = self.REPORT_LINE_TEMPLATE_OK
@@ -100,7 +100,7 @@ class SystemInfoTemplater:
         Based on https://stackoverflow.com/questions/14996453/python-libraries-to-calculate-human-readable-filesize-from-bytes # noqa: E501
         """
 
-        if not self._config.get("formatting.system_info.human_readable", False):
+        if not self._config.get("system_info.formatting.human_readable", False):
             return f"{nbytes} {self.SUFFIXES[0]}"
 
         i = 0

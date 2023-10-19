@@ -39,19 +39,26 @@ cd janitor
 ```
 
 ### 3. Settle your config from the example
+From version 0.5.0 onwards, the configuration is split in several files:
+- **main**: General parameters. Includes listener and generic storage parameters
+- **mastodon**: Parameters regarding the main Mastodon API instance configuration for publishing.
+- **schedules**: Scheduler parameters, like which tasks to run and when to do so.
+- **sysinfo**: Parameters about the system metrics collection modules.
+- **directnic_ddns**: Parameters for the Directnic's Dynamic DNS registers updater module.
+- **git_monitor**: Parameters regarding the Git monitor module.
+
+Just bring the configs you need out of the examples, like:
 ```
-cp config.yaml.dist config.yaml
+cp config/main.yaml.dist config/main.yaml
 ```
 
 ### 4. Edit the new config file
 ```
-nano config.yaml
+nano config/main.yaml
 ```
 
 ### 5. Change the parameters that make sense to your configuration
-Depending on how you'll want this bot instance to behave, there are some mandatory parameters to set up. The config file is quite well documented. Later on this document there are sections explaining which modes can be set, what are they and how to set them up. 
-
-Check the section below to get some tips on which configuration would fit for you.
+Depending on how you'll want this bot instance to behave, there are some mandatory parameters to set up. The config file is quite well documented. Later on this document there are sections explaining which modules can be set, what are they and how to set them up. 
 
 ### 6. Install all Python dependencies
 ```
@@ -61,7 +68,7 @@ make init
 ### 7. Create the app
 For the publishing into the Mastodon-like servers we need first to log in and set up the credential files. This is only needed for the "single mode" and the "listener mode", as they are the only ones that publish to the Mastodon API.
 ```
-make create_app
+bin/jan create_app
 ```
 
 And now the app is ready to run!

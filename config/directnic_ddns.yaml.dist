@@ -1,0 +1,14 @@
+###########################
+#         Janitor         #
+#-------------------------#
+#     Directnic's DDNS    #
+###########################
+
+# Directnic's Dynamic DNS updater
+directnic_ddns:
+  # [String] Where to store it
+  file: "storage/directnic_ddns.yaml"
+  # [List] Items to update
+  updates:
+    - https://directnic.com/dns/gateway/abcdefg123456/?data=
+    - https://directnic.com/dns/gateway/987654abcdef5/?data=

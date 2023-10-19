@@ -1,0 +1,52 @@
+###########################
+#         Janitor         #
+#-------------------------#
+#           Main          #
+###########################
+
+# App Info
+app:
+  # Server and Client configuration
+  service:
+    # Configuration for the Server side
+    listen:
+      # [String] IP to listen to.
+      #   Set 127.0.0.1 to only listen to localhost, which is the most secure
+      #   Set 0.0.0.0 to have the server available externally as well
+      host: 0.0.0.0
+      # [String] Port to listen to.
+      port: 5000
+      # [Bool] If the listener server will run in debug mode (more and explicit logging)
+      #   defaults to false.
+      debug: false
+    # [String] URL (and maybe port) to send the POST request to.
+    remote_url: http://localhost:5000
+  # Control of the app runners
+  run_control:
+    # [Bool] Performs a dry run: the queue is untouched and no re-toot is really done
+    # Check the logs/stdout to see the results
+    dry_run: True
+
+# Logging config
+logger:
+  # [Integer] Log level: NOTSET=0 | DEBUG=10 | INFO=20 | WARN=30 | ERROR=40 | CRITICAL=50
+  loglevel: 10
+  # [String] Name of the logger
+  name: "janitor"
+  # [Bool] Dump the log into a file
+  to_file: True
+  # [String] Path and filename of the log file
+  filename: "log/janitor.log"
+  # [Bool] Dump the log into a stdout
+  to_stdout: True
+  # [String] Format of the log
+  format: "[%(asctime)s] %(levelname)-8s %(name)-12s %(message)s"
+
+# Storage for the toots queue registry
+queue_storage:
+  # [String] Where to store it
+  file: "storage/queue.yaml"
+
+publisher:
+# [String] Where to download the media to
+  media_storage: "storage/media/"

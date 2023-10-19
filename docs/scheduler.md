@@ -9,7 +9,7 @@ For example, one may want to check the Dynamic DNS registers hourly, monitor a G
 ## ⚙️ Configuration
 
 ### 1. Define the schedule that should run
-In the config file there is a `schedules` parameter that accepts a list of objects representing each task to perform:
+In the `schedules.yaml` config file there is a `schedules` parameter that accepts a list of objects representing each task to perform:
 - `name` is just to describe what is this task
 - `when` is a `crontab` expression defining when this task will be triggered.
 - `action` is one of the possible values: "sysinfo_local" or "sysinfo_remote", at this point.

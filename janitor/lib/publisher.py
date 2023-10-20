@@ -46,7 +46,8 @@ class Publisher:
             #             self._logger.info("Could not publish %s", item["url"])
             instance_type = MastodonHelper.valid_or_raise(
                 self._config.get(
-                    "mastodon.named_accounts.default.instance_type", MastodonHelper.TYPE_MASTODON
+                    "mastodon.named_accounts.default.instance_type",
+                    MastodonHelper.TYPE_MASTODON
                 )
             )
             self._logger.debug(f"Instance type is valid: {instance_type}")

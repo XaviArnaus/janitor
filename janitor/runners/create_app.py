@@ -23,7 +23,8 @@ class CreateApp(RunnerProtocol):
             self._config.get("mastodon.named_accounts.default.app_name"),
             api_base_url=self._config.get("mastodon.named_accounts.default.api_base_url"),
             to_file=os.path.join(
-                ROOT_DIR, self._config.get("mastodon.named_accounts.default.credentials.client_file")
+                ROOT_DIR,
+                self._config.get("mastodon.named_accounts.default.credentials.client_file")
             )
         )
         self._logger.info("Finished Create App")

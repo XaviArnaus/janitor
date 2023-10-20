@@ -11,17 +11,17 @@ elif [ $1 = "test_message" ]; then
 elif [ $1 = "listener" ]; then
     if [ $2 = "start" ]; then
         # We want to spawn a listener without too much noise, and logging directly.
-        LISTENER=$(pgrep -f "'main', 'listener'");
+        LISTENER=$(pgrep -f "main', 'listener'");
         if [ ! -z "$LISTENER" ]
         then
             echo "Listener already running with PID: $LISTENER. Skipping."
         else
             nohup $POETRY_PATH run main $@ > log/listen_in_background.log 2>&1 &
-            ./$0 listener status
+            echo "Listener started."
         fi
     elif [ $2 = "status" ]; then
         # Are we already listening?
-        LISTENER=$(pgrep -f "'main', 'listener'");
+        LISTENER=$(pgrep -f "main', 'listener'");
         if [ -z "$LISTENER" ]
         then
             echo "Listener is NOT running"
@@ -29,7 +29,7 @@ elif [ $1 = "listener" ]; then
             echo "Listener is running with the PID: $LISTENER"
         fi
     elif [ $2 = "stop" ]; then
-        LISTENER=$(pgrep -f "'main', 'listener'");
+        LISTENER=$(pgrep -f "main', 'listener'");
         if [ ! -z "$LISTENER" ]
         then
             echo "Stopping listener under PID: $LISTENER"

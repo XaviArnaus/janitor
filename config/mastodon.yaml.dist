@@ -20,7 +20,7 @@ mastodon:
   # [Object] Mastodon account objects per name.
   #   The idea is that any Janitor module will refer to the name (key) of the object
   #   And then the related object will be loaded and used for publishing
-  per_name:
+  named_accounts:
     # [Object] The default Mastodon account object, basically used by all the application
     default:
       # [String] This will be the name of the bot

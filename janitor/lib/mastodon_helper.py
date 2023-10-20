@@ -32,7 +32,7 @@ class MastodonHelper:
                 "Getting instance without explicit connection params. Auto-discovering!"
             )
             connection_params = MastodonConnectionParams.from_dict(
-                config.get("mastodon.per_name.default")
+                config.get("mastodon.named_accounts.default")
             )
 
         instance_type = MastodonHelper.valid_or_raise(connection_params.instance_type)

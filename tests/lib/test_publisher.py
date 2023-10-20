@@ -16,7 +16,7 @@ CONFIG = {
     "logger.name": "logger_test",
     "app.run_control.dry_run": False,
     "publisher.media_storage": "storage/media/",
-    "mastodon.per_name.default.instance_type": "mastodon"
+    "mastodon.named_accounts.default.instance_type": "mastodon"
 }
 
 _mocked_mastodon_instance: Mastodon = Mock()
@@ -122,7 +122,7 @@ def test_publish_one_not_dry_run_pleroma(queue_item_1: QueueItem):
     mocked_config_get.assert_has_calls(
         [
             call("app.run_control.dry_run"),
-            call("mastodon.per_name.default.instance_type", "mastodon"),
+            call("mastodon.named_accounts.default.instance_type", "mastodon"),
         ]
     )
     mocked_build_status_post.assert_called_once_with(queue_item_1.message)
@@ -158,7 +158,7 @@ def test_publish_one_not_dry_run_mastodon(queue_item_1: QueueItem):
     mocked_config_get.assert_has_calls(
         [
             call("app.run_control.dry_run"),
-            call("mastodon.per_name.default.instance_type", "mastodon"),
+            call("mastodon.named_accounts.default.instance_type", "mastodon"),
         ]
     )
     mocked_build_status_post.assert_called_once_with(queue_item_1.message)
@@ -192,7 +192,7 @@ def test_publish_one_not_dry_run_mastodon_cut_text(queue_item_long: QueueItem):
     mocked_config_get.assert_has_calls(
         [
             call("app.run_control.dry_run"),
-            call("mastodon.per_name.default.instance_type", "mastodon"),
+            call("mastodon.named_accounts.default.instance_type", "mastodon"),
         ]
     )
     mocked_build_status_post.assert_called_once_with(queue_item_long.message)

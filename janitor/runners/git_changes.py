@@ -37,7 +37,7 @@ class GitChanges(RunnerProtocol):
 
                 # Check if we already have the repo cloned
                 # If not, clone it localy
-                monitor.initiate_or_clone_repository(repository=repository)
+                monitor.initiate_or_clone_repository(repository_info=repository)
 
                 # Get the new updates
                 monitor.get_updates()
@@ -54,7 +54,10 @@ class GitChanges(RunnerProtocol):
                 self._logger.info("New version for repository " + repo_name)
 
                 # Publish the changes into the Updates account
-                self._publish_update(message=message)
+                self._logger.debug(
+                    f"Publishing an update message into account {repository['named_account']}"
+                )
+                self._publish_update(message=message, named_account=repository["named_account"])
 
                 # Add a note about the project to publish them all together
                 published_projects.append(
@@ -62,9 +65,13 @@ class GitChanges(RunnerProtocol):
                 )
 
                 # Save the current last known version
+                self._logger.debug(
+                    f"Storing a new last known version: {list(parsed_content.keys())[0]}"
+                )
                 monitor.store_last_known_version(list(parsed_content.keys())[0])
 
             if len(published_projects) > 0:
+                self._logger.debug("Publishing an notice into account default")
                 self._publish_notification(
                     message=Message(
                         text="Published an update for:\n\n" + "\n".join(published_projects)
@@ -78,12 +85,12 @@ class GitChanges(RunnerProtocol):
                 message=Message(text="Error while publishing updates:\n\n" + str(e))
             )
 
-    def _publish_update(self, message: Message):
+    def _publish_update(self, message: Message, named_account: str = "updates"):
         # We want to publish to a different account,
         #   which only publishes updates.
         #   This means to instantiate a different Mastodon helper
         conn_params = MastodonConnectionParams.from_dict(
-            self._config.get("mastodon.named_accounts.updates")
+            self._config.get(f"mastodon.named_accounts.{named_account}")
         )
         client_file = os.path.join(ROOT_DIR, conn_params.credentials.client_file)
         # If the client_file does not exist we need to trigger the
@@ -107,11 +114,11 @@ class GitChanges(RunnerProtocol):
             base_path=ROOT_DIR
         ).publish_one(QueueItem(message))
 
-    def _publish_notification(self, message: Message):
+    def _publish_notification(self, message: Message, named_account: str = "default"):
         # This is the notification that we publish to
         #   the usual account, just to say who the action went.
         conn_params = MastodonConnectionParams.from_dict(
-            self._config.get("mastodon.named_accounts.default")
+            self._config.get(f"mastodon.named_accounts.{named_account}")
         )
 
         # Get the instance. Everything is by default

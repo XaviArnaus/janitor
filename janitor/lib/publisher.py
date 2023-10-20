@@ -26,9 +26,9 @@ class Publisher:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
         self._queue = Queue(config, base_path=base_path)
-        self._formatter = Formatter(config)
         self._mastodon = mastodon
         self._connection_params = connection_params
+        self._formatter = Formatter(config, connection_params.status_params)
 
     def publish_one(self, item: QueueItem) -> dict:
         # Translate the Message to StatusPost

@@ -1,7 +1,8 @@
 from pyxavi.config import Config
 from ..objects.message import Message
 from janitor.objects.message import MessageType
-from janitor.objects.status_post import StatusPost, StatusPostVisibility, StatusPostContentType
+from janitor.objects.status_post import StatusPost, StatusPostVisibility
+from janitor.objects.mastodon_connection_params import MastodonStatusParams
 from string import Template
 import logging
 
@@ -14,9 +15,10 @@ class Formatter:
 
     TEMPLATE_TEXT_WITH_MENTION = "$mention:\n\n$text"
 
-    def __init__(self, config: Config) -> None:
+    def __init__(self, config: Config, status_params: MastodonStatusParams) -> None:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
+        self._status_params = status_params
 
     def build_status_post(self, message: Message) -> StatusPost:
         status_post = StatusPost()
@@ -35,12 +37,8 @@ class Formatter:
             )
 
         # Now the rest of the details
-        status_post.content_type = StatusPostContentType.valid_or_raise(
-            value=self._config.get("mastodon.status_post.content_type")
-        )
-        status_post.visibility = StatusPostVisibility.valid_or_raise(
-            value=self._config.get("mastodon.status_post.visibility")
-        )
+        status_post.content_type = self._status_params.content_type
+        status_post.visibility = self._status_params.visibility
 
         # We always have to have a status (main text).
         # So we apply here the mention in case it's a direct message
@@ -57,10 +55,8 @@ class Formatter:
         return content
 
     def add_mention_to_message_if_direct_visibility(self, text: str) -> str:
-        is_dm = self._config.get(
-            "mastodon.status_post.visibility"
-        ) == StatusPostVisibility.DIRECT
-        mention = self._config.get("mastodon.status_post.username_to_dm")
+        is_dm = self._status_params.visibility == StatusPostVisibility.DIRECT
+        mention = self._status_params.username_to_dm
 
         if is_dm and mention:
             self._logger.info(f"It's a DM posting, applying mention to {mention}")

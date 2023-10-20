@@ -1,15 +1,24 @@
 from pyxavi.config import Config
 from janitor.lib.formatter import Formatter
 from janitor.objects.message import Message, MessageType
+from janitor.objects.mastodon_connection_params import MastodonStatusParams
 from janitor.objects.status_post import StatusPost, StatusPostContentType, StatusPostVisibility
-from unittest.mock import patch, Mock, call
+from unittest.mock import patch, Mock
 import pytest
+from unittest import TestCase
 from logging import Logger
 
 CONFIG = {
     "logger.name": "logger_test",
     "mastodon.status_post.content_type": "text/plain",
     "mastodon.status_post.visibility": "public"
+}
+
+STATUS_PARAMS = {
+    "content_type": "text/plain",
+    "visibility": "public",
+    "max_length": 500,
+    "username_to_dm": "@xavi"
 }
 
 
@@ -35,11 +44,12 @@ def message_with_summary() -> Message:
     )
 
 
-def get_instance() -> Formatter:
-
+def get_instance(status_params: MastodonStatusParams = None) -> Formatter:
+    if status_params is None:
+        status_params = MastodonStatusParams.from_dict(STATUS_PARAMS)
     with patch.object(Config, "__init__", new=patched_config_init):
         with patch.object(Config, "get", new=patched_config_get):
-            return Formatter(config=Config())
+            return Formatter(config=Config(), status_params=status_params)
 
 
 def test_initialize():
@@ -53,7 +63,12 @@ def test_initialize():
 def test_build_status_post_without_summary(message_without_summary: Message):
     status_post_content_type = StatusPostContentType.PLAIN
     status_post_visibility = StatusPostVisibility.PUBLIC
-    formatter = get_instance()
+    status_params = MastodonStatusParams.from_dict(
+        {
+            "content_type": status_post_content_type, "visibility": status_post_visibility
+        }
+    )
+    formatter = get_instance(status_params)
 
     expected_status_post = StatusPost(
         status=message_without_summary.text,
@@ -61,24 +76,13 @@ def test_build_status_post_without_summary(message_without_summary: Message):
         visibility=status_post_visibility
     )
 
-    mocked_config_get = Mock()
-    mocked_config_get.side_effect = [
-        CONFIG["mastodon.status_post.content_type"], CONFIG["mastodon.status_post.visibility"]
-    ]
     mocked_add_mention = Mock()
     mocked_add_mention.return_value = message_without_summary.text
-    with patch.object(Config, "get", new=mocked_config_get):
-        with patch.object(formatter,
-                          "add_mention_to_message_if_direct_visibility",
-                          new=mocked_add_mention):
-            formatted_status_post = formatter.build_status_post(message=message_without_summary)
+    with patch.object(formatter,
+                      "add_mention_to_message_if_direct_visibility",
+                      new=mocked_add_mention):
+        formatted_status_post = formatter.build_status_post(message=message_without_summary)
 
-    mocked_config_get.assert_has_calls(
-        [
-            call("mastodon.status_post.content_type"),
-            call("mastodon.status_post.visibility"),
-        ]
-    )
     assert formatted_status_post.spoiler_text == expected_status_post.spoiler_text
     assert formatted_status_post.status == expected_status_post.status
     assert formatted_status_post.visibility == expected_status_post.visibility
@@ -88,7 +92,12 @@ def test_build_status_post_without_summary(message_without_summary: Message):
 def test_build_status_post_with_summary(message_with_summary: Message):
     status_post_content_type = StatusPostContentType.PLAIN
     status_post_visibility = StatusPostVisibility.PUBLIC
-    formatter = get_instance()
+    status_params = MastodonStatusParams.from_dict(
+        {
+            "content_type": status_post_content_type, "visibility": status_post_visibility
+        }
+    )
+    formatter = get_instance(status_params)
 
     expected_status_post = StatusPost(
         spoiler_text=message_with_summary.summary,
@@ -97,24 +106,13 @@ def test_build_status_post_with_summary(message_with_summary: Message):
         visibility=status_post_visibility
     )
 
-    mocked_config_get = Mock()
-    mocked_config_get.side_effect = [
-        CONFIG["mastodon.status_post.content_type"], CONFIG["mastodon.status_post.visibility"]
-    ]
     mocked_add_mention = Mock()
     mocked_add_mention.return_value = message_with_summary.text
-    with patch.object(Config, "get", new=mocked_config_get):
-        with patch.object(formatter,
-                          "add_mention_to_message_if_direct_visibility",
-                          new=mocked_add_mention):
-            formatted_status_post = formatter.build_status_post(message=message_with_summary)
+    with patch.object(formatter,
+                      "add_mention_to_message_if_direct_visibility",
+                      new=mocked_add_mention):
+        formatted_status_post = formatter.build_status_post(message=message_with_summary)
 
-    mocked_config_get.assert_has_calls(
-        [
-            call("mastodon.status_post.content_type"),
-            call("mastodon.status_post.visibility"),
-        ]
-    )
     assert formatted_status_post.spoiler_text == expected_status_post.spoiler_text
     assert formatted_status_post.status == expected_status_post.status
     assert formatted_status_post.visibility == expected_status_post.visibility
@@ -125,20 +123,28 @@ def test_build_status_post_with_summary(message_with_summary: Message):
     argnames=('text', 'mention', 'visibility', 'expected_result'),
     argvalues=[
         ("I am a message", "@xavi", "direct", "@xavi:\n\nI am a message"),
-        ("I am a message", None, "direct", "I am a message"),
+        ("I am a message", None, "direct", False),
         ("I am a message", "@xavi", "public", "I am a message"),
     ],
 )
 def test_add_mention_to_message_when_is_dm(text, mention, visibility, expected_result):
 
-    formatter = get_instance()
+    if expected_result is False:
+        with TestCase.assertRaises(MastodonStatusParams, ValueError):
+            status_params = MastodonStatusParams.from_dict(
+                {
+                    "visibility": visibility, "username_to_dm": mention
+                }
+            )
+            formatter = get_instance(status_params)
+    else:
+        status_params = MastodonStatusParams.from_dict(
+            {
+                "visibility": visibility, "username_to_dm": mention
+            }
+        )
+        formatter = get_instance(status_params)
 
-    mocked_config_get = Mock()
-    mocked_config_get.side_effect = [visibility, mention]
-    with patch.object(Config, "get", new=mocked_config_get):
         result_text = formatter.add_mention_to_message_if_direct_visibility(text=text)
 
-    mocked_config_get.assert_has_calls(
-        [call("mastodon.status_post.visibility"), call("mastodon.status_post.username_to_dm")]
-    )
-    assert expected_result == result_text
+        assert expected_result == result_text

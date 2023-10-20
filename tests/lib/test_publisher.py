@@ -6,7 +6,8 @@ from janitor.lib.queue import Queue
 from janitor.objects.message import Message
 from janitor.objects.queue_item import QueueItem
 from janitor.objects.status_post import StatusPost
-from janitor.objects.mastodon_connection_params import MastodonConnectionParams
+from janitor.objects.mastodon_connection_params import\
+    MastodonConnectionParams, MastodonStatusParams
 from mastodon import Mastodon
 from unittest.mock import patch, Mock, call
 import pytest
@@ -49,6 +50,10 @@ def patched_generic_init(self, config: Config):
     pass
 
 
+def patched_formatter_init(self, config: Config, status_params: MastodonStatusParams):
+    pass
+
+
 def get_instance(mastodon_connection_params: MastodonConnectionParams = None) -> Publisher:
     _mocked_mastodon_instance.__class__ = Mastodon
     _mocked_mastodon_instance.status_post = Mock()
@@ -65,7 +70,7 @@ def get_instance(mastodon_connection_params: MastodonConnectionParams = None) ->
     with patch.object(Config, "__init__", new=patched_config_init):
         with patch.object(Config, "get", new=patched_config_get):
             with patch.object(Queue, "__init__", new=_mocked_queue_instance):
-                with patch.object(Formatter, "__init__", new=patched_generic_init):
+                with patch.object(Formatter, "__init__", new=patched_formatter_init):
                     return Publisher(
                         config=Config(),
                         mastodon=_mocked_mastodon_instance,

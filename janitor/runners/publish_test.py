@@ -1,5 +1,6 @@
 from pyxavi.config import Config
 from janitor.lib.mastodon_helper import MastodonHelper
+from janitor.objects.mastodon_connection_params import MastodonConnectionParams
 from janitor.lib.publisher import Publisher
 from janitor.objects.message import Message
 from janitor.objects.queue_item import QueueItem
@@ -23,14 +24,23 @@ class PublishTest(RunnerProtocol):
         '''
         try:
             # All actions are done under a Mastodon API instance
-            instance_type = self._config.get("mastodon.instance_type")
-            self._logger.info(f"Defined instance type: {instance_type}")
-            mastodon = MastodonHelper.get_instance(self._config, base_path=ROOT_DIR)
+            conn_params = MastodonConnectionParams.from_dict(
+                self._config.get("mastodon.named_accounts.default")
+            )
+            self._logger.info(f"Defined instance type: {conn_params.instance_type}")
+            mastodon = MastodonHelper.get_instance(
+                config=self._config, connection_params=conn_params, base_path=ROOT_DIR
+            )
             wrapper = type(mastodon)
             self._logger.info(f"Loaded wrapper: {wrapper}")
 
             # Prepare the Publisher
-            publisher = Publisher(self._config, mastodon, base_path=ROOT_DIR)
+            publisher = Publisher(
+                config=self._config,
+                mastodon=mastodon,
+                connection_params=conn_params,
+                base_path=ROOT_DIR
+            )
 
             # Prepare a test message
             self._logger.info("Preparing a test message")

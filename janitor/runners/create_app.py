@@ -19,11 +19,12 @@ class CreateApp(RunnerProtocol):
     def run(self):
         self._logger.info("Run Create App")
         MastodonHelper.create_app(
-            self._config.get("mastodon.instance_type"),
-            self._config.get("mastodon.app_name"),
-            api_base_url=self._config.get("mastodon.api_base_url"),
+            self._config.get("mastodon.named_accounts.default.instance_type"),
+            self._config.get("mastodon.named_accounts.default.app_name"),
+            api_base_url=self._config.get("mastodon.named_accounts.default.api_base_url"),
             to_file=os.path.join(
-                ROOT_DIR, self._config.get("mastodon.credentials.client_file")
+                ROOT_DIR,
+                self._config.get("mastodon.named_accounts.default.credentials.client_file")
             )
         )
         self._logger.info("Finished Create App")

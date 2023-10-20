@@ -12,3 +12,4 @@
 - README and documentation has been iterated
 - The *config* file has been sliced into several *config* files per module
 - The `validate_config` now is improved and considers all config files
+- Now all mastodon publishing accounts are registered inside the `mastodon.yaml` config file, each under a name, to easily be referenced from other Janitor modules.

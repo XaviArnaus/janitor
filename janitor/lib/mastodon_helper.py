@@ -22,16 +22,10 @@ class MastodonHelper:
     @staticmethod
     def get_instance(
         config: Config,
-        connection_params: MastodonConnectionParams = None,
+        connection_params: MastodonConnectionParams,
         base_path: str = None
     ) -> Mastodon:
         logger = logging.getLogger(config.get("logger.name"))
-
-        if connection_params is None:
-            logger.warn(
-                "Getting instance without explicit connection params. Auto-discovering!"
-            )
-            connection_params = MastodonConnectionParams.from_dict(config.get("mastodon"))
 
         instance_type = MastodonHelper.valid_or_raise(connection_params.instance_type)
         user_file = connection_params.credentials.user_file

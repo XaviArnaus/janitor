@@ -7,17 +7,10 @@ import pytest
 from mastodon import Mastodon
 import os
 
-CONFIG = {
-    "logger.name": "logger_test",
-    "mastodon.instance_type": "mastodon",
-    "mastodon.credentials.user_file": "user.secret",
-    "mastodon.credentials.client_file": "client.secret",
-    "mastodon.api_base_url": "https://mastodont.cat",
-    "mastodon.credentials.user.email": "bot+syscheck@my-fancy.site",
-    "mastodon.credentials.user.password": "SuperSecureP4ss",
-}
+CONFIG = {"logger.name": "logger_test"}
 
 CONFIG_MASTODON_CONN_PARAMS = {
+    "app_type": "SuperApp",
     "instance_type": "mastodon",
     "api_base_url": "https://mastodont.cat",
     "credentials": {

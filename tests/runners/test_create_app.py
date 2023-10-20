@@ -62,9 +62,9 @@ def test_create_app():
     )
     mocked_config_get.assert_has_calls(
         [
-            call("mastodon.instance_type"),
-            call("mastodon.app_name"),
-            call("mastodon.api_base_url"),
-            call("mastodon.credentials.client_file"),
+            call("mastodon.named_accounts.default.instance_type"),
+            call("mastodon.named_accounts.default.app_name"),
+            call("mastodon.named_accounts.default.api_base_url"),
+            call("mastodon.named_accounts.default.credentials.client_file"),
         ]
     )

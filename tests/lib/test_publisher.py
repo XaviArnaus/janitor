@@ -6,6 +6,8 @@ from janitor.lib.queue import Queue
 from janitor.objects.message import Message
 from janitor.objects.queue_item import QueueItem
 from janitor.objects.status_post import StatusPost
+from janitor.objects.mastodon_connection_params import\
+    MastodonConnectionParams, MastodonStatusParams
 from mastodon import Mastodon
 from unittest.mock import patch, Mock, call
 import pytest
@@ -15,8 +17,21 @@ from datetime import datetime
 CONFIG = {
     "logger.name": "logger_test",
     "app.run_control.dry_run": False,
-    "publisher.media_storage": "storage/media/",
-    "mastodon.instance_type": "mastodon"
+    "publisher.media_storage": "storage/media/"
+}
+
+CONFIG_MASTODON_CONN_PARAMS = {
+    "app_type": "SuperApp",
+    "instance_type": "mastodon",
+    "api_base_url": "https://mastodont.cat",
+    "credentials": {
+        "user_file": "user.secret",
+        "client_file": "client.secret",
+        "user": {
+            "email": "bot+syscheck@my-fancy.site",
+            "password": "SuperSecureP4ss",
+        }
+    }
 }
 
 _mocked_mastodon_instance: Mastodon = Mock()
@@ -35,7 +50,11 @@ def patched_generic_init(self, config: Config):
     pass
 
 
-def get_instance() -> Publisher:
+def patched_formatter_init(self, config: Config, status_params: MastodonStatusParams):
+    pass
+
+
+def get_instance(mastodon_connection_params: MastodonConnectionParams = None) -> Publisher:
     _mocked_mastodon_instance.__class__ = Mastodon
     _mocked_mastodon_instance.status_post = Mock()
     _mocked_mastodon_instance.status_post.return_value = {"id": 123}
@@ -43,12 +62,20 @@ def get_instance() -> Publisher:
     _mocked_mastodon_instance.media_post.return_value = {"id": 456}
     _mocked_queue_instance.return_value = None
 
+    if mastodon_connection_params is None:
+        mastodon_connection_params = MastodonConnectionParams.from_dict(
+            CONFIG_MASTODON_CONN_PARAMS
+        )
+
     with patch.object(Config, "__init__", new=patched_config_init):
         with patch.object(Config, "get", new=patched_config_get):
             with patch.object(Queue, "__init__", new=_mocked_queue_instance):
-                with patch.object(Formatter, "__init__", new=patched_generic_init):
+                with patch.object(Formatter, "__init__", new=patched_formatter_init):
                     return Publisher(
-                        config=Config(), mastodon=_mocked_mastodon_instance, base_path="bla"
+                        config=Config(),
+                        mastodon=_mocked_mastodon_instance,
+                        connection_params=mastodon_connection_params,
+                        base_path="bla"
                     )
 
 
@@ -109,22 +136,19 @@ def queue_item_long(datetime_2) -> QueueItem:
 
 def test_publish_one_not_dry_run_pleroma(queue_item_1: QueueItem):
     status_post = StatusPost(status=queue_item_1.message.text)
-    publisher = get_instance()
+    mastodon_connection_params = MastodonConnectionParams.from_dict(CONFIG_MASTODON_CONN_PARAMS)
+    mastodon_connection_params.instance_type = MastodonConnectionParams.TYPE_PLEROMA
+    publisher = get_instance(mastodon_connection_params=mastodon_connection_params)
 
     mocked_build_status_post = Mock()
     mocked_build_status_post.return_value = status_post
     mocked_config_get = Mock()
-    mocked_config_get.side_effect = [False, "pleroma", 500]
+    mocked_config_get.return_value = False
     with patch.object(Formatter, "build_status_post", new=mocked_build_status_post):
         with patch.object(Config, "get", new=mocked_config_get):
             result = publisher.publish_one(queue_item_1)
 
-    mocked_config_get.assert_has_calls(
-        [
-            call("app.run_control.dry_run"),
-            call("mastodon.instance_type", "mastodon"),
-        ]
-    )
+    mocked_config_get.assert_called_once_with("app.run_control.dry_run")
     mocked_build_status_post.assert_called_once_with(queue_item_1.message)
     _mocked_mastodon_instance.status_post.assert_called_once_with(
         status=status_post.status,
@@ -150,17 +174,12 @@ def test_publish_one_not_dry_run_mastodon(queue_item_1: QueueItem):
     mocked_build_status_post = Mock()
     mocked_build_status_post.return_value = status_post
     mocked_config_get = Mock()
-    mocked_config_get.side_effect = [False, "mastodon", 500]
+    mocked_config_get.return_value = False
     with patch.object(Formatter, "build_status_post", new=mocked_build_status_post):
         with patch.object(Config, "get", new=mocked_config_get):
             result = publisher.publish_one(queue_item_1)
 
-    mocked_config_get.assert_has_calls(
-        [
-            call("app.run_control.dry_run"),
-            call("mastodon.instance_type", "mastodon"),
-        ]
-    )
+    mocked_config_get.assert_called_once_with("app.run_control.dry_run")
     mocked_build_status_post.assert_called_once_with(queue_item_1.message)
     _mocked_mastodon_instance.status_post.assert_called_once_with(
         status=status_post.status,
@@ -184,17 +203,12 @@ def test_publish_one_not_dry_run_mastodon_cut_text(queue_item_long: QueueItem):
     mocked_build_status_post = Mock()
     mocked_build_status_post.return_value = status_post
     mocked_config_get = Mock()
-    mocked_config_get.side_effect = [False, "mastodon", 500]
+    mocked_config_get.return_value = False
     with patch.object(Formatter, "build_status_post", new=mocked_build_status_post):
         with patch.object(Config, "get", new=mocked_config_get):
             result = publisher.publish_one(queue_item_long)
 
-    mocked_config_get.assert_has_calls(
-        [
-            call("app.run_control.dry_run"),
-            call("mastodon.instance_type", "mastodon"),
-        ]
-    )
+    mocked_config_get.assert_called_once_with("app.run_control.dry_run")
     mocked_build_status_post.assert_called_once_with(queue_item_long.message)
     _mocked_mastodon_instance.status_post.assert_called_once_with(
         status=status_post.status[:497] + "...",

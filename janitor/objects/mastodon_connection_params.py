@@ -61,7 +61,8 @@ class MastodonConnectionParams():
             if "credentials" in connection_params_dict else None,
             status_params=MastodonStatusParams.from_dict(
                 connection_params_dict["status_params"]
-            ) if "status_params" in connection_params_dict else None
+            ) if "status_params" in connection_params_dict and
+            connection_params_dict["status_params"] is not None else None
         )
 
 

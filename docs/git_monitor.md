@@ -25,6 +25,8 @@ The following is the configuration params responsible to set up one repository t
       git: git@github.com:XaviArnaus/pyxavi.git
       # [String] Where to find or to clone the repository
       path: "storage/repos/pyxavi"
+      # [String] The related named account in `mastodon.yaml` used to publish
+      named_account: "updates"
       # Parameters to parse the Changelog
       changelog:
         # [String] Which file contains the changelog
@@ -33,6 +35,8 @@ The following is the configuration params responsible to set up one repository t
         #   - The body of each update is a list of changes
         # Note: Trying to support Common Changelog
         file: "CHANGELOG.md"
+        # [List] List of strings as versions that we will exclude from analysing
+        version_exceptions: ["Unreleased"]
         # [String] Separator used to split sections
         #   defaults to "\n## "
         section_separator: "\n## "
@@ -54,6 +58,7 @@ git_monitor:
       tags: ["#Python", "#library"]
       git: git@github.com:XaviArnaus/pyxavi.git
       path: "storage/repos/pyxavi"
+      named_account: "updates"
       changelog:
         file: "CHANGELOG.md"
     -
@@ -62,6 +67,7 @@ git_monitor:
       tags: ["#Python", "#bot"]
       git: git@github.com:XaviArnaus/janitor.git
       path: "storage/repos/janitor"
+      named_account: "updates"
       changelog:
         file: "CHANGELOG.md"
 ```

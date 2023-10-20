@@ -25,24 +25,29 @@ class GitMonitor:
         self._logger = logging.getLogger(config.get("logger.name"))
         self._storage = Storage(self._config.get("git_monitor.file", DEFAULT_FILENAME))
 
-    def initiate_or_clone_repository(self, repository: dict) -> Repo:
+    def initiate_or_clone_repository(self, repository_info: dict) -> Repo:
         # Checking for mandatory parameters
-        if ("path" not in repository or repository["path"] is None)\
-            and ("git" not in repository or repository["git"] is None
-                 or "path" not in repository or repository["path"] is None):
+        if ("path" not in repository_info or repository_info["path"] is None)\
+            and ("git" not in repository_info or repository_info["git"] is None
+                 or "path" not in repository_info or repository_info["path"] is None):
             raise RuntimeError(
                 "Mandatory parameters [path] or [git] and [path] are not present"
             )
 
-        if os.path.exists(repository["path"]):
-            self.current_repository = Repo.init(repository["path"])
+        if os.path.exists(repository_info["path"]):
+            self._logger.debug(f"Initializing repo {repository_info['name']}")
+            self.current_repository = Repo.init(repository_info["path"])
         else:
-            self.current_repository = Repo.clone_from(repository["git"], repository["path"])
+            self._logger.debug(f"Cloning repo {repository_info['name']}")
+            self.current_repository = Repo.clone_from(
+                repository_info["git"], repository_info["path"]
+            )
 
-        self.repository_info = repository
+        self.repository_info = repository_info
         return self.current_repository
 
     def get_updates(self):
+        self._logger.debug(f"Getting updates for repo {self.repository_info['name']}")
         origin = self.current_repository.remotes.origin
         origin.pull()
 
@@ -78,30 +83,42 @@ class GitMonitor:
             else DEFAULT_SECTION_SEPARATOR
         last_version_param_name = self.__get_param_name("last_version")
         last_known_version = self._storage.get(last_version_param_name, None)
+        versions_to_ignore = self.repository_info["changelog"]["version_exceptions"]\
+            if "version_exceptions" in self.repository_info["changelog"] else []
+
+        self._logger.debug(f"Last known version: {last_known_version}")
+        self._logger.debug(f"Will ignore the versions: {', '.join(versions_to_ignore)}")
 
         sections = content.split(version_section_separator)
         # Discarding position 0, it's the title and won't match the version cleaner.
         sections = sections[1:]
-
-        # If we don't have a last version, we won't publish anything
-        if last_known_version is None:
-            # Then just take the first item, store the version and leave
-            # Remember, Changelog is listing the versions the newer first.
-            version_to_store = self.__extract_version_from_section(section=sections[0])
-            if version_to_store is None:
-                raise RuntimeError("I could not get a version from this section")
-            else:
-                self._storage.set(last_version_param_name, version_to_store)
-                self._storage.write_file()
-                return {}
+        self._logger.debug(f"Found {len(sections)} sections")
 
         # Classify the content by version.
         # We already have the last known version, so stop when appears.
         sections_by_version = {}
         for section in sections:
             version = self.__extract_version_from_section(section)
+            if version is None:
+                raise RuntimeError("I could not get a version from this section")
+            if version in versions_to_ignore:
+                self._logger.debug(f"Found version {version} is meant to be ignored")
+                continue
+            if last_known_version is None:
+                self._logger.debug(
+                    "We don't have a last known. " +
+                    f"Saving found version: {version} and leaving."
+                )
+                # If we don't have a last version, we won't publish anything. Just save it.
+                self._storage.set(last_version_param_name, version)
+                self._storage.write_file()
+                return {}
             if version == last_known_version:
+                self._logger.debug(
+                    f"Found version {version} is the same as " + "last known. Stopping here."
+                )
                 break
+            self._logger.debug(f"Found version {version}, kept in parsed sections.")
             sections_by_version[version] = section
 
         return sections_by_version

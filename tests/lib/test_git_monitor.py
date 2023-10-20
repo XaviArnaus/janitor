@@ -91,16 +91,16 @@ def test_initialize():
     argnames=('repository', 'path_exist', 'expected_exception'),
     argvalues=[
         ({
-            "none": "none"
+            "name": "test_name", "none": "none"
         }, None, True),
         ({
-            "git": "yes"
+            "name": "test_name", "git": "yes"
         }, None, True),
         ({
-            "path": "yes"
+            "name": "test_name", "path": "yes"
         }, True, False),
         ({
-            "path": "yes", "git": "yes"
+            "name": "test_name", "path": "yes", "git": "yes"
         }, False, False),
     ],
 )
@@ -110,7 +110,7 @@ def test_initiate_existing_repository(repository, path_exist, expected_exception
 
     if expected_exception:
         with TestCase.assertRaises(monitor, RuntimeError):
-            monitor.initiate_or_clone_repository(repository=repository)
+            monitor.initiate_or_clone_repository(repository_info=repository)
     else:
         mocked_starter = Mock()
         mocked_path_exists = Mock()
@@ -118,12 +118,12 @@ def test_initiate_existing_repository(repository, path_exist, expected_exception
         if path_exist is True:
             with patch.object(os.path, "exists", new=mocked_path_exists):
                 with patch.object(Repo, "init", new=mocked_starter):
-                    monitor.initiate_or_clone_repository(repository=repository)
+                    monitor.initiate_or_clone_repository(repository_info=repository)
                 mocked_starter.assert_called_once_with(repository["path"])
         else:
             with patch.object(os.path, "exists", new=mocked_path_exists):
                 with patch.object(Repo, "clone_from", new=mocked_starter):
-                    monitor.initiate_or_clone_repository(repository=repository)
+                    monitor.initiate_or_clone_repository(repository_info=repository)
                 mocked_starter.assert_called_once_with(repository["git"], repository["path"])
 
 
@@ -134,6 +134,7 @@ def test_get_updates():
     mocked_pull = Mock()
 
     monitor = get_instance()
+    monitor.repository_info = REPOSITORY
     monitor.current_repository = mocked_repo
 
     with patch.object(mocked_origin, "pull", new=mocked_pull):

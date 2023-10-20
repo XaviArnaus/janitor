@@ -22,6 +22,8 @@ git_monitor:
       git: git@github.com:MyUser/my-great-project.git
       # [String] Where to find or to clone the repository
       path: "storage/repos/my-great-project"
+      # [String] The related named account in `mastodon.yaml` used to publish
+      named_account: "updates"
       # Parameters to parse the Changelog
       changelog: 
         # [String] Which file contains the changelog
@@ -30,6 +32,8 @@ git_monitor:
         #   - The body of each update is a list of changes
         # Note: Trying to support Common Changelog
         file: "CHANGELOG.md"
+        # [List] List of strings as versions that we will exclude from analysing
+        version_exceptions: []
         # [String] Separator used to split sections
         #   defaults to "\n## "
         section_separator: "\n## "

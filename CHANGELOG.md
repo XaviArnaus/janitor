@@ -6,8 +6,8 @@
 
 ### Changed
 
-- Fix issue with the main runner in Raspberry ([#24](https://github.com/XaviArnaus/janitor/pull/24))
-- Fix issue with controlling the listener with the main runner ([#25](https://github.com/XaviArnaus/janitor/pull/25))
+- Fix issue with the main runner in Raspberry ([#25](https://github.com/XaviArnaus/janitor/pull/24))
+- Fix issue with controlling the listener with the main runner ([#26](https://github.com/XaviArnaus/janitor/pull/25))
 
 ## [v0.5.0](https://github.com/XaviArnaus/janitor/releases/tag/v0.5.0)
 

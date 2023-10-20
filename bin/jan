@@ -17,6 +17,7 @@ elif [ $1 = "listener" ]; then
             echo "Listener already running with PID: $LISTENER. Skipping."
         else
             nohup $POETRY_PATH run main $@ > log/listen_in_background.log 2>&1 &
+            sleep 3
             ./$0 listener status
         fi
     elif [ $2 = "status" ]; then

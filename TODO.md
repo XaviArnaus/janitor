@@ -7,7 +7,6 @@
     - Make `QueueItem` just a protocol
 - Move `MastodonHelper` to `pyxavi`
 - Move the Mastodon publish related classes to `pyxavi`
-- Make the `git_monitor` to be able to publish to several other Mastodon accounts (example: own repositories vs. external repositories)
 - Make the `git_monitor` to monitor git tags and not only CHANGELOG changes.
 - Make a PyPI monitor
 
@@ -27,3 +26,4 @@
     3. `poetry install` and a possible `poetry lock`
     4. brings up the listener
     ➡️ Won't do, as obscures the tasks to do and now we have a tool to start/stop/status the Listener
+✅ Make the `git_monitor` to be able to publish to several other Mastodon accounts (example: own repositories vs. external repositories)

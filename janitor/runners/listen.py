@@ -96,7 +96,12 @@ class ListenSysInfo(Resource):
         mastodon = MastodonHelper.get_instance(
             config=self._config, connection_params=conn_params, base_path=ROOT_DIR
         )
-        publisher = Publisher(self._config, mastodon, base_path=ROOT_DIR)
+        publisher = Publisher(
+            config=self._config,
+            mastodon=mastodon,
+            connection_params=conn_params,
+            base_path=ROOT_DIR
+        )
         self._logger.info("Publishing one message")
         publisher.publish_one(QueueItem(message))
 
@@ -189,7 +194,12 @@ class ListenMessage(Resource):
         mastodon = MastodonHelper.get_instance(
             config=self._config, connection_params=conn_params, base_path=ROOT_DIR
         )
-        publisher = Publisher(self._config, mastodon, base_path=ROOT_DIR)
+        publisher = Publisher(
+            config=self._config,
+            mastodon=mastodon,
+            connection_params=conn_params,
+            base_path=ROOT_DIR
+        )
         self._logger.info("Publishing one message")
         publisher.publish_one(QueueItem(message))
 

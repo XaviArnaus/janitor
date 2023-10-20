@@ -100,8 +100,12 @@ class GitChanges(RunnerProtocol):
             config=self._config, connection_params=conn_params
         )
         # Now publish the message
-        _ = Publisher(self._config, mastodon_instance, base_path=ROOT_DIR)\
-            .publish_one(QueueItem(message))
+        _ = Publisher(
+            config=self._config,
+            mastodon=mastodon_instance,
+            connection_params=conn_params,
+            base_path=ROOT_DIR
+        ).publish_one(QueueItem(message))
 
     def _publish_notification(self, message: Message):
         # This is the notification that we publish to
@@ -115,5 +119,9 @@ class GitChanges(RunnerProtocol):
             config=self._config, connection_params=conn_params
         )
         # Now publish the message
-        _ = Publisher(self._config, mastodon_instance, base_path=ROOT_DIR)\
-            .publish_one(QueueItem(message))
+        _ = Publisher(
+            config=self._config,
+            mastodon=mastodon_instance,
+            connection_params=conn_params,
+            base_path=ROOT_DIR
+        ).publish_one(QueueItem(message))

@@ -35,7 +35,12 @@ class PublishTest(RunnerProtocol):
             self._logger.info(f"Loaded wrapper: {wrapper}")
 
             # Prepare the Publisher
-            publisher = Publisher(self._config, mastodon, base_path=ROOT_DIR)
+            publisher = Publisher(
+                config=self._config,
+                mastodon=mastodon,
+                connection_params=conn_params,
+                base_path=ROOT_DIR
+            )
 
             # Prepare a test message
             self._logger.info("Preparing a test message")

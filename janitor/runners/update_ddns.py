@@ -31,7 +31,12 @@ class UpdateDdns(RunnerProtocol):
         mastodon = MastodonHelper.get_instance(
             config=self._config, connection_params=conn_params, base_path=ROOT_DIR
         )
-        publisher = Publisher(self._config, mastodon, base_path=ROOT_DIR)
+        publisher = Publisher(
+            config=self._config,
+            mastodon=mastodon,
+            connection_params=conn_params,
+            base_path=ROOT_DIR
+        )
         queue_item = QueueItem(message=Message(text=text))
         self._logger.info("Publishing Mastodon message")
         _ = publisher.publish_one(queue_item)

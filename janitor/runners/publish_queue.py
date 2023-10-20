@@ -31,7 +31,12 @@ class PublishQueue(RunnerProtocol):
 
             # Read from the queue the toots to publish
             # and publishes all of them
-            publisher = Publisher(self._config, mastodon, base_path=ROOT_DIR)
+            publisher = Publisher(
+                config=self._config,
+                mastodon=mastodon,
+                connection_params=conn_params,
+                base_path=ROOT_DIR
+            )
             self._logger.info("Publishing the whole queue")
             publisher.publish_all_from_queue()
         except Exception as e:

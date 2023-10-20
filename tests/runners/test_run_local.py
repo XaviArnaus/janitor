@@ -92,7 +92,7 @@ def patched_mastodon_get_instance(config, connection_params, base_path):
     pass
 
 
-def patched_publisher_init(self, config, mastodon, base_path):
+def patched_publisher_init(self, config, mastodon, connection_params, base_path):
     pass
 
 

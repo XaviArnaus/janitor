@@ -5,6 +5,7 @@ from .queue import Queue
 from .formatter import Formatter
 from mastodon import Mastodon
 from .mastodon_helper import MastodonHelper
+from janitor.objects.mastodon_connection_params import MastodonConnectionParams
 import logging
 
 
@@ -15,14 +16,19 @@ class Publisher:
     It is responsible to publish the queued status posts.
     '''
 
-    DEFAULT_MAX_LENGTH = 500
-
-    def __init__(self, config: Config, mastodon: Mastodon, base_path: str = None) -> None:
+    def __init__(
+        self,
+        config: Config,
+        mastodon: Mastodon,
+        connection_params: MastodonConnectionParams,
+        base_path: str = None
+    ) -> None:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
         self._queue = Queue(config, base_path=base_path)
         self._formatter = Formatter(config)
         self._mastodon = mastodon
+        self._connection_params = connection_params
 
     def publish_one(self, item: QueueItem) -> dict:
         # Translate the Message to StatusPost
@@ -44,17 +50,10 @@ class Publisher:
             #             posted_media.append(posted_result["id"])
             #         else:
             #             self._logger.info("Could not publish %s", item["url"])
-            instance_type = MastodonHelper.valid_or_raise(
-                self._config.get(
-                    "mastodon.named_accounts.default.instance_type",
-                    MastodonHelper.TYPE_MASTODON
-                )
-            )
+            instance_type = MastodonHelper.valid_or_raise(self._connection_params.instance_type)
             self._logger.debug(f"Instance type is valid: {instance_type}")
 
-            max_length = self._config.get(
-                "mastodon.status_post.max_length", self.DEFAULT_MAX_LENGTH
-            )
+            max_length = self._connection_params.status_params.max_length
             if len(status_post.status) > max_length:
                 self._logger.info(
                     f"The status post is longer than the max length of {max_length}. Cutting..."

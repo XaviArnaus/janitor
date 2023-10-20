@@ -14,7 +14,8 @@ def test_instantiate_minimal():
 def test_to_dict_minimal():
     d = MastodonConnectionParams().to_dict()
 
-    assert d["instance_type"] is MastodonConnectionParams.TYPE_MASTODON
+    assert d["app_name"] is None
+    assert d["instance_type"] == MastodonConnectionParams.TYPE_MASTODON
     assert d["api_base_url"] is None
     assert d["credentials"] is None
     assert isinstance(d["status_params"], dict)
@@ -27,6 +28,7 @@ def test_to_dict_minimal():
 def test_from_dict_minimal():
     instance = MastodonConnectionParams.from_dict({})
 
+    assert instance.app_name == None
     assert instance.instance_type == MastodonConnectionParams.TYPE_MASTODON
     assert instance.api_base_url is None
     assert instance.credentials is None
@@ -35,6 +37,13 @@ def test_from_dict_minimal():
     assert instance.status_params.content_type == MastodonStatusParams.DEFAULT_CONTENT_TYPE
     assert instance.status_params.visibility == MastodonStatusParams.DEFAULT_VISIBILITY
     assert instance.status_params.username_to_dm is None
+
+
+def test_instantiate_with_app_name():
+    test_app_name = "hola"
+    instance = MastodonConnectionParams(app_name=test_app_name)
+
+    assert instance.app_name == test_app_name
 
 
 def test_instantiate_with_instance_type():

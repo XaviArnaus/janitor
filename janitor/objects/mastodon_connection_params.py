@@ -12,6 +12,7 @@ class MastodonConnectionParams():
 
     DEFAULT_INSTANCE_TYPE = TYPE_MASTODON
 
+    app_name: str
     instance_type: str
     api_base_url: str
     credentials: MastodonCredentials
@@ -19,11 +20,13 @@ class MastodonConnectionParams():
 
     def __init__(
         self,
+        app_name: str = None,
         instance_type: str = None,
         api_base_url: str = None,
         credentials: MastodonCredentials = None,
         status_params: MastodonStatusParams = None
     ) -> None:
+        self.app_name = app_name
         self.instance_type = instance_type\
             if instance_type is not None else self.DEFAULT_INSTANCE_TYPE
         self.api_base_url = api_base_url
@@ -36,6 +39,7 @@ class MastodonConnectionParams():
 
     def to_dict(self) -> dict:
         return {
+            "app_name": self.app_name,
             "instance_type": self.instance_type,
             "api_base_url": self.api_base_url,
             "credentials": self.credentials.to_dict()
@@ -47,6 +51,8 @@ class MastodonConnectionParams():
     @staticmethod
     def from_dict(connection_params_dict: dict) -> MastodonConnectionParams:
         return MastodonConnectionParams(
+            app_name=connection_params_dict["app_name"]
+            if "app_name" in connection_params_dict else None,
             instance_type=connection_params_dict["instance_type"]
             if "instance_type" in connection_params_dict else None,
             api_base_url=connection_params_dict["api_base_url"]

@@ -2,6 +2,12 @@
 
 ℹ️ If you're upgrading between versions, please see the document [Upgrading Guide](UPGRADING.md).
 
+## [Unreleased](https://github.com/XaviArnaus/janitor)
+
+### Changed
+
+- Fix issue with the main runner in Raspberry ([#24](https://github.com/XaviArnaus/janitor/pull/24))
+
 ## [v0.5.0](https://github.com/XaviArnaus/janitor/releases/tag/v0.5.0)
 
 ### Added

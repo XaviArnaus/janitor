@@ -83,7 +83,7 @@ class GitChanges(RunnerProtocol):
         #   which only publishes updates.
         #   This means to instantiate a different Mastodon helper
         conn_params = MastodonConnectionParams.from_dict(
-            self._config.get("git_monitor.mastodon")
+            self._config.get("mastodon.named_accounts.updates")
         )
         client_file = os.path.join(ROOT_DIR, conn_params.credentials.client_file)
         # If the client_file does not exist we need to trigger the
@@ -91,7 +91,7 @@ class GitChanges(RunnerProtocol):
         if not os.path.exists(client_file):
             MastodonHelper.create_app(
                 instance_type=conn_params.instance_type,
-                client_name=self._config.get("git_monitor.mastodon.app_name"),
+                client_name=conn_params.app_name,
                 api_base_url=conn_params.api_base_url,
                 to_file=client_file
             )
@@ -106,9 +106,14 @@ class GitChanges(RunnerProtocol):
     def _publish_notification(self, message: Message):
         # This is the notification that we publish to
         #   the usual account, just to say who the action went.
+        conn_params = MastodonConnectionParams.from_dict(
+            self._config.get("mastodon.named_accounts.default")
+        )
 
         # Get the instance. Everything is by default
-        mastodon_instance = MastodonHelper.get_instance(self._config)
+        mastodon_instance = MastodonHelper.get_instance(
+            config=self._config, connection_params=conn_params
+        )
         # Now publish the message
         _ = Publisher(self._config, mastodon_instance, base_path=ROOT_DIR)\
             .publish_one(QueueItem(message))

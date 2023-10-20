@@ -32,6 +32,20 @@ COLLECTED_DATA = {
     }
 }
 
+CONFIG_MASTODON_CONN_PARAMS = {
+    "app_type": "SuperApp",
+    "instance_type": "mastodon",
+    "api_base_url": "https://mastodont.cat",
+    "credentials": {
+        "user_file": "user.secret",
+        "client_file": "client.secret",
+        "user": {
+            "email": "bot+syscheck@my-fancy.site",
+            "password": "SuperSecureP4ss",
+        }
+    }
+}
+
 
 def patched_get_hostname(self):
     return COLLECTED_DATA["hostname"]
@@ -65,11 +79,16 @@ def patched_generic_init(self):
     pass
 
 
+def patched_config_get(self, param):
+    if param == "mastodon.named_accounts.default":
+        return CONFIG_MASTODON_CONN_PARAMS
+
+
 def patched_generic_init_with_config(self, config):
     pass
 
 
-def patched_mastodon_get_instance(config, base_path):
+def patched_mastodon_get_instance(config, connection_params, base_path):
     pass
 
 
@@ -120,6 +139,7 @@ def test_run_no_crossed_thresholds():
 @patch.object(SystemInfoTemplater, "__init__", new=patched_generic_init_with_config)
 @patch.object(MastodonHelper, "get_instance", new=patched_mastodon_get_instance)
 @patch.object(Publisher, "__init__", new=patched_publisher_init)
+@patch.object(Config, "get", new=patched_config_get)
 def test_run_crossed_thresholds(collected_data):
     message = Message(text="content of the report")
 

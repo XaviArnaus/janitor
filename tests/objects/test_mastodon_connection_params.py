@@ -28,7 +28,7 @@ def test_to_dict_minimal():
 def test_from_dict_minimal():
     instance = MastodonConnectionParams.from_dict({})
 
-    assert instance.app_name == None
+    assert instance.app_name is None
     assert instance.instance_type == MastodonConnectionParams.TYPE_MASTODON
     assert instance.api_base_url is None
     assert instance.credentials is None

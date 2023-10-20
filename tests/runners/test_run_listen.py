@@ -33,6 +33,20 @@ COLLECTED_DATA = {
     }
 }
 
+CONFIG_MASTODON_CONN_PARAMS = {
+    "app_type": "SuperApp",
+    "instance_type": "mastodon",
+    "api_base_url": "https://mastodont.cat",
+    "credentials": {
+        "user_file": "user.secret",
+        "client_file": "client.secret",
+        "user": {
+            "email": "bot+syscheck@my-fancy.site",
+            "password": "SuperSecureP4ss",
+        }
+    }
+}
+
 ICONS = {
     MessageType.NONE: "",
     MessageType.INFO: "1",
@@ -78,7 +92,12 @@ def patched_generic_init_with_config(self, config):
     pass
 
 
-def patched_mastodon_get_instance(config, base_path):
+def patched_config_get(self, param):
+    if param == "mastodon.named_accounts.default":
+        return CONFIG_MASTODON_CONN_PARAMS
+
+
+def patched_mastodon_get_instance(config, connection_params, base_path):
     pass
 
 
@@ -154,6 +173,7 @@ def test_post_data_comes_in_post_no_crossed_thresholds(collected_data):
 @patch.object(reqparse.RequestParser, "add_argument", new=patched_parser_add_argument)
 @patch.object(SystemInfoTemplater, "__init__", new=patched_generic_init_with_config)
 @patch.object(MastodonHelper, "get_instance", new=patched_mastodon_get_instance)
+@patch.object(Config, "get", new=patched_config_get)
 @patch.object(Publisher, "__init__", new=patched_publisher_init)
 def test_post_data_comes_in_post_crossed_thresholds(collected_data):
     message = Message(text="content of the report")
@@ -277,6 +297,7 @@ def test_init_message():
 @patch.object(reqparse.RequestParser, "add_argument", new=patched_parser_add_argument)
 @patch.object(MastodonHelper, "get_instance", new=patched_mastodon_get_instance)
 @patch.object(Publisher, "__init__", new=patched_publisher_init)
+@patch.object(Config, "get", new=patched_config_get)
 def test_post_optional_params_not_present(
     summary,
     text,

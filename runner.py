@@ -197,7 +197,6 @@ def _get_runner_by_command(args: Namespace) -> RunnerProtocol:
         raise RuntimeError(f"The requested command '{command_candidate}' does not exist")
 
 
-@staticmethod
 def setup_parser() -> ArgumentParser:
 
     parser = ArgumentParser(prog=CLI_NAME, description=PROGRAM_DESC, epilog=PROGRAM_EPILOG)

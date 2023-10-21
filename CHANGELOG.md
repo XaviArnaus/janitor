@@ -8,6 +8,7 @@
 
 - Fix issue with the main runner in Raspberry ([#25](https://github.com/XaviArnaus/janitor/pull/25))
 - Fix issue with controlling the listener with the main runner ([#26](https://github.com/XaviArnaus/janitor/pull/26) & [#27](https://github.com/XaviArnaus/janitor/pull/27))
+- Fix Directnic's Dynamic DNS Updater runner ([#28](https://github.com/XaviArnaus/janitor/pull/28))
 
 ## [v0.5.0](https://github.com/XaviArnaus/janitor/releases/tag/v0.5.0)
 

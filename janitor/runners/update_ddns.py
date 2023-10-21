@@ -21,8 +21,6 @@ class UpdateDdns(RunnerProtocol):
         self._logger = logger
         self._directnic = DirectnicDdns(self._config)
 
-        return self
-
     def _send_mastodon_message(self, text: str) -> None:
         self._logger.info("Initializing Mastodon tooling")
         conn_params = MastodonConnectionParams.from_dict(

@@ -19,6 +19,7 @@ from janitor.runners.publish_queue import PublishQueue
 from janitor.runners.publish_test import PublishTest
 from janitor.runners.update_ddns import UpdateDdns
 from janitor.runners.git_changes import GitChanges
+from janitor.runners.whatismyip import WhatIsMyIp
 
 PROGRAM_NAME = "janitor"
 CLI_NAME = "jan"
@@ -49,7 +50,8 @@ COMMAND_MAP = {
     "validate_config": (
         IMPLEMENTED_IN_BASH_TOKEN, "Validates the config.yaml Configuration file"
     ),
-    "migrate_config": (SUBCOMMAND_TOKEN, "Migrates the configuration file(s) between versions")
+    "migrate_config": (SUBCOMMAND_TOKEN, "Migrates the configuration file(s) between versions"),
+    "ip": (WhatIsMyIp, "Returns the current external IP"),
 }
 
 SUBCOMMAND_MAP = {

@@ -100,3 +100,9 @@ Janitor can monitor changes to CHANGELOG files from given Git repositories and a
 Once Janitor can perform multiple tasks, makes sense to proxy the periodicity by having a single Scheduler that sets up the diverse tasks. The Scheduler will read the `crontab` fashion time setup from the configuration file and trigger the defined tasks accordingly.
 
 - Read the [Scheduler](./docs/scheduler.md) page
+
+### #️⃣ The CLI tool
+
+Janitor is also shipped with a CLI tool to execute all the runners and to trigger some tasks.
+
+- Read the [CLI tool](./docs/cli_tool.md) page

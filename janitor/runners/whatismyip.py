@@ -6,8 +6,7 @@ import logging
 
 class WhatIsMyIp(RunnerProtocol):
     '''
-    Runner that gets the current external IP and updates
-        Directnic's Dynamic DNS entries
+    Runner that gets the current external IP
     '''
 
     def __init__(self, config: Config = None, logger: logging = None) -> None:
@@ -16,7 +15,7 @@ class WhatIsMyIp(RunnerProtocol):
 
     def run(self):
         '''
-        Get the IP, update and communicate
+        Get the IP
         '''
         try:
             self._logger.debug("Getting external IP from service")

@@ -4,6 +4,10 @@
 
 ## [Unreleased](https://github.com/XaviArnaus/janitor)
 
+### Added
+
+- A new CLI command (the main runner) to return the current external address ([#29](https://github.com/XaviArnaus/janitor/pull/29))
+
 ### Changed
 
 - Fix issue with the main runner in Raspberry ([#25](https://github.com/XaviArnaus/janitor/pull/25))

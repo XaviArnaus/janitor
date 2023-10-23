@@ -11,7 +11,6 @@
 - Make a PyPI monitor
 - When the Listener starts, loop the status until it gets up and running.
 - Rotate the logs
-- A command to request for the external IP, reusing the logic we already have
 
 # Done
 
@@ -30,3 +29,4 @@
     4. brings up the listener
     ➡️ Won't do, as obscures the tasks to do and now we have a tool to start/stop/status the Listener
 ✅ Make the `git_monitor` to be able to publish to several other Mastodon accounts (example: own repositories vs. external repositories)
+✅ A command to request for the external IP, reusing the logic we already have

@@ -44,7 +44,9 @@ def test_setup_parser():
         [
             call("command", action="store"),
             call("subcommand", nargs='?', default=None),
-            call("--version", action="version", version=PROGRAM_VERSION)
+            call("--version", action="version", version=PROGRAM_VERSION),
+            call("-l", "--loglevel", action="store"),
+            call("-d", "--debug", action="store_true"),
         ]
     )
 
@@ -176,10 +178,19 @@ def test_run_command():
     class Namespace:
         command: str
         subcommad: str
+        loglevel: int
 
-        def __init__(self, command: str, subcommand: str = None) -> None:
+        def __init__(
+            self,
+            command: str,
+            subcommand: str = None,
+            loglevel: int = None,
+            debug: bool = False
+        ) -> None:
             self.command = command
             self.subcommad = subcommand
+            self.loglevel = loglevel
+            self.debug = debug
 
     parsed_args = Namespace("command_1")
     mocked_config_load = Mock()

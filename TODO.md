@@ -10,6 +10,8 @@
 - Make the `git_monitor` to monitor git tags and not only CHANGELOG changes.
 - Make a PyPI monitor
 - When the Listener starts, loop the status until it gets up and running.
+- Rotate the logs
+- A command to request for the external IP, reusing the logic we already have
 
 # Done
 

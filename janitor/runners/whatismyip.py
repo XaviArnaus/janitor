@@ -1,7 +1,6 @@
 from pyxavi.config import Config
 from pyxavi.network import Network
 from janitor.runners.runner_protocol import RunnerProtocol
-from definitions import ROOT_DIR
 import logging
 
 
@@ -14,7 +13,6 @@ class WhatIsMyIp(RunnerProtocol):
     def __init__(self, config: Config = None, logger: logging = None) -> None:
         self._config = config
         self._logger = logger
-
 
     def run(self):
         '''

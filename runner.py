@@ -9,6 +9,7 @@ from definitions import ROOT_DIR, CONFIG_DIR
 from pyxavi.debugger import full_stack
 from string import Template
 import glob
+import logging
 
 from janitor.runners.create_app import CreateApp
 from janitor.runners.run_local import RunLocal
@@ -26,6 +27,7 @@ CLI_NAME = "jan"
 PROGRAM_DESC = "CLI command to execute runners and tasks"
 PROGRAM_EPILOG = f"Use [{CLI_NAME} commands] to get a list of available commands."
 PROGRAM_VERSION = pkg_resources.get_distribution(PROGRAM_NAME).version
+VERBOSE_LOGLEVEL = 10
 
 SUBCOMMAND_TOKEN = "#SUBCOMMAND#"
 HELP_TOKEN = "#HELP#"
@@ -211,6 +213,16 @@ def setup_parser() -> ArgumentParser:
 
     # Ability to show the version
     parser.add_argument("--version", action="version", version=PROGRAM_VERSION)
+
+    # Ability to override the Log level when using the CLI.
+    parser.add_argument(
+        "-l",
+        "--loglevel",
+        action="store",
+    )
+
+    # Shortcut to make the -l = 10, so it shows DEBUG (included) and higher.
+    parser.add_argument("-d", "--debug", action="store_true")
     return parser
 
 
@@ -231,16 +243,43 @@ def load_config_files() -> Config:
     return config
 
 
+def load_logger(config: Config, loglevel: int = None) -> logging:
+
+    if loglevel is not None:
+        # Lets first merge the config with the new value
+        logger_config = config.get("logger")
+        logger_config["loglevel"] = loglevel
+        logger_config["to_stdout"] = True
+        config.merge_from_dict(parameters={"logger": logger_config})
+
+    return Logger(config=config, base_path=ROOT_DIR).get_logger()
+
+
 def run():
     try:
-        config = load_config_files()
-        logger = Logger(config=config, base_path=ROOT_DIR).get_logger()
-
         # Set up the parser
         parser = setup_parser()
 
         # Get the arguments
         args = parser.parse_args()
+
+        # Adjust the log level
+        loglevel = None
+        if args.loglevel is not None:
+            # for loglevel we expect an positive integer from 0 on.
+            if args.loglevel is not None and isinstance(args.loglevel,
+                                                        int) and args.loglevel >= 0:
+                loglevel = args.loglevel
+            else:
+                raise RuntimeError(f"I don't understand the LogLevel [{args.loglevel}]")
+        if args.debug is True:
+            # verbose is just a shortcut to loglevel = 0 (or check the constant definition)
+            if args.debug:
+                loglevel = VERBOSE_LOGLEVEL
+
+        # Instantiating the config and logger
+        config = load_config_files()
+        logger = load_logger(config=config, loglevel=loglevel)
 
         # This prints the list of available commands and leaves.
         if args.command == "commands":

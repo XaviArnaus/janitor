@@ -5,7 +5,35 @@ Please keep in mind that steps are sequential, and to migrate from a 2 versions 
 
 This document lists the upgrading steps from the most newer version to the oldest version.
 
-## From version `0.4.0` to `0.5.0`
+## From version `v0.5.0` to `v0.5.1`
+
+- There are no significant changes in the configuration files.
+- There are changes in the dependencies.
+
+0. [optional] Backup your user data in any external location.
+    - Config file (by default `config.yaml`)
+    - Client secret file (by default `client.secret`)
+    - User secret file (by default `user.secret`)
+    - Storages (by default, everything inside `storage/`)
+1. Fetch the changes from the original repository
+    ```bash
+    git fetch
+    ```
+2. Checkout to the version `0.5.1`
+    ```bash
+    git checkout v0.5.1
+    ```
+3. Most likely your *Poetry* would complain about the lock file being old. Reset the lock file with the following command
+    ```bash
+    poetry lock 
+    ```
+4. Install the dependencies
+    ```bash
+    make init 
+    ```
+
+
+## From version `v0.4.0` to `v0.5.0`
 
 There is a major change introduced in this version regarding the structure of the configuration files. Now there is not a single big configuration file but a separated set of configuration files per module or functionality.
 There is also a tool delivered to assist in the process of migrating from the old single file to the multiple files. The only drawback is that the tool won't migrate also the comments on the config file, so while the configuration should work out of the box, you will loose the explanations in the new config files. You can always perform the migration manually, by generating the new config files from the distributed examples and then move the parameter values from the old config file to the new one.

@@ -8,6 +8,7 @@
 
 - A new CLI command (the main runner) to return the current external address ([#29](https://github.com/XaviArnaus/janitor/pull/29))
 - New CLI arguments to override logging config and print it to stdout ([#29](https://github.com/XaviArnaus/janitor/pull/29))
+- A new CLI and Scheduler command to rotate the log file ([#30](https://github.com/XaviArnaus/janitor/pull/30))
 
 ### Changed
 

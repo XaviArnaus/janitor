@@ -44,33 +44,63 @@ class GitChanges(RunnerProtocol):
                 # Get the new updates
                 monitor.get_updates()
 
-                # Get the contents of the changelog file, parsed in a dict
-                content = monitor.get_changelog_content()
-                parsed_content = monitor.parse_changelog(content=content)
+                # Only when monitoring per changelog
+                if "changelog" in repository and repository["changelog"] is not None:
+                    # Get the contents of the changelog file, parsed in a dict
+                    content = monitor.get_changelog_content()
+                    parsed_content = monitor.parse_changelog(content=content)
 
-                # Build the message to publish
-                message = monitor.build_update_message(parsed_content=parsed_content)
-                if message is None:
-                    self._logger.info("No new version for repository " + repo_name)
+                    # Build the message to publish by the Updater
+                    message = monitor.build_update_message(parsed_content=parsed_content)
+                    if message is None:
+                        self._logger.info("No new version for repository " + repo_name)
+                        continue
+                    self._logger.info("New version for repository " + repo_name)
+
+                    # Add a note about the project to publish them all together by the Service
+                    published_projects.append(
+                        f"- {repo_name}: {monitor.prepare_versions(parsed_content=parsed_content)}"
+                    )
+
+                    # Save the current last known version
+                    self._logger.debug(
+                        f"Storing a new last known version: {list(parsed_content.keys())[0]}"
+                    )
+                    monitor.store_last_known_version(list(parsed_content.keys())[0])
+
+                elif "commits" in repository and repository["commits"] is not None:
+                    commits_list = monitor.get_commit_log_from_last_seen()
+
+                    # Build the message to publish by the Updater
+                    message = monitor.build_message_from_commits(commits_list=commits_list)
+                    if message is None:
+                        self._logger.info("No new commits for repository " + repo_name)
+                        continue
+                    self._logger.info("New commits for repository " + repo_name)
+
+                    # Add a note about the project to publish them all together by the Service
+                    published_projects.append(
+                        f"- {repo_name}: {len(commits_list)} new commits"
+                    )
+
+                    # Save the current last known version
+                    last_commit = list(commits_list)[0]["hash"]
+                    self._logger.debug(
+                        f"Storing a new last known commit: {last_commit}"
+                    )
+                    monitor.store_last_known_commit(last_commit)
+
+                else:
+                    error = f"The repository {repo_name} does not have a valid monitoring set up."
+                    self._logger.warning(error)
+                    self._publish_notification(message=Message(text=f"Warning: {error}"))
                     continue
-                self._logger.info("New version for repository " + repo_name)
 
                 # Publish the changes into the Updates account
                 self._logger.debug(
                     f"Publishing an update message into account {repository['named_account']}"
                 )
                 self._publish_update(message=message, named_account=repository["named_account"])
-
-                # Add a note about the project to publish them all together
-                published_projects.append(
-                    f"- {repo_name}: {monitor.prepare_versions(parsed_content=parsed_content)}"
-                )
-
-                # Save the current last known version
-                self._logger.debug(
-                    f"Storing a new last known version: {list(parsed_content.keys())[0]}"
-                )
-                monitor.store_last_known_version(list(parsed_content.keys())[0])
 
             if len(published_projects) > 0:
                 self._logger.debug("Publishing an notice into account default")
@@ -83,9 +113,9 @@ class GitChanges(RunnerProtocol):
         except Exception as e:
             self._logger.exception(e)
 
-            self._publish_notification(
-                message=Message(text="Error while publishing updates:\n\n" + str(e))
-            )
+            # self._publish_notification(
+            #     message=Message(text="Error while publishing updates:\n\n" + str(e))
+            # )
 
     def _publish_update(self, message: Message, named_account: str = "updates"):
         # We want to publish to a different account,

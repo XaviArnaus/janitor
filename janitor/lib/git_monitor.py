@@ -50,6 +50,48 @@ class GitMonitor:
         self._logger.debug(f"Getting updates for repo {self.repository_info['name']}")
         origin = self.current_repository.remotes.origin
         origin.pull()
+    
+    def get_commit_log_from_last_seen(self) -> list:
+        last_commit_param_name = self.__get_param_name("last_commit")
+        last_known_commit = self._storage.get(last_commit_param_name, None)
+        if last_known_commit is None:
+            commits = list(self.current_repository.iter_commits())
+        else:
+            git_rev_list_limits = f"{last_known_commit}..HEAD"
+            commits = list(self.current_repository.iter_commits(rev=git_rev_list_limits))
+        return [
+            {
+                "author": str(c.author),
+                "hash": c.binsha.hex(),
+                "message": c.message.replace("\n", " ")
+            } for c in commits
+        ]
+    
+    def build_message_from_commits(self, commits_list: list) -> Message:
+        if len(commits_list) > 0:
+            text = "New "
+            text+= "\n".join([f"{c.author}: {c.message}" for c in commits_list])
+    
+    def build_message_from_commits(self, commits_list: list) -> Message:
+        if len(commits_list) == 0:
+            # This means that we don't have any commit to publish
+            return None
+
+        return Message(
+            text=Template(TEMPLATE_UPDATE_TEXT).substitute(
+                project=self.repository_info["name"],
+                link=self.repository_info["url"],
+                version="new commits",
+                text="\n".
+                join([f"- *{c['author']}*: {c['message']}" for c in commits_list]),
+                tags=" ".join(self.repository_info["tags"]) if "tags" in
+                self.repository_info else ""
+            )
+        )
+
+    def store_last_known_commit(self, last_known_commit: str) -> None:
+        self._storage.set(self.__get_param_name("last_commit"), last_known_commit)
+        self._storage.write_file()
 
     def get_changelog_content(self) -> str:
         changelog_filename = os.path.join(

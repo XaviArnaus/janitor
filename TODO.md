@@ -10,6 +10,8 @@
 - Make the `git_monitor` to monitor git tags and not only CHANGELOG changes.
 - Make a PyPI monitor
 - When the Listener starts, loop the status until it gets up and running.
+- Iterate the Scheduler, should not be defined so much manually. Also should be a CLI command to list Scheduleable tasks
+- Make that the runner for Log rotate also publishes a toot when it's done, according to a new config param
 
 # Done
 

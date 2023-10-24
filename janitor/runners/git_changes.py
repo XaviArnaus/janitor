@@ -17,7 +17,9 @@ class GitChanges(RunnerProtocol):
     publishing them into the mastodon-like defined account
     '''
 
-    def __init__(self, config: Config = None, logger: logging = None) -> None:
+    def __init__(
+        self, config: Config = None, logger: logging = None, params: dict = None
+    ) -> None:
         self._config = config
         self._logger = logger
 

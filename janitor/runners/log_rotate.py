@@ -12,7 +12,9 @@ class LogRotate(RunnerProtocol):
     Runner that rotates the log file
     '''
 
-    def __init__(self, config: Config = None, logger: logging = None) -> None:
+    def __init__(
+        self, config: Config = None, logger: logging = None, params: dict = None
+    ) -> None:
         self._config = config
         self._logger = logger
 

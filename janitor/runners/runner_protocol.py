@@ -5,7 +5,9 @@ import logging
 
 class RunnerProtocol(Protocol):
 
-    def __init__(self, config: Config = None, logger: logging = None) -> None:
+    def __init__(
+        self, config: Config = None, logger: logging = None, params: dict = None
+    ) -> None:
         """Initializing the class"""
 
     def run(self) -> None:

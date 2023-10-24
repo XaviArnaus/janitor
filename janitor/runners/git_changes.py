@@ -9,6 +9,7 @@ from janitor.runners.runner_protocol import RunnerProtocol
 from definitions import ROOT_DIR
 import os
 import logging
+from pyxavi.debugger import dd
 
 
 class GitChanges(RunnerProtocol):
@@ -41,66 +42,56 @@ class GitChanges(RunnerProtocol):
                 # If not, clone it localy
                 monitor.initiate_or_clone_repository(repository_info=repository)
 
-                # Get the new updates
+                # Bring the new updates
                 monitor.get_updates()
 
-                # Only when monitoring per changelog
-                if "changelog" in repository and repository["changelog"] is not None:
-                    # Get the contents of the changelog file, parsed in a dict
-                    content = monitor.get_changelog_content()
-                    parsed_content = monitor.parse_changelog(content=content)
-
-                    # Build the message to publish by the Updater
-                    message = monitor.build_update_message(parsed_content=parsed_content)
-                    if message is None:
-                        self._logger.info("No new version for repository " + repo_name)
-                        continue
-                    self._logger.info("New version for repository " + repo_name)
-
-                    # Add a note about the project to publish them all together by the Service
-                    published_projects.append(
-                        f"- {repo_name}: {monitor.prepare_versions(parsed_content=parsed_content)}"
-                    )
-
-                    # Save the current last known version
-                    self._logger.debug(
-                        f"Storing a new last known version: {list(parsed_content.keys())[0]}"
-                    )
-                    monitor.store_last_known_version(list(parsed_content.keys())[0])
-
-                elif "commits" in repository and repository["commits"] is not None:
-                    commits_list = monitor.get_commit_log_from_last_seen()
-
-                    # Build the message to publish by the Updater
-                    message = monitor.build_message_from_commits(commits_list=commits_list)
-                    if message is None:
-                        self._logger.info("No new commits for repository " + repo_name)
-                        continue
-                    self._logger.info("New commits for repository " + repo_name)
-
-                    # Add a note about the project to publish them all together by the Service
-                    published_projects.append(
-                        f"- {repo_name}: {len(commits_list)} new commits"
-                    )
-
-                    # Save the current last known version
-                    last_commit = list(commits_list)[0]["hash"]
-                    self._logger.debug(
-                        f"Storing a new last known commit: {last_commit}"
-                    )
-                    monitor.store_last_known_commit(last_commit)
-
-                else:
-                    error = f"The repository {repo_name} does not have a valid monitoring set up."
-                    self._logger.warning(error)
-                    self._publish_notification(message=Message(text=f"Warning: {error}"))
+                # Delegate the work to a ChangesProtocol class
+                #   It implements a custom approach for each monitoring style
+                #   all packed in a same protocol.
+                #
+                #   If it fails skip this repo and go for the next
+                try:
+                    controller = monitor.get_changes_instance()
+                except RuntimeError as e:
+                    self._logger.warning(e)
+                    self._publish_notification(message=Message(text=f"Warning: {e}"))
                     continue
 
-                # Publish the changes into the Updates account
+                # So get the values to compare
+                current_last_known = controller.get_current_last_known()
+                new_last_known = controller.get_new_last_known()
+
+                # If we don't have a previous value, it is the first run.
+                #   Just save the new value but avoid messaging around.
+                if current_last_known is None:
+                    controller.write_new_last_known(value=new_last_known)
+                    continue
+
+                # Now let's chech if we have new changes
+                if new_last_known is None or current_last_known == new_last_known:
+                    # No we don't. Finish here
+                    self._logger.info("No new changes for repository " + repo_name)
+                    continue
+
+                # Still here? So we have changes!
+                self._logger.info("New changes for repository " + repo_name)
+                # Build the message
+                message = controller.build_update_message()
+
+                # And publish it using the defined named_account.
                 self._logger.debug(
                     f"Publishing an update message into account {repository['named_account']}"
                 )
                 self._publish_update(message=message, named_account=repository["named_account"])
+
+                # Add a note about the project to publish them all together by the Service
+                published_projects.append(f"- {repo_name}: {controller.get_changes_note()}")
+
+                # And finally store this new last known
+                self._logger.debug(
+                    f"Storing a new last known change id: {new_last_known}"
+                )
+                controller.write_new_last_known(new_last_known)
 
             if len(published_projects) > 0:
                 self._logger.debug("Publishing an notice into account default")

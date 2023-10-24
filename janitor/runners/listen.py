@@ -21,7 +21,9 @@ CONFIG_FILE = "../config.yaml"
 
 class Listen(RunnerProtocol):
 
-    def __init__(self, config: Config = None, logger: logging = None) -> None:
+    def __init__(
+        self, config: Config = None, logger: logging = None, params: dict = None
+    ) -> None:
         self._config = config
         self._logger = logger
 

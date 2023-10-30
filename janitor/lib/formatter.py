@@ -13,7 +13,7 @@ class Formatter:
     to the StatusPost that we use only at publishing stage.
     """
 
-    TEMPLATE_TEXT_WITH_MENTION = "$mention:\n\n$text"
+    TEMPLATE_TEXT_WITH_MENTION = "$text\n\n🤫 Only for your eyes, $mention"
 
     def __init__(self, config: Config, status_params: MastodonStatusParams) -> None:
         self._config = config
@@ -55,7 +55,9 @@ class Formatter:
         return content
 
     def add_mention_to_message_if_direct_visibility(self, text: str) -> str:
-        is_dm = self._status_params.visibility == StatusPostVisibility.DIRECT
+        is_dm = self._status_params.visibility in [
+            StatusPostVisibility.PRIVATE, StatusPostVisibility.DIRECT
+        ]
         mention = self._status_params.username_to_dm
 
         if is_dm and mention:

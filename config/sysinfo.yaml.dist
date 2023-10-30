@@ -43,3 +43,43 @@ system_info:
     human_readable: True
     # [List[str]] List of metric names that won't apply the human_readable
     human_readable_exceptions: ["cpu_percent", "cpu_count", "memory_percent", "disk_usage_percent"]
+        # The templates. They use the Python's [string.Template] module
+    templates:
+      # Templates for the report lines
+      report_lines:
+        # [String] Template for the lines that do not have an issue
+        line_ok: "- **$title**: $value"
+        # [String] Template for the lines that do have an issue
+        line_fail: "- **$title**: $value ❗️"
+      # Templates depending on the Message Type
+      message_type:
+        # For the message_type NONE
+        none:
+          # [String] Summary line.
+          summary: ""
+          # [String] Text line.
+          text: "$text"
+        # For the message_type INFO
+        info:
+          # [String] Summary line.
+          summary: "ℹ️ $summary"
+          # [String] Text line.
+          text: "$text"
+        # For the message_type WARNING
+        warning:
+          # [String] Summary line.
+          summary: "⚠️ $summary"
+          # [String] Text line.
+          text: "$text"
+        # For the message_type ERROR
+        error:
+          # [String] Summary line.
+          summary: "🔥 $summary"
+          # [String] Text line.
+          text: "$text"
+        # For the message_type ALARM
+        error:
+          # [String] Summary line.
+          summary: "🚨 $summary"
+          # [String] Text line.
+          text: "$text"

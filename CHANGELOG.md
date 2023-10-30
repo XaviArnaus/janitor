@@ -2,6 +2,13 @@
 
 ℹ️ If you're upgrading between versions, please see the document [Upgrading Guide](UPGRADING.md).
 
+## [Unreleased](https://github.com/XaviArnaus/janitor/)
+
+### Changed
+
+- Now the System metrics templates live in the config file, not in the class ([#34](https://github.com/XaviArnaus/janitor/pull/34))
+- Now the messages sent as DIRECT and PRIVATE must come with a mention and will appear private only ([#34](https://github.com/XaviArnaus/janitor/pull/34))
+
 ## [v0.5.1](https://github.com/XaviArnaus/janitor/releases/tag/v0.5.1)
 
 ### Added

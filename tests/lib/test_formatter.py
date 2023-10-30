@@ -122,7 +122,8 @@ def test_build_status_post_with_summary(message_with_summary: Message):
 @pytest.mark.parametrize(
     argnames=('text', 'mention', 'visibility', 'expected_result'),
     argvalues=[
-        ("I am a message", "@xavi", "direct", "@xavi:\n\nI am a message"),
+        ("I am a message", "@xavi", "direct", "I am a message\n\n🤫 Only for your eyes, @xavi"),
+        ("I am a message", "@xavi", "private", "I am a message\n\n🤫 Only for your eyes, @xavi"),
         ("I am a message", None, "direct", False),
         ("I am a message", "@xavi", "public", "I am a message"),
     ],

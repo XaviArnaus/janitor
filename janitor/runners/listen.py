@@ -16,7 +16,8 @@ app = Flask(__name__)
 api = Api(app)
 
 DEFAULT_MESSAGE_TYPE = str(MessageType.NONE)
-CONFIG_FILE = "../config.yaml"
+MASTODON_NAMED_ACCOUNT = "default"
+# MASTODON_NAMED_ACCOUNT = "test"
 
 
 class Listen(RunnerProtocol):
@@ -93,7 +94,7 @@ class ListenSysInfo(Resource):
 
         # Publish the queue
         conn_params = MastodonConnectionParams.from_dict(
-            self._config.get("mastodon.named_accounts.default")
+            self._config.get(f"mastodon.named_accounts.{MASTODON_NAMED_ACCOUNT}")
         )
         mastodon = MastodonHelper.get_instance(
             config=self._config, connection_params=conn_params, base_path=ROOT_DIR
@@ -185,13 +186,13 @@ class ListenMessage(Resource):
         # Build the message
         icon = MessageType.icon_per_type(message_type)
         if not summary:
-            message = Message(text=f"{icon} {hostname}:\n\n{text}")
+            message = Message(text=f"{icon} from {hostname}:\n\n{text}")
         else:
             message = Message(summary=f"{icon} {hostname}:\n\n{summary}", text=f"{text}")
 
         # Publish the queue
         conn_params = MastodonConnectionParams.from_dict(
-            self._config.get("mastodon.named_accounts.default")
+            self._config.get(f"mastodon.named_accounts.{MASTODON_NAMED_ACCOUNT}")
         )
         mastodon = MastodonHelper.get_instance(
             config=self._config, connection_params=conn_params, base_path=ROOT_DIR

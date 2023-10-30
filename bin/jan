@@ -8,7 +8,7 @@ if [ $1 = "help" ]; then
     $POETRY_PATH run main -h
 elif [ $1 = "test_message" ]; then
     # Implemented here to demonstrate a curl call from the system to the listener.
-    curl -X POST -d "hostname=$(HOSTNAME)&message_type=info&message=This+is+a+test+message" http://localhost:5000/message
+    curl -X POST -d "hostname=$HOSTNAME&message_type=info&message=This+is+a+test+message" http://localhost:5000/message
 elif [ $1 = "listener" ]; then
     if [ $2 = "start" ]; then
         # We want to spawn a listener without too much noise, and logging directly.

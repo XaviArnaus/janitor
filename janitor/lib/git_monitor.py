@@ -115,16 +115,11 @@ class ChangelogChanges(BaseChanges):
         )
     
     def build_update_message(self, parameters: dict = None) -> Message:
-        prepared_version_string = self.get_changes_note()
-        if prepared_version_string is False:
-            # This means that we don't have any version to publish
-            return None
-
         return Message(
             text=Template(TEMPLATE_UPDATE_TEXT).substitute(
                 project=self._repo_info.get("name"),
                 link=self._repo_info.get("url"),
-                version=prepared_version_string,
+                version=self.get_changes_note(),
                 text="\n".
                 join([self._clean_markdown(text) for text in self._changes_stack.values()]),
                 tags=" ".join(self._repo_info.get("tags", ""))
@@ -142,17 +137,15 @@ class ChangelogChanges(BaseChanges):
         - if we have more versions: split in commas and last with ampersand:
             - v1.0, v1.1 & v1.2
             - v1.1 & v1.2
-        - if we have nonw: return False
+        - if we have none: return False
         '''
         versions = [key for key in self._changes_stack.keys()]
-        versions.reverse()
+        versions = sorted(versions, reverse=False)
         if len(versions) == 1:
             return versions[0]
         elif len(versions) > 1:
             all_but_last = versions[:-1]
             return ", ".join(all_but_last) + " & " + versions[-1]
-        else:
-            return False
     
     def __get_changelog_content(self) -> str:
         changelog_filename = os.path.join(
@@ -243,11 +236,7 @@ class CommitsChanges(BaseChanges):
         )
     
     def build_update_message(self, parameters: dict = None) -> Message:
-        if len(self._changes_stack) == 0:
-            # This means that we don't have any commit to publish
-            return None
-
-        return Message(
+       return Message(
             text=Template(TEMPLATE_UPDATE_TEXT).substitute(
                 project=self._repo_info.get("name"),
                 link=self._repo_info.get("url"),
@@ -269,7 +258,6 @@ class GitMonitor:
 
     repository_info: Dictionary
     current_repository: Repo
-    parsed_changelog_per_version: dict
     changes_instance: ChangesProtocol = None
 
     def __init__(self, config: Config) -> None:
@@ -324,7 +312,7 @@ class GitMonitor:
                 )
             else:
                 raise RuntimeError(
-                    f"The repository {self.repository_info('name')} does not have " +
+                    f"The repository {self.repository_info.get('name')} does not have " +
                     "a valid monitoring set up."
                 )
         

@@ -400,7 +400,7 @@ def get_changelog_instance(repo_info, repo_object, avoid_discover_changes = Fals
                                     repository_object=repo_object
                                 )
 
-def test_discover_changes_exception_when_not_file():
+def test_changelog_discover_changes_exception_when_not_file():
     changelog_filename = "this/is/a/changelog.md"
     is_file = False
     mocked_repo = Mock()
@@ -440,7 +440,7 @@ def test_discover_changes_exception_when_not_file():
         ("v2.0", False, "content_1", "content_2", "content_3_fail"),
     ],
 )
-def test_discover_changes_reads_file_when_isfile(
+def test_changelog_discover_changes_reads_file_when_isfile(
     last_version, expected_parsed: dict, content1_name, content2_name, content3_name, request
 ):
     changelog_filename = "this/is/a/changelog.md"
@@ -505,7 +505,7 @@ def test_discover_changes_reads_file_when_isfile(
     mocked_open_file.assert_called_once_with(changelog_filename, 'r')
 
 
-def test_build_update_message_with_one_update(content_3):
+def test_changelog_build_update_message_with_one_update(content_3):
     parsed_content = {"v3.0": content_3.replace("## [", "[")}
     expected_content = Message(
         text="**[pyxavi](https://github.com/XaviArnaus/pyxavi) v3.0** published!\n\n" +
@@ -525,7 +525,7 @@ def test_build_update_message_with_one_update(content_3):
     assert message.to_dict() == expected_content.to_dict()
 
 
-def test_build_update_message_with_two_updates(content_3, content_2):
+def test_changelog_build_update_message_with_two_updates(content_3, content_2):
     parsed_content = {
         "v3.0": content_3.replace("## [", "["), "v2.0": content_2.replace("## [", "[")
     }
@@ -548,7 +548,7 @@ def test_build_update_message_with_two_updates(content_3, content_2):
     assert message.to_dict() == expected_content.to_dict()
 
 
-def test_write_new_last_known():
+def test_changelog_write_new_last_known():
     value_to_write = "v1.2"
 
     mocked_storage_write = Mock()
@@ -588,7 +588,7 @@ def test_write_new_last_known():
         ({"v1.6": "I am a content v1", "v2.4": "I am a content v2", "v3.1": "I am a content v3"}, "v1.6, v2.4 & v3.1"),
     ],
 )
-def test_changes_note(changes_stack, expected_note):
+def test_changelog_changes_note(changes_stack, expected_note):
     mocked_repo = Mock()
     controller = get_changelog_instance(
         repo_info=Dictionary(REPOSITORY_CHANGELOG),
@@ -598,3 +598,200 @@ def test_changes_note(changes_stack, expected_note):
     controller._changes_stack = changes_stack
 
     assert controller.get_changes_note() == expected_note
+
+############ COMMITS changes class ################
+
+def get_commits_instance(repo_info, repo_object, avoid_discover_changes = False) -> ChangesProtocol:
+    mock_logger = Mock()
+    mock_logger.return_value = None
+    mock_logging_instance = Mock()
+    mock_logging = Mock()
+    mock_logging.__class__ = Logging
+    mock_logging.return_value = mock_logging_instance
+    mock_discover_changes = Mock()
+    mocked_logging_debug = Mock()
+    with patch.object(Config, "__init__", new=patched_config_init):
+        with patch.object(Config, "get", new=patched_config_get):
+            with patch.object(Logger, "__init__", new=mock_logger):
+                with patch.object(mock_logger, "get_logger", new=mock_logging):
+                    with patch.object(mock_logging_instance, "debug", new=mocked_logging_debug):
+                        with patch.object(Storage, "__init__", new=patched_storage_init):
+                            if avoid_discover_changes:
+                                with patch.object(CommitsChanges, "discover_changes", new=mock_discover_changes):
+                                    config = Config()
+                                    return CommitsChanges(
+                                        config=config,
+                                        logger=mock_logger,
+                                        repository_info=repo_info,
+                                        repository_object=repo_object
+                                    )
+                            else:
+                                config = Config()
+                                return CommitsChanges(
+                                    config=config,
+                                    logger=mock_logger,
+                                    repository_info=repo_info,
+                                    repository_object=repo_object
+                                )
+
+def test_commits_discover_changes_rev_list_empty():
+    last_known_commit = None
+    commits = []
+    expected_stack = {}
+
+    mocked_last_knwon = Mock()
+    mocked_last_knwon.return_value = last_known_commit
+    mocked_iter_commits = Mock()
+    mocked_iter_commits.return_value = commits
+    mocked_repo = Mock()
+    with patch.object(CommitsChanges, "get_current_last_known", new=mocked_last_knwon):
+        with patch.object(mocked_repo, "iter_commits", new=mocked_iter_commits):
+            controller = get_commits_instance(
+                Dictionary(REPOSITORY_COMMITS),
+                mocked_repo
+            )
+            assert controller._changes_stack == expected_stack
+
+def test_commits_discover_changes_rev_list_full():
+    last_known_commit = None
+
+    class Commit:
+        binsha: bytes
+        author: str
+        message: str
+
+        def __init__(self, binsha: bytes, author: str, message: str) -> None:
+            self.binsha = binsha
+            self.author = author
+            self.message = message
+
+    commits = [
+        Commit(bytes("test1".encode("utf-8")), "Xavi", "Description 1"),
+        Commit(bytes("test2".encode("utf-8")), "Xavi", "Description 2"),
+        Commit(bytes("test3".encode("utf-8")), "Xavi", "Description 3"),
+    ]
+    expected_stack = {
+        "test1".encode("utf-8").hex(): {"author": "Xavi", "message": "Description 1"},
+        "test2".encode("utf-8").hex(): {"author": "Xavi", "message": "Description 2"},
+        "test3".encode("utf-8").hex(): {"author": "Xavi", "message": "Description 3"},
+    }
+
+    mocked_last_knwon = Mock()
+    mocked_last_knwon.return_value = last_known_commit
+    mocked_iter_commits = Mock()
+    mocked_iter_commits.return_value = commits
+    mocked_repo = Mock()
+    with patch.object(CommitsChanges, "get_current_last_known", new=mocked_last_knwon):
+        with patch.object(mocked_repo, "iter_commits", new=mocked_iter_commits):
+            controller = get_commits_instance(
+                Dictionary(REPOSITORY_COMMITS),
+                mocked_repo
+            )
+            assert controller._changes_stack == expected_stack
+
+def test_commits_get_current_last_known():
+    value_to_read = "v1.2"
+
+    mocked_storage_get = Mock()
+    mocked_storage_get.return_value = value_to_read
+    mocked_storage_get.side_effect = [{}, value_to_read]
+    mocked_storage_set = Mock()
+    with patch.object(Storage, "get", new=mocked_storage_get):
+        with patch.object(Storage, "set", new=mocked_storage_set):
+            mocked_repo = Mock()
+            controller = get_commits_instance(
+                repo_info=Dictionary(REPOSITORY_COMMITS),
+                repo_object=mocked_repo,
+                avoid_discover_changes=True
+            )
+            returned_value = controller.get_current_last_known()
+    
+    assert returned_value == value_to_read
+
+
+def test_commits_build_update_message_with_one_update(content_3):
+    parsed_content = {
+        "test1".encode("utf-8").hex(): {"author": "Xavi", "message": "Description 1"},
+    }
+    expected_content = Message(
+        text="**[pyxavi](https://github.com/XaviArnaus/pyxavi) 1 new commits** published!\n" +
+        "\n- *Xavi*: Description 1\n#Python #library\n"
+    )
+
+    mocked_repo = Mock()
+    controller = get_commits_instance(
+        repo_info=Dictionary(REPOSITORY_COMMITS),
+        repo_object=mocked_repo,
+        avoid_discover_changes=True
+    )
+    controller._changes_stack = parsed_content
+
+    message = controller.build_update_message()
+
+    assert message.to_dict() == expected_content.to_dict()
+
+
+def test_commits_build_update_message_with_two_updates(content_3, content_2):
+    parsed_content = {
+        "test1".encode("utf-8").hex(): {"author": "Xavi", "message": "Description 1"},
+        "test2".encode("utf-8").hex(): {"author": "Xavi", "message": "Description 2"},
+    }
+    expected_content = Message(
+        text="**[pyxavi](https://github.com/XaviArnaus/pyxavi) 2 new commits** published!\n" +
+        "\n- *Xavi*: Description 1\n- *Xavi*: Description 2\n#Python #library\n"
+    )
+
+    mocked_repo = Mock()
+    controller = get_commits_instance(
+        repo_info=Dictionary(REPOSITORY_COMMITS),
+        repo_object=mocked_repo,
+        avoid_discover_changes=True
+    )
+    controller._changes_stack = parsed_content
+
+    message = controller.build_update_message()
+
+    assert message.to_dict() == expected_content.to_dict()
+
+def test_commits_write_new_last_known():
+    value_to_write = "test1".encode("utf-8").hex()
+
+    mocked_storage_write = Mock()
+    mocked_storage_get = Mock()
+    mocked_storage_get.return_value = {}
+    mocked_storage_set = Mock()
+    with patch.object(Storage, "get", new=mocked_storage_get):
+        with patch.object(Storage, "set", new=mocked_storage_set):
+            with patch.object(Storage, "write_file", new=mocked_storage_write):
+                mocked_repo = Mock()
+                controller = get_commits_instance(
+                    repo_info=Dictionary(REPOSITORY_CHANGELOG),
+                    repo_object=mocked_repo,
+                    avoid_discover_changes=True
+                )
+                controller.write_new_last_known(value=value_to_write)
+    
+    mocked_storage_set.assert_has_calls(
+        [
+            call(slugify(REPOSITORY_COMMITS["git"]), {}),
+            call(slugify(REPOSITORY_COMMITS["git"]) + ".last_commit", value_to_write)
+        ]
+    )
+    mocked_storage_write.assert_called_once()
+
+
+def test_commits_changes_note():
+    changes_stack = {
+        "test1".encode("utf-8").hex(): {"author": "Xavi", "message": "Description 1"},
+        "test2".encode("utf-8").hex(): {"author": "Xavi", "message": "Description 2"},
+    }
+
+    mocked_repo = Mock()
+    controller = get_commits_instance(
+        repo_info=Dictionary(REPOSITORY_COMMITS),
+        repo_object=mocked_repo,
+        avoid_discover_changes=True
+    )
+    controller._changes_stack = changes_stack
+
+    assert controller.get_changes_note() == "2 new commits"

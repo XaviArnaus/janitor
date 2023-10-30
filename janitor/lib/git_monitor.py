@@ -199,15 +199,6 @@ class ChangelogChanges(BaseChanges):
             if version in versions_to_ignore:
                 self._logger.debug(f"Found version {version} is meant to be ignored")
                 continue
-            # if last_known_version is None:
-            #     self._logger.debug(
-            #         "We don't have a last known. " +
-            #         f"Saving found version: {version} and leaving."
-            #     )
-            #     # If we don't have a last version, we won't publish anything. Just save it.
-            #     self._storage.set(last_version_param_name, version)
-            #     self._storage.write_file()
-            #     return {}
             if version == last_known_version:
                 self._logger.debug(
                     f"Found version {version} is the same as " + "last known. Stopping here."
@@ -279,6 +270,7 @@ class GitMonitor:
     repository_info: Dictionary
     current_repository: Repo
     parsed_changelog_per_version: dict
+    changes_instance: ChangesProtocol = None
 
     def __init__(self, config: Config) -> None:
         self._config = config
@@ -312,24 +304,43 @@ class GitMonitor:
         origin.pull()
     
     def get_changes_instance(self) -> ChangesProtocol:
-        monitoring_method = self.repository_info.get("monitoring_method", DEFAULT_MONITORING_METHOD)
+
+        if self.changes_instance is None:
+            monitoring_method = self.repository_info.get("monitoring_method", DEFAULT_MONITORING_METHOD)
+            
+            if monitoring_method == "changelog":
+                self.changes_instance = ChangelogChanges(
+                    config=self._config,
+                    logger=self._logger,
+                    repository_info=self.repository_info,
+                    repository_object=self.current_repository
+                )
+            elif monitoring_method == "commits":
+                self.changes_instance = CommitsChanges(
+                    config=self._config,
+                    logger=self._logger,
+                    repository_info=self.repository_info,
+                    repository_object=self.current_repository
+                )
+            else:
+                raise RuntimeError(
+                    f"The repository {self.repository_info('name')} does not have " +
+                    "a valid monitoring set up."
+                )
         
-        if monitoring_method == "changelog":
-            return ChangelogChanges(
-                config=self._config,
-                logger=self._logger,
-                repository_info=self.repository_info,
-                repository_object=self.current_repository
-            )
-        elif monitoring_method == "commits":
-            return CommitsChanges(
-                config=self._config,
-                logger=self._logger,
-                repository_info=self.repository_info,
-                repository_object=self.current_repository
-            )
-        else:
-            raise RuntimeError(
-                f"The repository {self.repository_info('name')} does not have " +
-                "a valid monitoring set up."
-            )
+        return self.changes_instance
+    
+    def get_current_last_known(self) -> str:
+        return self.get_changes_instance().get_current_last_known()
+    
+    def get_new_last_known(self) -> str:
+        return self.get_changes_instance().get_new_last_known()
+    
+    def get_update_message(self, parameters: dict = None) -> Message:
+        return self.get_changes_instance().build_update_message(parameters=parameters)
+    
+    def get_changes_note(self)-> str:
+        return self.get_changes_instance().get_changes_note()
+    
+    def write_new_last_known(self, value: str) -> None:
+        return self.get_changes_instance().write_new_last_known(value=value)

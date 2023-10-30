@@ -46,26 +46,14 @@ class GitChanges(RunnerProtocol):
                 # Bring the new updates
                 monitor.get_updates()
 
-                # Delegate the work to a ChangesProtocol class
-                #   It implements a custom approach for each monitoring style
-                #   all packed in a same protocol.
-                #
-                #   If it fails skip this repo and go for the next
-                try:
-                    controller = monitor.get_changes_instance()
-                except RuntimeError as e:
-                    self._logger.warning(e)
-                    self._publish_notification(message=Message(text=f"Warning: {e}"))
-                    continue
-
                 # So get the values to compare
-                current_last_known = controller.get_current_last_known()
-                new_last_known = controller.get_new_last_known()
+                current_last_known = monitor.get_current_last_known()
+                new_last_known = monitor.get_new_last_known()
 
                 # If we don't have a previous value, it is the first run.
                 #   Just save the new value but avoid messaging around.
                 if current_last_known is None:
-                    controller.write_new_last_known(value=new_last_known)
+                    monitor.write_new_last_known(value=new_last_known)
                     continue
 
                 # Now let's chech if we have new changes
@@ -77,7 +65,7 @@ class GitChanges(RunnerProtocol):
                 # Still here? So we have changes!
                 self._logger.info(f"New changes for repository {repo.get('name')}")
                 # Build the message
-                message = controller.build_update_message()
+                message = monitor.get_update_message()
 
                 # And publish it using the defined named_account.
                 self._logger.debug(
@@ -86,13 +74,13 @@ class GitChanges(RunnerProtocol):
                 self._publish_update(message=message, named_account=repo.get('named_account'))
 
                 # Add a note about the project to publish them all together by the Service
-                published_projects.append(f"- {repo.get('name')}: {controller.get_changes_note()}")
+                published_projects.append(f"- {repo.get('name')}: {monitor.get_changes_note()}")
 
                 # And finally store this new last known
                 self._logger.debug(
                     f"Storing a new last known change id: {new_last_known}"
                 )
-                controller.write_new_last_known(new_last_known)
+                monitor.write_new_last_known(new_last_known)
 
             if len(published_projects) > 0:
                 self._logger.debug("Publishing an notice into account default")

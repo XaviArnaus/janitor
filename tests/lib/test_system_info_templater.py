@@ -21,7 +21,17 @@ CONFIG = {
     },
     "system_info.formatting.human_readable_exceptions": [
         "cpu_percent", "cpu_count", "memory_percent", "disk_usage_percent"
-    ]
+    ],
+    "system_info.formatting.templates.message_type.none.summary": "⚠️ $summary",
+    "system_info.formatting.templates.message_type.none.text": "$text",
+    "system_info.formatting.templates.message_type.info.summary": "⚠️ $summary",
+    "system_info.formatting.templates.message_type.info.text": "$text",
+    "system_info.formatting.templates.message_type.warning.summary": "⚠️ $summary",
+    "system_info.formatting.templates.message_type.warning.text": "$text",
+    "system_info.formatting.templates.message_type.error.summary": "⚠️ $summary",
+    "system_info.formatting.templates.message_type.error.text": "$text",
+    "system_info.formatting.templates.message_type.alarm.summary": "⚠️ $summary",
+    "system_info.formatting.templates.message_type.alarm.text": "$text",
 }
 
 
@@ -52,17 +62,18 @@ def test_build_report_line_no_issue():
     title_item_name = "Title for the metric name"
     item_value = 45
     field_has_issue = False
+    line_template = "- **$title**: $value"
 
     templater = get_instance()
 
     mocked_config_get = Mock()
-    mocked_config_get.return_value = title_item_name
+    mocked_config_get.side_effect = [title_item_name, line_template]
     with patch.object(Config, "get", new=mocked_config_get):
         templated_line = templater._build_report_line(
             item_name=item_name, item_value=item_value, field_has_issue=field_has_issue
         )
 
-    expected_string = templater.REPORT_LINE_TEMPLATE_OK.substitute(
+    expected_string = Template(line_template).substitute(
         title=title_item_name, value=item_value
     )
 
@@ -74,17 +85,19 @@ def test_build_report_line_with_issue():
     title_item_name = "Title for the metric name"
     item_value = 45
     field_has_issue = True
+    line_template = "- **$title**: $value"
+    line_template_fail = "- **$title**: $value ❗️"
 
     templater = get_instance()
 
     mocked_config_get = Mock()
-    mocked_config_get.return_value = title_item_name
+    mocked_config_get.side_effect = [title_item_name, line_template, line_template_fail]
     with patch.object(Config, "get", new=mocked_config_get):
         templated_line = templater._build_report_line(
             item_name=item_name, item_value=item_value, field_has_issue=field_has_issue
         )
 
-    expected_string = templater.REPORT_LINE_TEMPLATE_ISSUE.substitute(
+    expected_string = Template(line_template_fail).substitute(
         title=title_item_name, value=item_value
     )
 
@@ -163,6 +176,16 @@ def test_process_report():
     mocked_config_get.side_effect = [
         CONFIG["system_info.thresholds"],
         CONFIG["system_info.formatting.human_readable_exceptions"],
+        CONFIG["system_info.formatting.templates.message_type.none.summary"],
+        CONFIG["system_info.formatting.templates.message_type.none.text"],
+        CONFIG["system_info.formatting.templates.message_type.info.summary"],
+        CONFIG["system_info.formatting.templates.message_type.info.text"],
+        CONFIG["system_info.formatting.templates.message_type.warning.summary"],
+        CONFIG["system_info.formatting.templates.message_type.warning.text"],
+        CONFIG["system_info.formatting.templates.message_type.error.summary"],
+        CONFIG["system_info.formatting.templates.message_type.error.text"],
+        CONFIG["system_info.formatting.templates.message_type.alarm.summary"],
+        CONFIG["system_info.formatting.templates.message_type.alarm.text"],
     ]
     mocked_build_line = Mock()
     mocked_build_line.side_effect = [

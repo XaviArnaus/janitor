@@ -13,6 +13,7 @@ from pyxavi.debugger import dd
 DEFAULT_FILENAME = "storage/git_monitor.yaml"
 DEFAULT_VERSION_REGEX = r"\[(v[0-9]+\.[0-9]+\.?[0-9]?)\]"
 DEFAULT_SECTION_SEPARATOR = "\n## "
+DEFAULT_MONITORING_METHOD = "commits"
 TEMPLATE_UPDATE_TEXT = "**[$project]($link) $version** published!\n\n$text\n$tags\n"
 
 
@@ -155,7 +156,7 @@ class ChangelogChanges(BaseChanges):
     
     def __get_changelog_content(self) -> str:
         changelog_filename = os.path.join(
-            self._repo_object.working_tree_dir, self._repo_info["changelog"]["file"]
+            self._repo_object.working_tree_dir, self._repo_info["params"]["file"]
         )
 
         if os.path.isfile(changelog_filename):
@@ -166,21 +167,21 @@ class ChangelogChanges(BaseChanges):
             raise RuntimeError("File not found in the repository")
 
     def __extract_version_from_section(self, section: str) -> str:
-        regex = self._repo_info["changelog"]["version_regex"]\
-            if "version_regex" in self._repo_info["changelog"] else DEFAULT_VERSION_REGEX
+        regex = self._repo_info["params"]["version_regex"]\
+            if "version_regex" in self._repo_info["params"] else DEFAULT_VERSION_REGEX
         matched = re.search(regex, section)
         if matched is None:
             return None
         return matched.group(1)
 
     def __parse_changelog(self, content: str) -> dict:
-        version_section_separator = self._repo_info["changelog"]["section_separator"]\
-            if "section_separator" in self._repo_info["changelog"]\
+        version_section_separator = self._repo_info["params"]["section_separator"]\
+            if "section_separator" in self._repo_info["params"]\
             else DEFAULT_SECTION_SEPARATOR
 
         last_known_version = self.get_current_last_known()
-        versions_to_ignore = self._repo_info["changelog"]["version_exceptions"]\
-            if "version_exceptions" in self._repo_info["changelog"] else []
+        versions_to_ignore = self._repo_info["params"]["version_exceptions"]\
+            if "version_exceptions" in self._repo_info["params"] else []
 
         self._logger.debug(f"Last known version: {last_known_version}")
         self._logger.debug(f"Will ignore the versions: {', '.join(versions_to_ignore)}")
@@ -314,16 +315,17 @@ class GitMonitor:
         origin.pull()
     
     def get_changes_instance(self) -> ChangesProtocol:
-        if "changelog" in self.repository_info\
-            and self.repository_info["changelog"] is not None:
+        monitoring_method = self.repository_info["monitoring_method"]\
+            if "monitoring_method" in self.repository_info else DEFAULT_MONITORING_METHOD
+        
+        if monitoring_method == "changelog":
             return ChangelogChanges(
                 config=self._config,
                 logger=self._logger,
                 repository_info=self.repository_info,
                 repository_object=self.current_repository
             )
-        elif "commits" in self.repository_info\
-            and self.repository_info["commits"] is not None:
+        elif monitoring_method == "commits":
             return CommitsChanges(
                 config=self._config,
                 logger=self._logger,

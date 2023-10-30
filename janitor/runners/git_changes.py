@@ -10,7 +10,6 @@ from janitor.runners.runner_protocol import RunnerProtocol
 from definitions import ROOT_DIR
 import os
 import logging
-from pyxavi.debugger import dd
 
 
 class GitChanges(RunnerProtocol):
@@ -77,9 +76,7 @@ class GitChanges(RunnerProtocol):
                 published_projects.append(f"- {repo.get('name')}: {monitor.get_changes_note()}")
 
                 # And finally store this new last known
-                self._logger.debug(
-                    f"Storing a new last known change id: {new_last_known}"
-                )
+                self._logger.debug(f"Storing a new last known change id: {new_last_known}")
                 monitor.write_new_last_known(new_last_known)
 
             if len(published_projects) > 0:

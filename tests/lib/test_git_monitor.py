@@ -2,7 +2,8 @@ from pyxavi.config import Config
 from pyxavi.logger import Logger
 from pyxavi.storage import Storage
 from pyxavi.dictionary import Dictionary
-from janitor.lib.git_monitor import GitMonitor, ChangelogChanges, ChangesProtocol, CommitsChanges
+from janitor.lib.git_monitor import GitMonitor, ChangelogChanges,\
+    ChangesProtocol, CommitsChanges
 from janitor.objects.message import Message
 from unittest.mock import patch, Mock, mock_open, MagicMock, call
 import pytest
@@ -169,7 +170,7 @@ def test_get_changes_instance_for_changelog():
     monitor = get_instance()
     monitor.repository_info = Dictionary(REPOSITORY_CHANGELOG)
     monitor.current_repository = mocked_repo
-    
+
     mocked_changelog_changes_init = Mock()
     mocked_changelog_changes_init.return_value = None
     mocked_changelog_changes_init.__class__ = ChangelogChanges
@@ -192,6 +193,7 @@ def test_get_changes_instance_for_changelog():
     )
     mocked_commits_changes_init.assert_not_called()
 
+
 def test_get_changes_instance_for_commits():
     dictionary_monitoring_method = "commits"
 
@@ -199,7 +201,7 @@ def test_get_changes_instance_for_commits():
     monitor = get_instance()
     monitor.repository_info = Dictionary(REPOSITORY_COMMITS)
     monitor.current_repository = mocked_repo
-    
+
     mocked_changelog_changes_init = Mock()
     mocked_changelog_changes_init.return_value = None
     mocked_changelog_changes_init.__class__ = ChangelogChanges
@@ -222,6 +224,7 @@ def test_get_changes_instance_for_commits():
         repository_object=monitor.current_repository
     )
 
+
 def test_get_changes_instance_for_unknown():
     dictionary_monitoring_method = "unknown"
 
@@ -229,7 +232,7 @@ def test_get_changes_instance_for_unknown():
     monitor = get_instance()
     monitor.repository_info = Dictionary(REPOSITORY_COMMITS)
     monitor.current_repository = mocked_repo
-    
+
     mocked_changelog_changes_init = Mock()
     mocked_changelog_changes_init.return_value = None
     mocked_changelog_changes_init.__class__ = ChangelogChanges
@@ -242,7 +245,7 @@ def test_get_changes_instance_for_unknown():
         with patch.object(ChangelogChanges, "__init__", new=mocked_changelog_changes_init):
             with patch.object(CommitsChanges, "__init__", new=mocked_commits_changes_init):
                 with TestCase.assertRaises(monitor, RuntimeError):
-                    returned_instance = monitor.get_changes_instance()
+                    _ = monitor.get_changes_instance()
 
     mocked_changelog_changes_init.assert_not_called()
     mocked_commits_changes_init.assert_not_called
@@ -259,9 +262,11 @@ def test_monitor_get_current_last_known():
     mock_changes_get_current_last_known = Mock()
     mock_changes_get_current_last_known.return_value = value_to_return
     with patch.object(monitor, "get_changes_instance", new=mock_get_changes_instance):
-        with patch.object(mock_changes_instance, "get_current_last_known", new=mock_changes_get_current_last_known):
+        with patch.object(mock_changes_instance,
+                          "get_current_last_known",
+                          new=mock_changes_get_current_last_known):
             returned = monitor.get_current_last_known()
-    
+
     assert returned == value_to_return
     mock_get_changes_instance.assert_called_once()
     mock_changes_get_current_last_known.assert_called_once()
@@ -278,9 +283,11 @@ def test_monitor_get_new_last_known():
     mock_changes_get_new_last_known = Mock()
     mock_changes_get_new_last_known.return_value = value_to_return
     with patch.object(monitor, "get_changes_instance", new=mock_get_changes_instance):
-        with patch.object(mock_changes_instance, "get_new_last_known", new=mock_changes_get_new_last_known):
+        with patch.object(mock_changes_instance,
+                          "get_new_last_known",
+                          new=mock_changes_get_new_last_known):
             returned = monitor.get_new_last_known()
-    
+
     assert returned == value_to_return
     mock_get_changes_instance.assert_called_once()
     mock_changes_get_new_last_known.assert_called_once()
@@ -297,9 +304,11 @@ def test_monitor_get_update_message():
     mock_changes_build_update_message = Mock()
     mock_changes_build_update_message.return_value = value_to_return
     with patch.object(monitor, "get_changes_instance", new=mock_get_changes_instance):
-        with patch.object(mock_changes_instance, "build_update_message", new=mock_changes_build_update_message):
+        with patch.object(mock_changes_instance,
+                          "build_update_message",
+                          new=mock_changes_build_update_message):
             returned = monitor.get_update_message()
-    
+
     assert returned == value_to_return
     mock_get_changes_instance.assert_called_once()
     mock_changes_build_update_message.assert_called_once()
@@ -317,14 +326,14 @@ def test_monitor_get_update_message_with_parameters():
     mock_changes_build_update_message = Mock()
     mock_changes_build_update_message.return_value = value_to_return
     with patch.object(monitor, "get_changes_instance", new=mock_get_changes_instance):
-        with patch.object(mock_changes_instance, "build_update_message", new=mock_changes_build_update_message):
+        with patch.object(mock_changes_instance,
+                          "build_update_message",
+                          new=mock_changes_build_update_message):
             returned = monitor.get_update_message(parameters=parameters)
-    
+
     assert returned == value_to_return
     mock_get_changes_instance.assert_called_once()
-    mock_changes_build_update_message.assert_called_once_with(
-        parameters=parameters
-    )
+    mock_changes_build_update_message.assert_called_once_with(parameters=parameters)
 
 
 def test_monitor_get_changes_note():
@@ -338,9 +347,11 @@ def test_monitor_get_changes_note():
     mock_changes_get_changes_note = Mock()
     mock_changes_get_changes_note.return_value = value_to_return
     with patch.object(monitor, "get_changes_instance", new=mock_get_changes_instance):
-        with patch.object(mock_changes_instance, "get_changes_note", new=mock_changes_get_changes_note):
+        with patch.object(mock_changes_instance,
+                          "get_changes_note",
+                          new=mock_changes_get_changes_note):
             returned = monitor.get_changes_note()
-    
+
     assert returned == value_to_return
     mock_get_changes_instance.assert_called_once()
     mock_changes_get_changes_note.assert_called_once()
@@ -356,18 +367,21 @@ def test_monitor_write_new_last_known():
     mock_get_changes_instance.return_value = mock_changes_instance
     mock_changes_write_new_last_known = Mock()
     with patch.object(monitor, "get_changes_instance", new=mock_get_changes_instance):
-        with patch.object(mock_changes_instance, "write_new_last_known", new=mock_changes_write_new_last_known):
-            returned = monitor.write_new_last_known(value=value_to_write)
-    
+        with patch.object(mock_changes_instance,
+                          "write_new_last_known",
+                          new=mock_changes_write_new_last_known):
+            _ = monitor.write_new_last_known(value=value_to_write)
+
     mock_get_changes_instance.assert_called_once()
-    mock_changes_write_new_last_known.assert_called_once_with(
-        value=value_to_write
-    )
+    mock_changes_write_new_last_known.assert_called_once_with(value=value_to_write)
 
 
-############ CHANGELOG changes class ################
+# -------------- CHANGELOG changes class --------------
 
-def get_changelog_instance(repo_info, repo_object, avoid_discover_changes = False) -> ChangesProtocol:
+
+def get_changelog_instance(
+    repo_info, repo_object, avoid_discover_changes=False
+) -> ChangesProtocol:
     mock_logger = Mock()
     mock_logger.return_value = None
     mock_logging_instance = Mock()
@@ -383,7 +397,9 @@ def get_changelog_instance(repo_info, repo_object, avoid_discover_changes = Fals
                     with patch.object(mock_logging_instance, "debug", new=mocked_logging_debug):
                         with patch.object(Storage, "__init__", new=patched_storage_init):
                             if avoid_discover_changes:
-                                with patch.object(ChangelogChanges, "discover_changes", new=mock_discover_changes):
+                                with patch.object(ChangelogChanges,
+                                                  "discover_changes",
+                                                  new=mock_discover_changes):
                                     config = Config()
                                     return ChangelogChanges(
                                         config=config,
@@ -399,6 +415,7 @@ def get_changelog_instance(repo_info, repo_object, avoid_discover_changes = Fals
                                     repository_info=repo_info,
                                     repository_object=repo_object
                                 )
+
 
 def test_changelog_discover_changes_exception_when_not_file():
     changelog_filename = "this/is/a/changelog.md"
@@ -416,23 +433,30 @@ def test_changelog_discover_changes_exception_when_not_file():
         with patch.object(os.path, "join", new=mocked_path_join):
             with patch.object(os.path, "isfile", new=mocked_path_isfile):
                 with TestCase.assertRaises(ChangelogChanges, RuntimeError):
-                    controller = get_changelog_instance(
-                        repo_info=Dictionary(REPOSITORY_CHANGELOG),
-                        repo_object=mocked_repo
+                    _ = get_changelog_instance(
+                        repo_info=Dictionary(REPOSITORY_CHANGELOG), repo_object=mocked_repo
                     )
 
     mocked_path_join.assert_called_once_with(
         mocked_working_tree_dir, REPOSITORY_CHANGELOG["params"]["file"]
     )
 
+
 @pytest.mark.parametrize(
     argnames=(
         'last_version', 'expected_parsed', 'content1_name', 'content2_name', 'content3_name'
     ),
     argvalues=[
-        ("v2.0", {"v3.0.0": "content_30"}, "content_1", "content_2", "content_30"),
-        ("v2.0", {"v3.0": "content_3"}, "content_1", "content_2", "content_3"),
-        ("v1.0", {"v3.0": "content_3", "v2.0": "content_2"},
+        ("v2.0", {
+            "v3.0.0": "content_30"
+        }, "content_1", "content_2", "content_30"),
+        ("v2.0", {
+            "v3.0": "content_3"
+        }, "content_1", "content_2", "content_3"),
+        (
+            "v1.0", {
+                "v3.0": "content_3", "v2.0": "content_2"
+            },
             "content_1",
             "content_2",
             "content_3"
@@ -477,8 +501,8 @@ def test_changelog_discover_changes_reads_file_when_isfile(
                 with patch.object(os.path, "join", new=mocked_path_join):
                     with patch.object(os.path, "isfile", new=mocked_path_isfile):
                         with patch.object(builtins,
-                                        "open",
-                                        mock_open(mock=mocked_open_file, read_data=content)):
+                                          "open",
+                                          mock_open(mock=mocked_open_file, read_data=content)):
 
                             if expected_parsed is False:
                                 with TestCase.assertRaises(ChangelogChanges, RuntimeError):
@@ -565,7 +589,7 @@ def test_changelog_write_new_last_known():
                     avoid_discover_changes=True
                 )
                 controller.write_new_last_known(value=value_to_write)
-    
+
     mocked_storage_set.assert_has_calls(
         [
             call(slugify(REPOSITORY_CHANGELOG["git"]), {}),
@@ -574,18 +598,51 @@ def test_changelog_write_new_last_known():
     )
     mocked_storage_write.assert_called_once()
 
+
 @pytest.mark.parametrize(
-    argnames=(
-        'changes_stack', 'expected_note'
-    ),
+    argnames=('changes_stack', 'expected_note'),
     argvalues=[
-        ({"v3.0": "I am a content v3"}, "v3.0"),
-        ({"v2.0": "I am a content v2", "v3.0": "I am a content v3"}, "v2.0 & v3.0"),
-        ({"v1.0": "I am a content v1", "v2.0": "I am a content v2", "v3.0": "I am a content v3"}, "v1.0, v2.0 & v3.0"),
-        ({"v3.0": "I am a content v3", "v2.0": "I am a content v2"}, "v2.0 & v3.0"),
-        ({"v3.0": "I am a content v3", "v2.0": "I am a content v2", "v1.0": "I am a content v1"}, "v1.0, v2.0 & v3.0"),
-        ({"v1.1": "I am a content v1", "v1.2": "I am a content v2", "v1.3": "I am a content v3"}, "v1.1, v1.2 & v1.3"),
-        ({"v1.6": "I am a content v1", "v2.4": "I am a content v2", "v3.1": "I am a content v3"}, "v1.6, v2.4 & v3.1"),
+        ({
+            "v3.0": "I am a content v3"
+        }, "v3.0"),
+        ({
+            "v2.0": "I am a content v2", "v3.0": "I am a content v3"
+        }, "v2.0 & v3.0"),
+        (
+            {
+                "v1.0": "I am a content v1",
+                "v2.0": "I am a content v2",
+                "v3.0": "I am a content v3"
+            },
+            "v1.0, v2.0 & v3.0"
+        ),
+        ({
+            "v3.0": "I am a content v3", "v2.0": "I am a content v2"
+        }, "v2.0 & v3.0"),
+        (
+            {
+                "v3.0": "I am a content v3",
+                "v2.0": "I am a content v2",
+                "v1.0": "I am a content v1"
+            },
+            "v1.0, v2.0 & v3.0"
+        ),
+        (
+            {
+                "v1.1": "I am a content v1",
+                "v1.2": "I am a content v2",
+                "v1.3": "I am a content v3"
+            },
+            "v1.1, v1.2 & v1.3"
+        ),
+        (
+            {
+                "v1.6": "I am a content v1",
+                "v2.4": "I am a content v2",
+                "v3.1": "I am a content v3"
+            },
+            "v1.6, v2.4 & v3.1"
+        ),
     ],
 )
 def test_changelog_changes_note(changes_stack, expected_note):
@@ -599,9 +656,13 @@ def test_changelog_changes_note(changes_stack, expected_note):
 
     assert controller.get_changes_note() == expected_note
 
-############ COMMITS changes class ################
 
-def get_commits_instance(repo_info, repo_object, avoid_discover_changes = False) -> ChangesProtocol:
+# -------------- COMMITS changes class --------------
+
+
+def get_commits_instance(
+    repo_info, repo_object, avoid_discover_changes=False
+) -> ChangesProtocol:
     mock_logger = Mock()
     mock_logger.return_value = None
     mock_logging_instance = Mock()
@@ -617,7 +678,9 @@ def get_commits_instance(repo_info, repo_object, avoid_discover_changes = False)
                     with patch.object(mock_logging_instance, "debug", new=mocked_logging_debug):
                         with patch.object(Storage, "__init__", new=patched_storage_init):
                             if avoid_discover_changes:
-                                with patch.object(CommitsChanges, "discover_changes", new=mock_discover_changes):
+                                with patch.object(CommitsChanges,
+                                                  "discover_changes",
+                                                  new=mock_discover_changes):
                                     config = Config()
                                     return CommitsChanges(
                                         config=config,
@@ -634,6 +697,7 @@ def get_commits_instance(repo_info, repo_object, avoid_discover_changes = False)
                                     repository_object=repo_object
                                 )
 
+
 def test_commits_discover_changes_rev_list_empty():
     last_known_commit = None
     commits = []
@@ -646,11 +710,9 @@ def test_commits_discover_changes_rev_list_empty():
     mocked_repo = Mock()
     with patch.object(CommitsChanges, "get_current_last_known", new=mocked_last_knwon):
         with patch.object(mocked_repo, "iter_commits", new=mocked_iter_commits):
-            controller = get_commits_instance(
-                Dictionary(REPOSITORY_COMMITS),
-                mocked_repo
-            )
+            controller = get_commits_instance(Dictionary(REPOSITORY_COMMITS), mocked_repo)
             assert controller._changes_stack == expected_stack
+
 
 def test_commits_discover_changes_rev_list_full():
     last_known_commit = None
@@ -671,9 +733,15 @@ def test_commits_discover_changes_rev_list_full():
         Commit(bytes("test3".encode("utf-8")), "Xavi", "Description 3"),
     ]
     expected_stack = {
-        "test1".encode("utf-8").hex(): {"author": "Xavi", "message": "Description 1"},
-        "test2".encode("utf-8").hex(): {"author": "Xavi", "message": "Description 2"},
-        "test3".encode("utf-8").hex(): {"author": "Xavi", "message": "Description 3"},
+        "test1".encode("utf-8").hex(): {
+            "author": "Xavi", "message": "Description 1"
+        },
+        "test2".encode("utf-8").hex(): {
+            "author": "Xavi", "message": "Description 2"
+        },
+        "test3".encode("utf-8").hex(): {
+            "author": "Xavi", "message": "Description 3"
+        },
     }
 
     mocked_last_knwon = Mock()
@@ -683,11 +751,9 @@ def test_commits_discover_changes_rev_list_full():
     mocked_repo = Mock()
     with patch.object(CommitsChanges, "get_current_last_known", new=mocked_last_knwon):
         with patch.object(mocked_repo, "iter_commits", new=mocked_iter_commits):
-            controller = get_commits_instance(
-                Dictionary(REPOSITORY_COMMITS),
-                mocked_repo
-            )
+            controller = get_commits_instance(Dictionary(REPOSITORY_COMMITS), mocked_repo)
             assert controller._changes_stack == expected_stack
+
 
 def test_commits_get_current_last_known():
     value_to_read = "v1.2"
@@ -705,13 +771,15 @@ def test_commits_get_current_last_known():
                 avoid_discover_changes=True
             )
             returned_value = controller.get_current_last_known()
-    
+
     assert returned_value == value_to_read
 
 
 def test_commits_build_update_message_with_one_update(content_3):
     parsed_content = {
-        "test1".encode("utf-8").hex(): {"author": "Xavi", "message": "Description 1"},
+        "test1".encode("utf-8").hex(): {
+            "author": "Xavi", "message": "Description 1"
+        },
     }
     expected_content = Message(
         text="**[pyxavi](https://github.com/XaviArnaus/pyxavi) 1 new commits** published!\n" +
@@ -733,8 +801,12 @@ def test_commits_build_update_message_with_one_update(content_3):
 
 def test_commits_build_update_message_with_two_updates(content_3, content_2):
     parsed_content = {
-        "test1".encode("utf-8").hex(): {"author": "Xavi", "message": "Description 1"},
-        "test2".encode("utf-8").hex(): {"author": "Xavi", "message": "Description 2"},
+        "test1".encode("utf-8").hex(): {
+            "author": "Xavi", "message": "Description 1"
+        },
+        "test2".encode("utf-8").hex(): {
+            "author": "Xavi", "message": "Description 2"
+        },
     }
     expected_content = Message(
         text="**[pyxavi](https://github.com/XaviArnaus/pyxavi) 2 new commits** published!\n" +
@@ -753,6 +825,7 @@ def test_commits_build_update_message_with_two_updates(content_3, content_2):
 
     assert message.to_dict() == expected_content.to_dict()
 
+
 def test_commits_write_new_last_known():
     value_to_write = "test1".encode("utf-8").hex()
 
@@ -770,7 +843,7 @@ def test_commits_write_new_last_known():
                     avoid_discover_changes=True
                 )
                 controller.write_new_last_known(value=value_to_write)
-    
+
     mocked_storage_set.assert_has_calls(
         [
             call(slugify(REPOSITORY_COMMITS["git"]), {}),
@@ -782,8 +855,12 @@ def test_commits_write_new_last_known():
 
 def test_commits_changes_note():
     changes_stack = {
-        "test1".encode("utf-8").hex(): {"author": "Xavi", "message": "Description 1"},
-        "test2".encode("utf-8").hex(): {"author": "Xavi", "message": "Description 2"},
+        "test1".encode("utf-8").hex(): {
+            "author": "Xavi", "message": "Description 1"
+        },
+        "test2".encode("utf-8").hex(): {
+            "author": "Xavi", "message": "Description 2"
+        },
     }
 
     mocked_repo = Mock()

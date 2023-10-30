@@ -1,4 +1,5 @@
 from pyxavi.config import Config
+from pyxavi.dictionary import Dictionary
 from janitor.lib.mastodon_helper import MastodonHelper
 from janitor.objects.mastodon_connection_params import MastodonConnectionParams
 from janitor.lib.publisher import Publisher
@@ -36,11 +37,11 @@ class GitChanges(RunnerProtocol):
             repositories = self._config.get("git_monitor.repositories", [])
             published_projects = []
             for repository in repositories:
-                repo_name = repository["name"]
+                repo = Dictionary(repository)
 
                 # Check if we already have the repo cloned
                 # If not, clone it localy
-                monitor.initiate_or_clone_repository(repository_info=repository)
+                monitor.initiate_or_clone_repository(repository_info=repo)
 
                 # Bring the new updates
                 monitor.get_updates()
@@ -70,22 +71,22 @@ class GitChanges(RunnerProtocol):
                 # Now let's chech if we have new changes
                 if new_last_known is None or current_last_known == new_last_known:
                     # No we don't. Finish here
-                    self._logger.info("No new changes for repository " + repo_name)
+                    self._logger.info(f"No new changes for repository {repo.get('name')}")
                     continue
 
                 # Still here? So we have changes!
-                self._logger.info("New changes for repository " + repo_name)
+                self._logger.info(f"New changes for repository {repo.get('name')}")
                 # Build the message
                 message = controller.build_update_message()
 
                 # And publish it using the defined named_account.
                 self._logger.debug(
-                    f"Publishing an update message into account {repository['named_account']}"
+                    f"Publishing an update message into account {repo.get('named_account')}"
                 )
-                self._publish_update(message=message, named_account=repository["named_account"])
+                self._publish_update(message=message, named_account=repo.get('named_account'))
 
                 # Add a note about the project to publish them all together by the Service
-                published_projects.append(f"- {repo_name}: {controller.get_changes_note()}")
+                published_projects.append(f"- {repo.get('name')}: {controller.get_changes_note()}")
 
                 # And finally store this new last known
                 self._logger.debug(

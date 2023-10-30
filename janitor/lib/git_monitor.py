@@ -1,5 +1,6 @@
 from pyxavi.config import Config
 from pyxavi.storage import Storage
+from pyxavi.dictionary import Dictionary
 from janitor.objects.message import Message
 from typing import Protocol
 from git import Repo
@@ -19,7 +20,7 @@ TEMPLATE_UPDATE_TEXT = "**[$project]($link) $version** published!\n\n$text\n$tag
 
 class ChangesProtocol(Protocol):
     def __init__(
-        self, config: Config, logger: logging, repository_info: dict, repository_object: Repo
+        self, config: Config, logger: logging, repository_info: Dictionary, repository_object: Repo
     ) -> None:
         """Initializing the class"""
     
@@ -48,12 +49,12 @@ class BaseChanges(ChangesProtocol):
     _config: Config
     _logger: logging
     _storage: Storage
-    _repo_info: dict
+    _repo_info: Dictionary
     _repo_object: Repo
     _changes_stack: dict
 
     def __init__(
-        self, config: Config, logger: logging, repository_info: dict, repository_object: Repo
+        self, config: Config, logger: logging, repository_info: Dictionary, repository_object: Repo
     ) -> None:
         self._config = config
         self._logger = logger
@@ -91,7 +92,7 @@ class BaseChanges(ChangesProtocol):
         raise NotImplementedError("The child class does not implement this method yet")
 
     def _get_param_name(self, param_name: str) -> str:
-        current_repo_id = slugify(self._repo_info["git"])
+        current_repo_id = slugify(self._repo_info.get("git"))
         # This get/set dance ensures that the parameter parent will exist always
         current_value = self._storage.get(current_repo_id, {})
         self._storage.set(current_repo_id, current_value)
@@ -121,13 +122,12 @@ class ChangelogChanges(BaseChanges):
 
         return Message(
             text=Template(TEMPLATE_UPDATE_TEXT).substitute(
-                project=self._repo_info["name"],
-                link=self._repo_info["url"],
+                project=self._repo_info.get("name"),
+                link=self._repo_info.get("url"),
                 version=prepared_version_string,
                 text="\n".
                 join([self._clean_markdown(text) for text in self._changes_stack.values()]),
-                tags=" ".join(self._repo_info["tags"]) if "tags" in
-                self._repo_info else ""
+                tags=" ".join(self._repo_info.get("tags", ""))
             )
         )
     
@@ -156,7 +156,7 @@ class ChangelogChanges(BaseChanges):
     
     def __get_changelog_content(self) -> str:
         changelog_filename = os.path.join(
-            self._repo_object.working_tree_dir, self._repo_info["params"]["file"]
+            self._repo_object.working_tree_dir, self._repo_info.get("params.file")
         )
 
         if os.path.isfile(changelog_filename):
@@ -167,21 +167,19 @@ class ChangelogChanges(BaseChanges):
             raise RuntimeError("File not found in the repository")
 
     def __extract_version_from_section(self, section: str) -> str:
-        regex = self._repo_info["params"]["version_regex"]\
-            if "version_regex" in self._repo_info["params"] else DEFAULT_VERSION_REGEX
+        regex = self._repo_info.get("params.version_regex", DEFAULT_VERSION_REGEX)
         matched = re.search(regex, section)
         if matched is None:
             return None
         return matched.group(1)
 
     def __parse_changelog(self, content: str) -> dict:
-        version_section_separator = self._repo_info["params"]["section_separator"]\
-            if "section_separator" in self._repo_info["params"]\
-            else DEFAULT_SECTION_SEPARATOR
+        version_section_separator = self._repo_info.get(
+            "params.section_separator", DEFAULT_SECTION_SEPARATOR
+        )
 
         last_known_version = self.get_current_last_known()
-        versions_to_ignore = self._repo_info["params"]["version_exceptions"]\
-            if "version_exceptions" in self._repo_info["params"] else []
+        versions_to_ignore = self._repo_info.get("params.version_exceptions", [])
 
         self._logger.debug(f"Last known version: {last_known_version}")
         self._logger.debug(f"Will ignore the versions: {', '.join(versions_to_ignore)}")
@@ -260,13 +258,12 @@ class CommitsChanges(BaseChanges):
 
         return Message(
             text=Template(TEMPLATE_UPDATE_TEXT).substitute(
-                project=self._repo_info["name"],
-                link=self._repo_info["url"],
+                project=self._repo_info.get("name"),
+                link=self._repo_info.get("url"),
                 version=self.get_changes_note(),
                 text="\n".
                 join([f"- *{c['author']}*: {c['message']}" for c in self._changes_stack.values()]),
-                tags=" ".join(self._repo_info["tags"]) if "tags" in
-                self._repo_info else ""
+                tags=" ".join(self._repo_info.get("tags", ""))
             )
         )
     
@@ -279,7 +276,7 @@ class CommitsChanges(BaseChanges):
 
 class GitMonitor:
 
-    repository_info: dict
+    repository_info: Dictionary
     current_repository: Repo
     parsed_changelog_per_version: dict
 
@@ -288,35 +285,34 @@ class GitMonitor:
         self._logger = logging.getLogger(config.get("logger.name"))
         self._storage = Storage(self._config.get("git_monitor.file", DEFAULT_FILENAME))
 
-    def initiate_or_clone_repository(self, repository_info: dict) -> Repo:
+    def initiate_or_clone_repository(self, repository_info: Dictionary) -> Repo:
         # Checking for mandatory parameters
-        if ("path" not in repository_info or repository_info["path"] is None)\
-            and ("git" not in repository_info or repository_info["git"] is None
-                 or "path" not in repository_info or repository_info["path"] is None):
+        if repository_info.get("path", None) is None\
+            and (repository_info.get("git", None) is None\
+                 or repository_info.get("path", None) is None):
             raise RuntimeError(
                 "Mandatory parameters [path] or [git] and [path] are not present"
             )
 
-        if os.path.exists(repository_info["path"]):
-            self._logger.debug(f"Initializing repo {repository_info['name']}")
-            self.current_repository = Repo.init(repository_info["path"])
+        if os.path.exists(repository_info.get("path")):
+            self._logger.debug(f"Initializing repo {repository_info.get('name')}")
+            self.current_repository = Repo.init(repository_info.get("path"))
         else:
-            self._logger.debug(f"Cloning repo {repository_info['name']}")
+            self._logger.debug(f"Cloning repo {repository_info.get('name')}")
             self.current_repository = Repo.clone_from(
-                repository_info["git"], repository_info["path"]
+                repository_info.get("git"), repository_info.get("path")
             )
 
         self.repository_info = repository_info
         return self.current_repository
 
     def get_updates(self):
-        self._logger.debug(f"Getting updates for repo {self.repository_info['name']}")
+        self._logger.debug(f"Getting updates for repo {self.repository_info.get('name')}")
         origin = self.current_repository.remotes.origin
         origin.pull()
     
     def get_changes_instance(self) -> ChangesProtocol:
-        monitoring_method = self.repository_info["monitoring_method"]\
-            if "monitoring_method" in self.repository_info else DEFAULT_MONITORING_METHOD
+        monitoring_method = self.repository_info.get("monitoring_method", DEFAULT_MONITORING_METHOD)
         
         if monitoring_method == "changelog":
             return ChangelogChanges(
@@ -334,6 +330,6 @@ class GitMonitor:
             )
         else:
             raise RuntimeError(
-                f"The repository {self.repository_info['name']} does not have " +
+                f"The repository {self.repository_info('name')} does not have " +
                 "a valid monitoring set up."
             )

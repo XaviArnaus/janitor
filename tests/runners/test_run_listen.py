@@ -261,7 +261,7 @@ def test_init_message():
             None,
             "endor",
             None,
-            " endor:\n\nI am a text message",
+            " from endor:\n\nI am a text message",
             200
         ),
         (
@@ -270,7 +270,7 @@ def test_init_message():
             MessageType.ALARM,
             "endor",
             None,
-            "4 endor:\n\nI am a text message",
+            "4 from endor:\n\nI am a text message",
             200
         ),
         (

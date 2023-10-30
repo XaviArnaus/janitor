@@ -186,7 +186,7 @@ class ListenMessage(Resource):
         # Build the message
         icon = MessageType.icon_per_type(message_type)
         if not summary:
-            message = Message(text=f"{icon} {hostname}:\n\n{text}")
+            message = Message(text=f"{icon} from {hostname}:\n\n{text}")
         else:
             message = Message(summary=f"{icon} {hostname}:\n\n{summary}", text=f"{text}")
 

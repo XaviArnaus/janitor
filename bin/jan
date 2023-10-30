@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 PYTHON=python3
 POETRY_PATH=$(which poetry)
+HOSTNAME=$(hostname -f)
 
 if [ $1 = "help" ]; then
     # Just redirect the possible command "help" to the already existing -h
     $POETRY_PATH run main -h
 elif [ $1 = "test_message" ]; then
     # Implemented here to demonstrate a curl call from the system to the listener.
-    curl -X POST -d "hostname=MyHostname&message=This+is+a+test+message" http://localhost:5000/message
+    curl -X POST -d "hostname=$(HOSTNAME)&message_type=info&message=This+is+a+test+message" http://localhost:5000/message
 elif [ $1 = "listener" ]; then
     if [ $2 = "start" ]; then
         # We want to spawn a listener without too much noise, and logging directly.

@@ -11,25 +11,6 @@ class SystemInfoTemplater:
     It decides which template to use based on the MessageType
     """
 
-    MESSAGE_TEMPLATE = {
-        MessageType.NONE: {
-            "summary": None, "text": Template("$text")
-        },
-        MessageType.INFO: {
-            "summary": Template("ℹ️ $summary"), "text": Template("$text")
-        },
-        MessageType.WARNING: {
-            "summary": Template("⚠️ $summary"), "text": Template("$text")
-        },
-        MessageType.ERROR: {
-            "summary": Template("🔥 $summary"), "text": Template("$text")
-        },
-        MessageType.ALARM: {
-            "summary": Template("🚨 $summary"), "text": Template("$text")
-        }
-    }
-    REPORT_LINE_TEMPLATE_OK = Template("- **$title**: $value")
-    REPORT_LINE_TEMPLATE_ISSUE = Template("- **$title**: $value ❗️")
     SUFFIXES = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
 
     def __init__(self, config: Config) -> None:
@@ -75,11 +56,75 @@ class SystemInfoTemplater:
             error_level = MessageType.INFO
 
         # Apply the template related to the MessageType
-        template = self.MESSAGE_TEMPLATE[error_level]
+        template = self._get_message_template(error_level)
         return Message(
             summary=template["summary"].substitute(summary=hostname),
-            text=template["text"].substitute(text="\n".join(report_lines)),
+            text=template["text"].substitute(summary=hostname, text="\n".join(report_lines)),
             message_type=error_level
+        )
+
+    def _get_message_template(self, message_type: MessageType) -> dict:
+        templates = {
+            MessageType.NONE: {
+                "summary": Template(
+                    self._config.
+                    get("system_info.formatting.templates.message_type.none.summary")
+                ),
+                "text": Template(
+                    self._config.get("system_info.formatting.templates.message_type.none.text")
+                )
+            },
+            MessageType.INFO: {
+                "summary": Template(
+                    self._config.
+                    get("system_info.formatting.templates.message_type.info.summary")
+                ),
+                "text": Template(
+                    self._config.get("system_info.formatting.templates.message_type.info.text")
+                )
+            },
+            MessageType.WARNING: {
+                "summary": Template(
+                    self._config.
+                    get("system_info.formatting.templates.message_type.warning.summary")
+                ),
+                "text": Template(
+                    self._config.
+                    get("system_info.formatting.templates.message_type.warning.text")
+                )
+            },
+            MessageType.ERROR: {
+                "summary": Template(
+                    self._config.
+                    get("system_info.formatting.templates.message_type.error.summary")
+                ),
+                "text": Template(
+                    self._config.
+                    get("system_info.formatting.templates.message_type.error.text")
+                )
+            },
+            MessageType.ALARM: {
+                "summary": Template(
+                    self._config.
+                    get("system_info.formatting.templates.message_type.alarm.summary")
+                ),
+                "text": Template(
+                    self._config.
+                    get("system_info.formatting.templates.message_type.alarm.text")
+                )
+            }
+        }
+
+        return templates[message_type]
+
+    def _get_line_ok_template(self) -> Template:
+        return Template(
+            self._config.get("system_info.formatting.templates.report_lines.line_ok")
+        )
+
+    def _get_line_fail_template(self) -> Template:
+        return Template(
+            self._config.get("system_info.formatting.templates.report_lines.line_fail")
         )
 
     def _build_report_line(
@@ -90,9 +135,9 @@ class SystemInfoTemplater:
             "system_info.formatting.report_item_names_map." + item_name, item_name
         )
         self._logger.debug(f"Will receive the title [{title}]")
-        template = self.REPORT_LINE_TEMPLATE_OK
+        template = self._get_line_ok_template()
         if field_has_issue:
-            template = self.REPORT_LINE_TEMPLATE_ISSUE
+            template = self._get_line_fail_template()
         return template.substitute(title=title, value=item_value)
 
     def _humansize(self, nbytes):

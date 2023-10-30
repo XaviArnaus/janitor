@@ -8,6 +8,11 @@
 
 - Git Monitor module now also monitors commits from repositories ([#33](https://github.com/XaviArnaus/janitor/pull/33))
 
+### Changed
+
+- Now the System metrics templates live in the config file, not in the class ([#34](https://github.com/XaviArnaus/janitor/pull/34))
+- Now the messages sent as DIRECT and PRIVATE must come with a mention and will appear private only ([#34](https://github.com/XaviArnaus/janitor/pull/34))
+
 ### Fixed
 
 - Identification of changes in the CHANGELOG, regarding `Changed` vs. `Fixed`.

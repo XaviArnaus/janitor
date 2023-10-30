@@ -2,6 +2,16 @@
 
 ℹ️ If you're upgrading between versions, please see the document [Upgrading Guide](UPGRADING.md).
 
+## [Unreleased](https://github.com/XaviArnaus/janitor/)
+
+### Added
+
+- Git Monitor module now also monitors commits from repositories ([#33](https://github.com/XaviArnaus/janitor/pull/33))
+
+### Fixed
+
+- Identification of changes in the CHANGELOG, regarding `Changed` vs. `Fixed`.
+
 ## [v0.5.1](https://github.com/XaviArnaus/janitor/releases/tag/v0.5.1)
 
 ### Added
@@ -10,7 +20,7 @@
 - New CLI arguments to override logging config and print it to stdout ([#29](https://github.com/XaviArnaus/janitor/pull/29))
 - A new CLI and Scheduler command to rotate the log file ([#30](https://github.com/XaviArnaus/janitor/pull/30))
 
-### Changed
+### Fixed
 
 - Fix issue with the main runner in Raspberry ([#25](https://github.com/XaviArnaus/janitor/pull/25))
 - Fix issue with controlling the listener with the main runner ([#26](https://github.com/XaviArnaus/janitor/pull/26) & [#27](https://github.com/XaviArnaus/janitor/pull/27))

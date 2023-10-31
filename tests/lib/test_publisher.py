@@ -31,6 +31,9 @@ CONFIG_MASTODON_CONN_PARAMS = {
             "email": "bot+syscheck@my-fancy.site",
             "password": "SuperSecureP4ss",
         }
+    },
+    "status_params": {
+        "max_length": 500
     }
 }
 
@@ -134,22 +137,15 @@ def queue_item_long(datetime_2) -> QueueItem:
     )
 
 
-def test_publish_one_not_dry_run_pleroma(queue_item_1: QueueItem):
+def test_do_status_publish_pleroma(queue_item_1: QueueItem):
     status_post = StatusPost(status=queue_item_1.message.text)
     mastodon_connection_params = MastodonConnectionParams.from_dict(CONFIG_MASTODON_CONN_PARAMS)
     mastodon_connection_params.instance_type = MastodonConnectionParams.TYPE_PLEROMA
     publisher = get_instance(mastodon_connection_params=mastodon_connection_params)
+    publisher._is_dry_run = False
 
-    mocked_build_status_post = Mock()
-    mocked_build_status_post.return_value = status_post
-    mocked_config_get = Mock()
-    mocked_config_get.return_value = False
-    with patch.object(Formatter, "build_status_post", new=mocked_build_status_post):
-        with patch.object(Config, "get", new=mocked_config_get):
-            result = publisher.publish_one(queue_item_1)
+    result = publisher._do_status_publish(status_post)
 
-    mocked_config_get.assert_called_once_with("app.run_control.dry_run")
-    mocked_build_status_post.assert_called_once_with(queue_item_1.message)
     _mocked_mastodon_instance.status_post.assert_called_once_with(
         status=status_post.status,
         in_reply_to_id=status_post.in_reply_to_id,
@@ -167,20 +163,13 @@ def test_publish_one_not_dry_run_pleroma(queue_item_1: QueueItem):
     assert result == {"id": 123}
 
 
-def test_publish_one_not_dry_run_mastodon(queue_item_1: QueueItem):
+def test_do_status_publish_mastodon(queue_item_1: QueueItem):
     status_post = StatusPost(status=queue_item_1.message.text)
     publisher = get_instance()
+    publisher._is_dry_run = False
 
-    mocked_build_status_post = Mock()
-    mocked_build_status_post.return_value = status_post
-    mocked_config_get = Mock()
-    mocked_config_get.return_value = False
-    with patch.object(Formatter, "build_status_post", new=mocked_build_status_post):
-        with patch.object(Config, "get", new=mocked_config_get):
-            result = publisher.publish_one(queue_item_1)
+    result = publisher._do_status_publish(status_post)
 
-    mocked_config_get.assert_called_once_with("app.run_control.dry_run")
-    mocked_build_status_post.assert_called_once_with(queue_item_1.message)
     _mocked_mastodon_instance.status_post.assert_called_once_with(
         status=status_post.status,
         in_reply_to_id=status_post.in_reply_to_id,
@@ -196,20 +185,14 @@ def test_publish_one_not_dry_run_mastodon(queue_item_1: QueueItem):
     assert result == {"id": 123}
 
 
-def test_publish_one_not_dry_run_mastodon_cut_text(queue_item_long: QueueItem):
+def test_publish_status_post_not_dry_run_cut_text(queue_item_long: QueueItem):
     status_post = StatusPost(status=queue_item_long.message.text)
     publisher = get_instance()
+    publisher._is_dry_run = False
+    publisher._connection_params.status_params.max_length = 500
 
-    mocked_build_status_post = Mock()
-    mocked_build_status_post.return_value = status_post
-    mocked_config_get = Mock()
-    mocked_config_get.return_value = False
-    with patch.object(Formatter, "build_status_post", new=mocked_build_status_post):
-        with patch.object(Config, "get", new=mocked_config_get):
-            result = publisher.publish_one(queue_item_long)
+    result = publisher.publish_status_post(status_post)
 
-    mocked_config_get.assert_called_once_with("app.run_control.dry_run")
-    mocked_build_status_post.assert_called_once_with(queue_item_long.message)
     _mocked_mastodon_instance.status_post.assert_called_once_with(
         status=status_post.status[:497] + "...",
         in_reply_to_id=status_post.in_reply_to_id,
@@ -225,22 +208,51 @@ def test_publish_one_not_dry_run_mastodon_cut_text(queue_item_long: QueueItem):
     assert result == {"id": 123}
 
 
-def test_publish_one_dry_run(queue_item_1: QueueItem):
+def test_publish_status_post_not_dry_run(queue_item_1: QueueItem):
+    status_post = StatusPost(status=queue_item_1.message.text)
+    mastodon_connection_params = MastodonConnectionParams.from_dict(CONFIG_MASTODON_CONN_PARAMS)
+    mastodon_connection_params.instance_type = MastodonConnectionParams.TYPE_PLEROMA
+    publisher = get_instance(mastodon_connection_params=mastodon_connection_params)
+    publisher._is_dry_run = False
+
+    mocked_build_status_post = Mock()
+    mocked_build_status_post.return_value = status_post
+    mocked_do_status_publish = Mock()
+    mocked_do_status_publish.return_value = {"id": 123}
+    with patch.object(Publisher, "_do_status_publish", new=mocked_do_status_publish):
+        result = publisher.publish_status_post(status_post)
+
+    mocked_do_status_publish.assert_called_once_with(status_post=status_post)
+    assert result == {"id": 123}
+
+
+def test_publish_status_post_dry_run(queue_item_1: QueueItem):
+    status_post = StatusPost(status=queue_item_1.message.text)
+    publisher = get_instance()
+    publisher._is_dry_run = True
+
+    result = publisher.publish_status_post(status_post)
+
+    _mocked_mastodon_instance.status_post.assert_not_called()
+    assert result is None
+
+
+def test_publish_one(queue_item_1: QueueItem):
     status_post = StatusPost(status=queue_item_1.message.text)
     publisher = get_instance()
 
     mocked_build_status_post = Mock()
     mocked_build_status_post.return_value = status_post
-    mocked_config_get = Mock()
-    mocked_config_get.return_value = True
+    mocked_publish_status_post = Mock()
+    mocked_publish_status_post.return_value = {"id": 123}
     with patch.object(Formatter, "build_status_post", new=mocked_build_status_post):
-        with patch.object(Config, "get", new=mocked_config_get):
+        with patch.object(Publisher, "publish_status_post", new=mocked_publish_status_post):
             result = publisher.publish_one(queue_item_1)
 
-    mocked_config_get.assert_called_once_with("app.run_control.dry_run")
     mocked_build_status_post.assert_called_once_with(queue_item_1.message)
+    mocked_publish_status_post.assert_called_once_with(status_post=status_post)
     _mocked_mastodon_instance.status_post.assert_not_called()
-    assert result is None
+    assert result == {"id": 123}
 
 
 def test_post_media():

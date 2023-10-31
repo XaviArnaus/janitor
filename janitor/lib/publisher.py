@@ -34,58 +34,16 @@ class Publisher:
         self._mastodon = mastodon
         self._connection_params = connection_params
         self._formatter = Formatter(config, connection_params.status_params)
+        self._is_dry_run = self._config.get("app.run_control.dry_run")
+        self._instance_type = MastodonHelper.valid_or_raise(
+            self._connection_params.instance_type
+        )
 
     def publish_one(self, item: QueueItem) -> dict:
         # Translate the Message to StatusPost
         status_post = self._formatter.build_status_post(item.message)
 
-        # Publish the StatusPost
-        if self._config.get("app.run_control.dry_run"):
-            self._logger.debug("It's a Dry Run, stopping here.")
-        else:
-            # posted_media = []
-            # if "media" in item and item["media"]:
-            #     self._logger.info("Publising first %s media items", len(item["media"]))
-            #     for item in item["media"]:
-            #         posted_result = self._post_media(
-            #             item["url"],
-            #             description=item["alt_text"] if "alt_text" in item else None
-            #         )
-            #         if posted_result:
-            #             posted_media.append(posted_result["id"])
-            #         else:
-            #             self._logger.info("Could not publish %s", item["url"])
-            instance_type = MastodonHelper.valid_or_raise(self._connection_params.instance_type)
-            self._logger.debug(f"Instance type is valid: {instance_type}")
-
-            max_length = self._connection_params.status_params.max_length
-            if len(status_post.status) > max_length:
-                self._logger.info(
-                    f"The status post is longer than the max length of {max_length}. Cutting..."
-                )
-                status_post.status = status_post.status[:max_length - 3] + "..."
-
-            retry = 0
-            published = None
-            while published is None:
-                try:
-                    self._logger.info(
-                        f"Publishing new post (retry: {retry}) for " +
-                        f"instance type {instance_type}"
-                    )
-                    return self._do_status_post(
-                        status_post=status_post, instance_type=instance_type
-                    )
-                except Exception as e:
-                    self._logger.exception(e)
-                    self._logger.debug(f"sleeping {self.SLEEP_TIME} seconds")
-                    time.sleep(self.SLEEP_TIME)
-                    retry += 1
-                    if retry >= self.MAX_RETRIES:
-                        self._logger.error(
-                            f"MAX RETRIES of {self.MAX_RETRIES} is reached. Stop trying."
-                        )
-                        raise ConnectionError(f"Could not publish the post: {e}")
+        return self.publish_status_post(status_post=status_post)
 
     def _post_media(self, media_file: str, description: str) -> dict:
         try:
@@ -119,17 +77,58 @@ class Publisher:
 
         if not self._config.get("app.run_control.dry_run"):
             self._queue.save()
-    
-    def _do_status_post(self, status_post: StatusPost, instance_type: str = None) -> dict:
+
+    def publish_status_post(self, status_post: StatusPost) -> dict:
+        if self._is_dry_run:
+            self._logger.debug("It's a Dry Run, stopping here.")
+            return None
+
+        # posted_media = []
+        # if "media" in item and item["media"]:
+        #     self._logger.info("Publising first %s media items", len(item["media"]))
+        #     for item in item["media"]:
+        #         posted_result = self._post_media(
+        #             item["url"],
+        #             description=item["alt_text"] if "alt_text" in item else None
+        #         )
+        #         if posted_result:
+        #             posted_media.append(posted_result["id"])
+        #         else:
+        #             self._logger.info("Could not publish %s", item["url"])
+
+        # Let's ensure that it fits according to the params
+        status_post.status = self.__slice_status_if_longer_than_defined(
+            status=status_post.status
+        )
+
+        retry = 0
+        published = None
+        while published is None:
+            try:
+                self._logger.info(
+                    f"Publishing new post (retry: {retry}) for " +
+                    f"instance type {self._instance_type}"
+                )
+                return self._do_status_publish(status_post=status_post)
+            except Exception as e:
+                self._logger.exception(e)
+                self._logger.debug(f"sleeping {self.SLEEP_TIME} seconds")
+                time.sleep(self.SLEEP_TIME)
+                retry += 1
+                if retry >= self.MAX_RETRIES:
+                    self._logger.error(
+                        f"MAX RETRIES of {self.MAX_RETRIES} is reached. Stop trying."
+                    )
+                    raise ConnectionError(f"Could not publish the post: {e}")
+
+    def _do_status_publish(self, status_post: StatusPost) -> dict:
         """
         This is the method that executes the post of the status.
 
         No checks, no validations, just the action.
         """
-        if instance_type is None:
-            instance_type = MastodonHelper.TYPE_MASTODON
 
-        if instance_type == MastodonHelper.TYPE_MASTODON:
+        if self._instance_type == MastodonHelper.TYPE_MASTODON:
             published = self._mastodon.status_post(
                 status=status_post.status,
                 in_reply_to_id=status_post.in_reply_to_id,
@@ -143,23 +142,7 @@ class Publisher:
                 poll=status_post.poll,
                 # media_ids=posted_media if posted_media else None # yapf: disable
             )
-        elif instance_type == MastodonHelper.TYPE_PLEROMA:
-            published = self._mastodon.status_post(
-                status=status_post.status,
-                in_reply_to_id=status_post.in_reply_to_id,
-                media_ids=status_post.media_ids,
-                sensitive=status_post.sensitive,
-                visibility=status_post.visibility,
-                spoiler_text=status_post.spoiler_text,
-                language=status_post.language,
-                idempotency_key=status_post.idempotency_key,
-                content_type=status_post.content_type,
-                scheduled_at=status_post.scheduled_at,
-                poll=status_post.poll,
-                quote_id=status_post.quote_id,
-                # media_ids=posted_media if posted_media else None # yapf: disable
-            )
-        elif instance_type == MastodonHelper.TYPE_FIREFISH:
+        elif self._instance_type == MastodonHelper.TYPE_PLEROMA:
             published = self._mastodon.status_post(
                 status=status_post.status,
                 in_reply_to_id=status_post.in_reply_to_id,
@@ -175,4 +158,32 @@ class Publisher:
                 quote_id=status_post.quote_id,
                 # media_ids=posted_media if posted_media else None # yapf: disable
             )
+        elif self._instance_type == MastodonHelper.TYPE_FIREFISH:
+            published = self._mastodon.status_post(
+                status=status_post.status,
+                in_reply_to_id=status_post.in_reply_to_id,
+                media_ids=status_post.media_ids,
+                sensitive=status_post.sensitive,
+                visibility=status_post.visibility,
+                spoiler_text=status_post.spoiler_text,
+                language=status_post.language,
+                idempotency_key=status_post.idempotency_key,
+                content_type=status_post.content_type,
+                scheduled_at=status_post.scheduled_at,
+                poll=status_post.poll,
+                quote_id=status_post.quote_id,
+                # media_ids=posted_media if posted_media else None # yapf: disable
+            )
+        else:
+            raise RuntimeError(f"Unknown instance type {self._instance_type}")
         return published
+
+    def __slice_status_if_longer_than_defined(self, status: str) -> str:
+        max_length = self._connection_params.status_params.max_length
+        if len(status) > max_length:
+            self._logger.info(
+                f"The status post is longer than the max length of {max_length}. Cutting..."
+            )
+            status = status[:max_length - 3] + "..."
+
+        return status

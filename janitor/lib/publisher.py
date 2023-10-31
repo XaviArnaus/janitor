@@ -42,7 +42,7 @@ class Publisher:
         self._only_oldest = config.get("publisher.only_oldest_post_every_iteration", False)
         self._media_storage = self._config.get("publisher.media_storage")
 
-    def publish_one(self, item: QueueItem) -> dict:
+    def publish_queue_item(self, item: QueueItem) -> dict:
         """
         Publishes a received QueueItem
 
@@ -93,7 +93,7 @@ class Publisher:
             # Get the first element from the queue
             queued_post = self._queue.pop()
             # Publish it
-            self.publish_one(queued_post)
+            self.publish_queue_item(queued_post)
             # Do we want to publish only the oldest in every iteration?
             #   This means that the queue gets empty one item every run
             if self._only_oldest:

@@ -186,7 +186,7 @@ def test_post_data_comes_in_post_crossed_thresholds(collected_data):
     mocked_crossed_thresholds.return_value = True
     mocked_templater_process_report = Mock()
     mocked_templater_process_report.return_value = message
-    mocked_publisher_publish_one = Mock()
+    mocked_publisher_publish_queue_item = Mock()
     mocked_queue_item_init = Mock()
     mocked_queue_item_init.__class__ = QueueItem
     mocked_queue_item_init.return_value = None
@@ -197,16 +197,16 @@ def test_post_data_comes_in_post_crossed_thresholds(collected_data):
                               new=mocked_templater_process_report):
                 with patch.object(QueueItem, "__init__", new=mocked_queue_item_init):
                     with patch.object(Publisher,
-                                      "publish_one",
-                                      new=mocked_publisher_publish_one):
+                                      "publish_queue_item",
+                                      new=mocked_publisher_publish_queue_item):
                         code = listener.post()
 
     mocked_parse_args.assert_called_once()
     mocked_crossed_thresholds.assert_called_once_with(collected_data, ["hostname"])
     mocked_templater_process_report.assert_called_once_with(collected_data)
     mocked_queue_item_init.assert_called_once_with(message)
-    # For any reason I can't ensure that publish_one() is called with the mocked queue item!
-    mocked_publisher_publish_one.assert_called_once()
+    # For any reason I can't ensure that publish_queue_item() is called with the mocked queue item!
+    mocked_publisher_publish_queue_item.assert_called_once()
     assert code == 200
 
 
@@ -324,7 +324,7 @@ def test_post_optional_params_not_present(
     mocked_message_init = Mock()
     mocked_message_init.__class__ = Message
     mocked_message_init.return_value = None
-    mocked_publisher_publish_one = Mock()
+    mocked_publisher_publish_queue_item = Mock()
     mocked_queue_item_init = Mock()
     mocked_queue_item_init.__class__ = QueueItem
     mocked_queue_item_init.return_value = None
@@ -336,8 +336,8 @@ def test_post_optional_params_not_present(
             with patch.object(Message, "__init__", new=mocked_message_init):
                 with patch.object(QueueItem, "__init__", new=mocked_queue_item_init):
                     with patch.object(Publisher,
-                                      "publish_one",
-                                      new=mocked_publisher_publish_one):
+                                      "publish_queue_item",
+                                      new=mocked_publisher_publish_queue_item):
                         result = listener.post()
 
     mocked_parse_args.assert_called_once()
@@ -351,15 +351,15 @@ def test_post_optional_params_not_present(
             )
         else:
             mocked_message_init.assert_called_once_with(text=expected_message_text)
-        # For any reason I can't ensure that publish_one() is called with the mocked message!
+        # For any reason I can't ensure that publish_queue_item() is called with the mocked message!
         mocked_queue_item_init.assert_called_once()
-        # For any reason I can't ensure that publish_one() is called with the mocked queue item!
-        mocked_publisher_publish_one.assert_called_once()
+        # For any reason I can't ensure that publish_queue_item() is called with the mocked queue item!
+        mocked_publisher_publish_queue_item.assert_called_once()
     else:
         mocked_message_type_icon.assert_not_called()
         mocked_message_init.assert_not_called()
         mocked_queue_item_init.assert_not_called()
-        mocked_publisher_publish_one.assert_not_called()
+        mocked_publisher_publish_queue_item.assert_not_called()
 
     if isinstance(result, tuple):
         return_message, code = result

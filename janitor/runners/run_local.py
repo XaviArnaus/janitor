@@ -52,7 +52,7 @@ class RunLocal(RunnerProtocol):
         )
         self._logger.info("Publishing the whole queue")
         queue_item = QueueItem(message)
-        publisher.publish_one(queue_item)
+        publisher.publish_queue_item(queue_item)
 
         self._logger.info("End.")
 

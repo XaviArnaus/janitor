@@ -39,7 +39,7 @@ class UpdateDdns(RunnerProtocol):
         )
         queue_item = QueueItem(message=Message(text=text))
         self._logger.info("Publishing Mastodon message")
-        _ = publisher.publish_one(queue_item)
+        _ = publisher.publish_queue_item(queue_item)
 
     def run(self):
         '''

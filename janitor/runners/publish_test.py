@@ -91,7 +91,7 @@ class PublishTest(RunnerProtocol):
 
             # Publish the item
             self._logger.info("Publishing the test queue item")
-            _ = publisher.publish_one(queue_item)
+            _ = publisher.publish_queue_item(queue_item)
 
         except Exception as e:
             self._logger.exception(e)

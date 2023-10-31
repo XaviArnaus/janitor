@@ -238,13 +238,13 @@ def test_publish_status_post_dry_run(queue_item_1: QueueItem):
     assert result is None
 
 
-def test_publish_one(queue_item_1: QueueItem):
+def test_publish_queue_item(queue_item_1: QueueItem):
     publisher = get_instance()
 
     mocked_publish_message = Mock()
     mocked_publish_message.return_value = {"id": 123}
     with patch.object(Publisher, "publish_message", new=mocked_publish_message):
-        result = publisher.publish_one(queue_item_1)
+        result = publisher.publish_queue_item(queue_item_1)
 
     mocked_publish_message.assert_called_once_with(message=queue_item_1.message)
     assert result == {"id": 123}
@@ -348,15 +348,15 @@ def test_publish_all_from_queue_not_is_empty_dry_run(queue_item_1, queue_item_2)
     mocked_queue_is_empty.side_effect = [False, False, False, True]
     mocked_queue_pop = Mock()
     mocked_queue_pop.side_effect = [queue_item_1, queue_item_2]
-    mocked_publish_one = Mock()
+    mocked_publish_queue_item = Mock()
     with patch.object(Queue, "is_empty", new=mocked_queue_is_empty):
         with patch.object(Queue, "pop", new=mocked_queue_pop):
-            with patch.object(publisher, "publish_one", new=mocked_publish_one):
+            with patch.object(publisher, "publish_queue_item", new=mocked_publish_queue_item):
                 result = publisher.publish_all_from_queue()
 
     assert mocked_queue_is_empty.call_count == 4
     assert mocked_queue_pop.call_count == 2
-    mocked_publish_one.assert_has_calls([call(queue_item_1), call(queue_item_2)])
+    mocked_publish_queue_item.assert_has_calls([call(queue_item_1), call(queue_item_2)])
     assert result is None
 
 
@@ -369,15 +369,15 @@ def test_publish_all_from_queue_not_is_empty_dry_run_oldest(queue_item_1, queue_
     mocked_queue_is_empty.side_effect = [False, False, False, True]
     mocked_queue_pop = Mock()
     mocked_queue_pop.side_effect = [queue_item_1, queue_item_2]
-    mocked_publish_one = Mock()
+    mocked_publish_queue_item = Mock()
     with patch.object(Queue, "is_empty", new=mocked_queue_is_empty):
         with patch.object(Queue, "pop", new=mocked_queue_pop):
-            with patch.object(publisher, "publish_one", new=mocked_publish_one):
+            with patch.object(publisher, "publish_queue_item", new=mocked_publish_queue_item):
                 result = publisher.publish_all_from_queue()
 
     assert mocked_queue_is_empty.call_count == 2
     assert mocked_queue_pop.call_count == 1
-    mocked_publish_one.assert_called_once_with(queue_item_1)
+    mocked_publish_queue_item.assert_called_once_with(queue_item_1)
     assert result is None
 
 
@@ -390,17 +390,17 @@ def test_publish_all_from_queue_not_is_empty_no_dry_run(queue_item_1, queue_item
     mocked_queue_is_empty.side_effect = [False, False, False, True]
     mocked_queue_pop = Mock()
     mocked_queue_pop.side_effect = [queue_item_1, queue_item_2]
-    mocked_publish_one = Mock()
+    mocked_publish_queue_item = Mock()
     mocked_queue_save = Mock()
     with patch.object(Queue, "is_empty", new=mocked_queue_is_empty):
         with patch.object(Queue, "pop", new=mocked_queue_pop):
-            with patch.object(publisher, "publish_one", new=mocked_publish_one):
+            with patch.object(publisher, "publish_queue_item", new=mocked_publish_queue_item):
                 with patch.object(Queue, "save", new=mocked_queue_save):
                     result = publisher.publish_all_from_queue()
 
     assert mocked_queue_is_empty.call_count == 4
     assert mocked_queue_pop.call_count == 2
-    mocked_publish_one.assert_has_calls([call(queue_item_1), call(queue_item_2)])
+    mocked_publish_queue_item.assert_has_calls([call(queue_item_1), call(queue_item_2)])
     mocked_queue_save.assert_called_once()
     assert result is None
 
@@ -414,16 +414,16 @@ def test_publish_all_from_queue_not_is_empty_no_dry_run_oldest(queue_item_1, que
     mocked_queue_is_empty.side_effect = [False, False, False, True]
     mocked_queue_pop = Mock()
     mocked_queue_pop.side_effect = [queue_item_1, queue_item_2]
-    mocked_publish_one = Mock()
+    mocked_publish_queue_item = Mock()
     mocked_queue_save = Mock()
     with patch.object(Queue, "is_empty", new=mocked_queue_is_empty):
         with patch.object(Queue, "pop", new=mocked_queue_pop):
-            with patch.object(publisher, "publish_one", new=mocked_publish_one):
+            with patch.object(publisher, "publish_queue_item", new=mocked_publish_queue_item):
                 with patch.object(Queue, "save", new=mocked_queue_save):
                     result = publisher.publish_all_from_queue()
 
     assert mocked_queue_is_empty.call_count == 2
     assert mocked_queue_pop.call_count == 1
-    mocked_publish_one.assert_called_once_with(queue_item_1)
+    mocked_publish_queue_item.assert_called_once_with(queue_item_1)
     mocked_queue_save.assert_called_once()
     assert result is None

@@ -114,7 +114,7 @@ class GitChanges(RunnerProtocol):
             mastodon=mastodon_instance,
             connection_params=conn_params,
             base_path=ROOT_DIR
-        ).publish_one(QueueItem(message))
+        ).publish_queue_item(QueueItem(message))
 
     def _publish_notification(self, message: Message, named_account: str = "default"):
         # This is the notification that we publish to
@@ -133,4 +133,4 @@ class GitChanges(RunnerProtocol):
             mastodon=mastodon_instance,
             connection_params=conn_params,
             base_path=ROOT_DIR
-        ).publish_one(QueueItem(message))
+        ).publish_queue_item(QueueItem(message))

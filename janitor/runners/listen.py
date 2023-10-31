@@ -106,7 +106,7 @@ class ListenSysInfo(Resource):
             base_path=ROOT_DIR
         )
         self._logger.info("Publishing one message")
-        publisher.publish_one(QueueItem(message))
+        publisher.publish_queue_item(QueueItem(message))
 
         self._logger.info("End.")
         return 200
@@ -204,7 +204,7 @@ class ListenMessage(Resource):
             base_path=ROOT_DIR
         )
         self._logger.info("Publishing one message")
-        publisher.publish_one(QueueItem(message))
+        publisher.publish_queue_item(QueueItem(message))
 
         self._logger.info("End.")
         return 200

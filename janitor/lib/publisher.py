@@ -41,10 +41,25 @@ class Publisher:
         )
 
     def publish_one(self, item: QueueItem) -> dict:
+        """
+        Publishes a received QueueItem
+
+        This is a simple proxy method to publish_message
+        """
         return self.publish_message(message=item.message)
 
     def publish_message(self, message: Message, requeue_if_fails: bool = False) -> dict:
-        # Translate the Message to StatusPost
+        """
+        Publishes a given Message object
+
+        - Translates to a StatusPost object using the Formatter class.
+        - It captures PublisherException errors thrown from publish_status_post
+            when max retries is reached. with `requeue_if_fails` the failed message
+            moves to the beginning of the queue, but the queue is not cared: you need
+            to process it from another endpoint.
+        - It delegates to publish_status_post for proper publishing
+        """
+        
         status_post = self._formatter.build_status_post(message=message)
 
         try:
@@ -75,21 +90,19 @@ class Publisher:
             return
 
         while not self._queue.is_empty():
+            # Get the first element from the queue
             queued_post = self._queue.pop()
+            # Publish it
             self.publish_one(queued_post)
+            # Do we want to publish only the oldest in every iteration?
+            #   This means that the queue gets empty one item every run
+            if self._config.get("publisher.only_oldest_post_every_iteration", False):
+                self._logger.info("We're meant to publish only the oldest. Finishing.")
+                break
 
         if not self._config.get("app.run_control.dry_run"):
             self._queue.save()
 
-    def publish_older_from_queue(self) -> None:
-        if self._queue.is_empty():
-            self._logger.info("The queue is empty, skipping.")
-            return
-
-        self.publish_one(self._queue.pop())
-
-        if not self._config.get("app.run_control.dry_run"):
-            self._queue.save()
 
     def publish_status_post(self, status_post: StatusPost) -> dict:
         if self._is_dry_run:

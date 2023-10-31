@@ -48,5 +48,8 @@ queue_storage:
   file: "storage/queue.yaml"
 
 publisher:
-# [String] Where to download the media to
+  # [String] Where to download the media to
   media_storage: "storage/media/"
+  # [Bool] Publish only the older post
+  # Useful if we have this bot executed often, so publishes a single post in every run
+  only_oldest_post_every_iteration: True

@@ -158,10 +158,13 @@ def test_run_crossed_thresholds(collected_data):
                           "process_report",
                           new=mocked_templater_process_report):
             with patch.object(QueueItem, "__init__", new=mocked_queue_item_init):
-                with patch.object(Publisher, "publish_queue_item", new=mocked_publisher_publish_queue_item):
+                with patch.object(Publisher,
+                                  "publish_queue_item",
+                                  new=mocked_publisher_publish_queue_item):
                     runner.run()
 
     mocked_templater_process_report.assert_called_once_with(collected_data)
     mocked_queue_item_init.assert_called_once_with(message)
-    # For any reason I can't ensure that publish_queue_item() is called with the mocked queue item!
+    # For any reason I can't ensure that publish_queue_item()
+    #   is called with the mocked queue item!
     mocked_publisher_publish_queue_item.assert_called_once()

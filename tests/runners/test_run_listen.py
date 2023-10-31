@@ -205,7 +205,8 @@ def test_post_data_comes_in_post_crossed_thresholds(collected_data):
     mocked_crossed_thresholds.assert_called_once_with(collected_data, ["hostname"])
     mocked_templater_process_report.assert_called_once_with(collected_data)
     mocked_queue_item_init.assert_called_once_with(message)
-    # For any reason I can't ensure that publish_queue_item() is called with the mocked queue item!
+    # For any reason I can't ensure that publish_queue_item()
+    #   is called with the mocked queue item!
     mocked_publisher_publish_queue_item.assert_called_once()
     assert code == 200
 
@@ -351,9 +352,11 @@ def test_post_optional_params_not_present(
             )
         else:
             mocked_message_init.assert_called_once_with(text=expected_message_text)
-        # For any reason I can't ensure that publish_queue_item() is called with the mocked message!
+        # For any reason I can't ensure that publish_queue_item()
+        #   is called with the mocked message!
         mocked_queue_item_init.assert_called_once()
-        # For any reason I can't ensure that publish_queue_item() is called with the mocked queue item!
+        # For any reason I can't ensure that publish_queue_item()
+        #   is called with the mocked queue item!
         mocked_publisher_publish_queue_item.assert_called_once()
     else:
         mocked_message_type_icon.assert_not_called()

@@ -3,7 +3,6 @@ from pyxavi.logger import Logger
 from janitor.lib.system_info import SystemInfo
 from janitor.lib.system_info_templater import SystemInfoTemplater
 from janitor.lib.publisher import Publisher
-from janitor.lib.mastodon_helper import MastodonHelper
 from janitor.objects.message import Message, MessageType
 from janitor.objects.queue_item import QueueItem
 from janitor.runners.listen import ListenMessage, ListenSysInfo
@@ -97,11 +96,7 @@ def patched_config_get(self, param):
         return CONFIG_MASTODON_CONN_PARAMS
 
 
-def patched_mastodon_get_instance(config, connection_params, base_path):
-    pass
-
-
-def patched_publisher_init(self, config, mastodon, connection_params, base_path):
+def patched_publisher_init(self, config, connection_params, base_path):
     pass
 
 
@@ -172,7 +167,6 @@ def test_post_data_comes_in_post_no_crossed_thresholds(collected_data):
 
 @patch.object(reqparse.RequestParser, "add_argument", new=patched_parser_add_argument)
 @patch.object(SystemInfoTemplater, "__init__", new=patched_generic_init_with_config)
-@patch.object(MastodonHelper, "get_instance", new=patched_mastodon_get_instance)
 @patch.object(Config, "get", new=patched_config_get)
 @patch.object(Publisher, "__init__", new=patched_publisher_init)
 def test_post_data_comes_in_post_crossed_thresholds(collected_data):
@@ -296,7 +290,6 @@ def test_init_message():
     ],
 )
 @patch.object(reqparse.RequestParser, "add_argument", new=patched_parser_add_argument)
-@patch.object(MastodonHelper, "get_instance", new=patched_mastodon_get_instance)
 @patch.object(Publisher, "__init__", new=patched_publisher_init)
 @patch.object(Config, "get", new=patched_config_get)
 def test_post_optional_params_not_present(

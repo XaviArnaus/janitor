@@ -10,6 +10,7 @@ from .mastodon_helper import MastodonHelper
 from janitor.objects.mastodon_connection_params import MastodonConnectionParams
 import logging
 import time
+import os
 
 
 class Publisher:
@@ -25,22 +26,23 @@ class Publisher:
     def __init__(
         self,
         config: Config,
-        mastodon: Mastodon,
         connection_params: MastodonConnectionParams,
         base_path: str = None
     ) -> None:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
         self._queue = Queue(config, base_path=base_path)
-        self._mastodon = mastodon
         self._connection_params = connection_params
         self._formatter = Formatter(config, connection_params.status_params)
-        self._is_dry_run = config.get("app.run_control.dry_run", False)
         self._instance_type = MastodonHelper.valid_or_raise(
             self._connection_params.instance_type
         )
+        self._base_path = base_path
+        self._is_dry_run = config.get("app.run_control.dry_run", False)
         self._only_oldest = config.get("publisher.only_oldest_post_every_iteration", False)
         self._media_storage = self._config.get("publisher.media_storage")
+
+        self._mastodon = self._get_mastodon_instance()
 
     def publish_queue_item(self, item: QueueItem) -> dict:
         """
@@ -212,6 +214,25 @@ class Publisher:
             status = status[:max_length - 3] + "..."
 
         return status
+
+    def _get_mastodon_instance(self) -> Mastodon:
+        # If the client_file does not exist we need to trigger the
+        #   create app action.
+        client_file = os.path.join(
+            self._base_path, self._connection_params.credentials.client_file
+        )
+        if not os.path.exists(client_file):
+            MastodonHelper.create_app(
+                instance_type=self._connection_params.instance_type,
+                client_name=self._connection_params.app_name,
+                api_base_url=self._connection_params.api_base_url,
+                to_file=client_file
+            )
+
+        # Instantiate and return
+        return MastodonHelper.get_instance(
+            config=self._config, connection_params=self._connection_params
+        )
 
 
 class PublisherException(BaseException):

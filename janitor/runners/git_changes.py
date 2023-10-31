@@ -1,5 +1,4 @@
 from pyxavi.config import Config
-from janitor.lib.mastodon_helper import MastodonHelper
 from janitor.objects.mastodon_connection_params import MastodonConnectionParams
 from janitor.lib.publisher import Publisher
 from janitor.objects.message import Message
@@ -7,7 +6,6 @@ from janitor.objects.queue_item import QueueItem
 from janitor.lib.git_monitor import GitMonitor
 from janitor.runners.runner_protocol import RunnerProtocol
 from definitions import ROOT_DIR
-import os
 import logging
 
 
@@ -94,26 +92,9 @@ class GitChanges(RunnerProtocol):
         conn_params = MastodonConnectionParams.from_dict(
             self._config.get(f"mastodon.named_accounts.{named_account}")
         )
-        client_file = os.path.join(ROOT_DIR, conn_params.credentials.client_file)
-        # If the client_file does not exist we need to trigger the
-        #   create app action.
-        if not os.path.exists(client_file):
-            MastodonHelper.create_app(
-                instance_type=conn_params.instance_type,
-                client_name=conn_params.app_name,
-                api_base_url=conn_params.api_base_url,
-                to_file=client_file
-            )
-        # Now get the instance
-        mastodon_instance = MastodonHelper.get_instance(
-            config=self._config, connection_params=conn_params
-        )
         # Now publish the message
         _ = Publisher(
-            config=self._config,
-            mastodon=mastodon_instance,
-            connection_params=conn_params,
-            base_path=ROOT_DIR
+            config=self._config, connection_params=conn_params, base_path=ROOT_DIR
         ).publish_queue_item(QueueItem(message))
 
     def _publish_notification(self, message: Message, named_account: str = "default"):
@@ -122,15 +103,7 @@ class GitChanges(RunnerProtocol):
         conn_params = MastodonConnectionParams.from_dict(
             self._config.get(f"mastodon.named_accounts.{named_account}")
         )
-
-        # Get the instance. Everything is by default
-        mastodon_instance = MastodonHelper.get_instance(
-            config=self._config, connection_params=conn_params
-        )
         # Now publish the message
         _ = Publisher(
-            config=self._config,
-            mastodon=mastodon_instance,
-            connection_params=conn_params,
-            base_path=ROOT_DIR
+            config=self._config, connection_params=conn_params, base_path=ROOT_DIR
         ).publish_queue_item(QueueItem(message))

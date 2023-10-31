@@ -2,7 +2,6 @@ from pyxavi.config import Config
 from janitor.lib.system_info import SystemInfo
 from janitor.lib.system_info_templater import SystemInfoTemplater
 from janitor.lib.publisher import Publisher
-from janitor.lib.mastodon_helper import MastodonHelper
 from janitor.objects.mastodon_connection_params import MastodonConnectionParams
 from janitor.objects.queue_item import QueueItem
 from janitor.objects.message import Message, MessageType
@@ -96,14 +95,8 @@ class ListenSysInfo(Resource):
         conn_params = MastodonConnectionParams.from_dict(
             self._config.get(f"mastodon.named_accounts.{MASTODON_NAMED_ACCOUNT}")
         )
-        mastodon = MastodonHelper.get_instance(
-            config=self._config, connection_params=conn_params, base_path=ROOT_DIR
-        )
         publisher = Publisher(
-            config=self._config,
-            mastodon=mastodon,
-            connection_params=conn_params,
-            base_path=ROOT_DIR
+            config=self._config, connection_params=conn_params, base_path=ROOT_DIR
         )
         self._logger.info("Publishing one message")
         publisher.publish_queue_item(QueueItem(message))
@@ -194,14 +187,8 @@ class ListenMessage(Resource):
         conn_params = MastodonConnectionParams.from_dict(
             self._config.get(f"mastodon.named_accounts.{MASTODON_NAMED_ACCOUNT}")
         )
-        mastodon = MastodonHelper.get_instance(
-            config=self._config, connection_params=conn_params, base_path=ROOT_DIR
-        )
         publisher = Publisher(
-            config=self._config,
-            mastodon=mastodon,
-            connection_params=conn_params,
-            base_path=ROOT_DIR
+            config=self._config, connection_params=conn_params, base_path=ROOT_DIR
         )
         self._logger.info("Publishing one message")
         publisher.publish_queue_item(QueueItem(message))

@@ -3,7 +3,6 @@ from pyxavi.logger import Logger
 from janitor.lib.system_info import SystemInfo
 from janitor.lib.system_info_templater import SystemInfoTemplater
 from janitor.lib.publisher import Publisher
-from janitor.lib.mastodon_helper import MastodonHelper
 from janitor.objects.message import Message
 from janitor.objects.queue_item import QueueItem
 from janitor.runners.run_local import RunLocal
@@ -88,11 +87,7 @@ def patched_generic_init_with_config(self, config):
     pass
 
 
-def patched_mastodon_get_instance(config, connection_params, base_path):
-    pass
-
-
-def patched_publisher_init(self, config, mastodon, connection_params, base_path):
+def patched_publisher_init(self, config, connection_params, base_path):
     pass
 
 
@@ -137,7 +132,6 @@ def test_run_no_crossed_thresholds():
 @patch.object(SystemInfo, "get_mem_data", new=patched_get_mem_data)
 @patch.object(SystemInfo, "get_disk_data", new=patched_get_disk_data)
 @patch.object(SystemInfoTemplater, "__init__", new=patched_generic_init_with_config)
-@patch.object(MastodonHelper, "get_instance", new=patched_mastodon_get_instance)
 @patch.object(Publisher, "__init__", new=patched_publisher_init)
 @patch.object(Config, "get", new=patched_config_get)
 def test_run_crossed_thresholds(collected_data):

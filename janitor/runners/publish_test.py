@@ -1,5 +1,4 @@
 from pyxavi.config import Config
-from janitor.lib.mastodon_helper import MastodonHelper
 from janitor.objects.mastodon_connection_params import MastodonConnectionParams
 from janitor.lib.publisher import Publisher
 from janitor.objects.message import Message
@@ -7,7 +6,6 @@ from janitor.objects.queue_item import QueueItem
 from janitor.runners.runner_protocol import RunnerProtocol
 from definitions import ROOT_DIR
 import logging
-import os
 
 DEFAULT_NAMED_ACCOUNT = ["test", "default"]
 
@@ -55,30 +53,10 @@ class PublishTest(RunnerProtocol):
         try:
             # All actions are done under a Mastodon API instance
             conn_params = MastodonConnectionParams.from_dict(self._params["named_account"])
-            # If the client_file does not exist we need to trigger the
-            #   create app action.
-            client_file = os.path.join(ROOT_DIR, conn_params.credentials.client_file)
-            if not os.path.exists(client_file):
-                self._logger.info(f"The client file did not exist: {client_file}")
-                MastodonHelper.create_app(
-                    instance_type=conn_params.instance_type,
-                    client_name=conn_params.app_name,
-                    api_base_url=conn_params.api_base_url,
-                    to_file=client_file
-                )
-            self._logger.info(f"Defined instance type: {conn_params.instance_type}")
-            mastodon = MastodonHelper.get_instance(
-                config=self._config, connection_params=conn_params, base_path=ROOT_DIR
-            )
-            wrapper = type(mastodon)
-            self._logger.info(f"Loaded wrapper: {wrapper}")
 
             # Prepare the Publisher
             publisher = Publisher(
-                config=self._config,
-                mastodon=mastodon,
-                connection_params=conn_params,
-                base_path=ROOT_DIR
+                config=self._config, connection_params=conn_params, base_path=ROOT_DIR
             )
 
             # Prepare a test message

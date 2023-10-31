@@ -1,5 +1,4 @@
 from pyxavi.config import Config
-from janitor.lib.mastodon_helper import MastodonHelper
 from janitor.objects.mastodon_connection_params import MastodonConnectionParams
 from janitor.lib.publisher import Publisher
 from janitor.runners.runner_protocol import RunnerProtocol
@@ -27,17 +26,11 @@ class PublishQueue(RunnerProtocol):
             conn_params = MastodonConnectionParams.from_dict(
                 self._config.get("mastodon.named_accounts.default")
             )
-            mastodon = MastodonHelper.get_instance(
-                config=self._config, connection_params=conn_params, base_path=ROOT_DIR
-            )
 
             # Read from the queue the toots to publish
             # and publishes all of them
             publisher = Publisher(
-                config=self._config,
-                mastodon=mastodon,
-                connection_params=conn_params,
-                base_path=ROOT_DIR
+                config=self._config, connection_params=conn_params, base_path=ROOT_DIR
             )
             self._logger.info("Publishing the whole queue")
             publisher.publish_all_from_queue()

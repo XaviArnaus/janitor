@@ -1,6 +1,7 @@
 from pyxavi.config import Config
 from pyxavi.media import Media
 from janitor.objects.queue_item import QueueItem
+from janitor.objects.status_post import StatusPost
 from .queue import Queue
 from .formatter import Formatter
 from mastodon import Mastodon
@@ -72,53 +73,9 @@ class Publisher:
                         f"Publishing new post (retry: {retry}) for " +
                         f"instance type {instance_type}"
                     )
-                    if instance_type == MastodonHelper.TYPE_MASTODON:
-                        published = self._mastodon.status_post(
-                            status=status_post.status,
-                            in_reply_to_id=status_post.in_reply_to_id,
-                            media_ids=status_post.media_ids,
-                            sensitive=status_post.sensitive,
-                            visibility=status_post.visibility,
-                            spoiler_text=status_post.spoiler_text,
-                            language=status_post.language,
-                            idempotency_key=status_post.idempotency_key,
-                            scheduled_at=status_post.scheduled_at,
-                            poll=status_post.poll,
-                            # media_ids=posted_media if posted_media else None # yapf: disable
-                        )
-                    elif instance_type == MastodonHelper.TYPE_PLEROMA:
-                        published = self._mastodon.status_post(
-                            status=status_post.status,
-                            in_reply_to_id=status_post.in_reply_to_id,
-                            media_ids=status_post.media_ids,
-                            sensitive=status_post.sensitive,
-                            visibility=status_post.visibility,
-                            spoiler_text=status_post.spoiler_text,
-                            language=status_post.language,
-                            idempotency_key=status_post.idempotency_key,
-                            content_type=status_post.content_type,
-                            scheduled_at=status_post.scheduled_at,
-                            poll=status_post.poll,
-                            quote_id=status_post.quote_id,
-                            # media_ids=posted_media if posted_media else None # yapf: disable
-                        )
-                    elif instance_type == MastodonHelper.TYPE_FIREFISH:
-                        published = self._mastodon.status_post(
-                            status=status_post.status,
-                            in_reply_to_id=status_post.in_reply_to_id,
-                            media_ids=status_post.media_ids,
-                            sensitive=status_post.sensitive,
-                            visibility=status_post.visibility,
-                            spoiler_text=status_post.spoiler_text,
-                            language=status_post.language,
-                            idempotency_key=status_post.idempotency_key,
-                            content_type=status_post.content_type,
-                            scheduled_at=status_post.scheduled_at,
-                            poll=status_post.poll,
-                            quote_id=status_post.quote_id,
-                            # media_ids=posted_media if posted_media else None # yapf: disable
-                        )
-                    return published
+                    return self._do_status_post(
+                        status_post=status_post, instance_type=instance_type
+                    )
                 except Exception as e:
                     self._logger.exception(e)
                     self._logger.debug(f"sleeping {self.SLEEP_TIME} seconds")
@@ -162,3 +119,60 @@ class Publisher:
 
         if not self._config.get("app.run_control.dry_run"):
             self._queue.save()
+    
+    def _do_status_post(self, status_post: StatusPost, instance_type: str = None) -> dict:
+        """
+        This is the method that executes the post of the status.
+
+        No checks, no validations, just the action.
+        """
+        if instance_type is None:
+            instance_type = MastodonHelper.TYPE_MASTODON
+
+        if instance_type == MastodonHelper.TYPE_MASTODON:
+            published = self._mastodon.status_post(
+                status=status_post.status,
+                in_reply_to_id=status_post.in_reply_to_id,
+                media_ids=status_post.media_ids,
+                sensitive=status_post.sensitive,
+                visibility=status_post.visibility,
+                spoiler_text=status_post.spoiler_text,
+                language=status_post.language,
+                idempotency_key=status_post.idempotency_key,
+                scheduled_at=status_post.scheduled_at,
+                poll=status_post.poll,
+                # media_ids=posted_media if posted_media else None # yapf: disable
+            )
+        elif instance_type == MastodonHelper.TYPE_PLEROMA:
+            published = self._mastodon.status_post(
+                status=status_post.status,
+                in_reply_to_id=status_post.in_reply_to_id,
+                media_ids=status_post.media_ids,
+                sensitive=status_post.sensitive,
+                visibility=status_post.visibility,
+                spoiler_text=status_post.spoiler_text,
+                language=status_post.language,
+                idempotency_key=status_post.idempotency_key,
+                content_type=status_post.content_type,
+                scheduled_at=status_post.scheduled_at,
+                poll=status_post.poll,
+                quote_id=status_post.quote_id,
+                # media_ids=posted_media if posted_media else None # yapf: disable
+            )
+        elif instance_type == MastodonHelper.TYPE_FIREFISH:
+            published = self._mastodon.status_post(
+                status=status_post.status,
+                in_reply_to_id=status_post.in_reply_to_id,
+                media_ids=status_post.media_ids,
+                sensitive=status_post.sensitive,
+                visibility=status_post.visibility,
+                spoiler_text=status_post.spoiler_text,
+                language=status_post.language,
+                idempotency_key=status_post.idempotency_key,
+                content_type=status_post.content_type,
+                scheduled_at=status_post.scheduled_at,
+                poll=status_post.poll,
+                quote_id=status_post.quote_id,
+                # media_ids=posted_media if posted_media else None # yapf: disable
+            )
+        return published

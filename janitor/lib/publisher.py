@@ -43,11 +43,20 @@ class Publisher:
     def publish_one(self, item: QueueItem) -> dict:
         return self.publish_message(message=item.message)
 
-    def publish_message(self, message: Message) -> dict:
+    def publish_message(self, message: Message, requeue_if_fails: bool = False) -> dict:
         # Translate the Message to StatusPost
         status_post = self._formatter.build_status_post(message=message)
 
-        return self.publish_status_post(status_post=status_post)
+        try:
+            return self.publish_status_post(status_post=status_post)
+        except PublisherException as e:
+            self._logger.error(e)
+
+            if requeue_if_fails:
+                queue_item = QueueItem(message=message)
+                self._queue.unpop(queue_item)
+                if self._is_dry_run:
+                    self._queue.save()
 
     def _post_media(self, media_file: str, description: str) -> dict:
         try:
@@ -123,7 +132,7 @@ class Publisher:
                     self._logger.error(
                         f"MAX RETRIES of {self.MAX_RETRIES} is reached. Stop trying."
                     )
-                    raise ConnectionError(f"Could not publish the post: {e}")
+                    raise PublisherException(f"Could not publish the post: {e}")
 
     def _do_status_publish(self, status_post: StatusPost) -> dict:
         """
@@ -191,3 +200,7 @@ class Publisher:
             status = status[:max_length - 3] + "..."
 
         return status
+
+
+class PublisherException(BaseException):
+    pass

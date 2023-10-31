@@ -1,6 +1,6 @@
 from pyxavi.config import Config
 from pyxavi.media import Media
-from janitor.lib.publisher import Publisher
+from janitor.lib.publisher import Publisher, PublisherException
 from janitor.lib.formatter import Formatter
 from janitor.lib.queue import Queue
 from janitor.objects.message import Message
@@ -249,7 +249,7 @@ def test_publish_one(queue_item_1: QueueItem):
     assert result == {"id": 123}
 
 
-def test_publish_message(queue_item_1: QueueItem):
+def test_publish_message_no_requeue(queue_item_1: QueueItem):
     status_post = StatusPost(status=queue_item_1.message.text)
     publisher = get_instance()
 
@@ -264,6 +264,44 @@ def test_publish_message(queue_item_1: QueueItem):
     mocked_build_status_post.assert_called_once_with(message=queue_item_1.message)
     mocked_publish_status_post.assert_called_once_with(status_post=status_post)
     assert result == {"id": 123}
+
+
+def test_publish_message_no_requeue_exception(queue_item_1: QueueItem):
+    status_post = StatusPost(status=queue_item_1.message.text)
+    publisher = get_instance()
+
+    mocked_build_status_post = Mock()
+    mocked_build_status_post.return_value = status_post
+    mocked_publish_status_post = Mock()
+    mocked_publish_status_post.side_effect = PublisherException("test")
+    mocked_queue_unpop = Mock()
+    with patch.object(Formatter, "build_status_post", new=mocked_build_status_post):
+        with patch.object(publisher, "publish_status_post", new=mocked_publish_status_post):
+            _ = publisher.publish_message(message=queue_item_1.message)
+
+    mocked_build_status_post.assert_called_once_with(message=queue_item_1.message)
+    mocked_queue_unpop.assert_not_called()
+
+
+def test_publish_message_requeue_exception(queue_item_1: QueueItem):
+    status_post = StatusPost(status=queue_item_1.message.text)
+    publisher = get_instance()
+    publisher._is_dry_run = False
+
+    mocked_build_status_post = Mock()
+    mocked_build_status_post.return_value = status_post
+    mocked_queue_unpop = Mock()
+    mocked_publish_status_post = Mock()
+    mocked_publish_status_post.side_effect = PublisherException("test")
+    with patch.object(Formatter, "build_status_post", new=mocked_build_status_post):
+        with patch.object(Queue, "unpop", new=mocked_queue_unpop):
+            with patch.object(publisher, "publish_status_post", new=mocked_publish_status_post):
+                _ = publisher.publish_message(
+                    message=queue_item_1.message, requeue_if_fails=True
+                )
+
+    mocked_build_status_post.assert_called_once_with(message=queue_item_1.message)
+    mocked_queue_unpop.assert_called_once()
 
 
 def test_post_media():

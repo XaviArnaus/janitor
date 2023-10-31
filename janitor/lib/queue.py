@@ -54,9 +54,12 @@ class Queue:
 
     def pop(self) -> dict:
         if not self.is_empty():
-            if not self._config.get("app.run_control.dry_run"):
-                return self._queue.pop(0)
-            else:
-                return self._queue[0]
+            return self._queue.pop(0)
         else:
             return None
+
+    def unpop(self, item: QueueItem) -> None:
+        if self.is_empty():
+            self._queue = []
+
+        self._queue = [item] + self._queue

@@ -2,6 +2,7 @@ from pyxavi.config import Config
 from pyxavi.media import Media
 from janitor.objects.queue_item import QueueItem
 from janitor.objects.status_post import StatusPost
+from janitor.objects.message import Message
 from .queue import Queue
 from .formatter import Formatter
 from mastodon import Mastodon
@@ -40,8 +41,11 @@ class Publisher:
         )
 
     def publish_one(self, item: QueueItem) -> dict:
+        return self.publish_message(message=item.message)
+
+    def publish_message(self, message: Message) -> dict:
         # Translate the Message to StatusPost
-        status_post = self._formatter.build_status_post(item.message)
+        status_post = self._formatter.build_status_post(message=message)
 
         return self.publish_status_post(status_post=status_post)
 

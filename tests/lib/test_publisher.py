@@ -238,6 +238,18 @@ def test_publish_status_post_dry_run(queue_item_1: QueueItem):
 
 
 def test_publish_one(queue_item_1: QueueItem):
+    publisher = get_instance()
+
+    mocked_publish_message = Mock()
+    mocked_publish_message.return_value = {"id": 123}
+    with patch.object(Publisher, "publish_message", new=mocked_publish_message):
+        result = publisher.publish_one(queue_item_1)
+
+    mocked_publish_message.assert_called_once_with(message=queue_item_1.message)
+    assert result == {"id": 123}
+
+
+def test_publish_message(queue_item_1: QueueItem):
     status_post = StatusPost(status=queue_item_1.message.text)
     publisher = get_instance()
 
@@ -247,11 +259,10 @@ def test_publish_one(queue_item_1: QueueItem):
     mocked_publish_status_post.return_value = {"id": 123}
     with patch.object(Formatter, "build_status_post", new=mocked_build_status_post):
         with patch.object(Publisher, "publish_status_post", new=mocked_publish_status_post):
-            result = publisher.publish_one(queue_item_1)
+            result = publisher.publish_message(message=queue_item_1.message)
 
-    mocked_build_status_post.assert_called_once_with(queue_item_1.message)
+    mocked_build_status_post.assert_called_once_with(message=queue_item_1.message)
     mocked_publish_status_post.assert_called_once_with(status_post=status_post)
-    _mocked_mastodon_instance.status_post.assert_not_called()
     assert result == {"id": 123}
 
 

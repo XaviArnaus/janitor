@@ -4,6 +4,10 @@
 
 ## [Unreleased](https://github.com/XaviArnaus/janitor/)
 
+### Added
+
+- The Publisher retries 3 times with a sleep of 10 seconds if there was any problem when publishing
+
 ### Changed
 
 - Now the System metrics templates live in the config file, not in the class ([#34](https://github.com/XaviArnaus/janitor/pull/34))

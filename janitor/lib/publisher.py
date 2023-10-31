@@ -61,7 +61,7 @@ class Publisher:
             to process it from another endpoint.
         - It delegates to publish_status_post for proper publishing
         """
-        
+
         status_post = self._formatter.build_status_post(message=message)
 
         try:
@@ -102,7 +102,6 @@ class Publisher:
 
         if not self._is_dry_run:
             self._queue.save()
-
 
     def publish_status_post(self, status_post: StatusPost) -> dict:
         if self._is_dry_run:

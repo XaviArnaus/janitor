@@ -7,6 +7,7 @@ from mastodon import Mastodon
 from .mastodon_helper import MastodonHelper
 from janitor.objects.mastodon_connection_params import MastodonConnectionParams
 import logging
+import time
 
 
 class Publisher:
@@ -15,6 +16,9 @@ class Publisher:
 
     It is responsible to publish the queued status posts.
     '''
+
+    MAX_RETRIES = 3
+    SLEEP_TIME = 10
 
     def __init__(
         self,
@@ -60,55 +64,71 @@ class Publisher:
                 )
                 status_post.status = status_post.status[:max_length - 3] + "..."
 
-            if instance_type == MastodonHelper.TYPE_MASTODON:
-                self._logger.info("Publishing new post for Mastodon instance type")
-                return self._mastodon.status_post(
-                    status=status_post.status,
-                    in_reply_to_id=status_post.in_reply_to_id,
-                    media_ids=status_post.media_ids,
-                    sensitive=status_post.sensitive,
-                    visibility=status_post.visibility,
-                    spoiler_text=status_post.spoiler_text,
-                    language=status_post.language,
-                    idempotency_key=status_post.idempotency_key,
-                    scheduled_at=status_post.scheduled_at,
-                    poll=status_post.poll,
-                    # media_ids=posted_media if posted_media else None # yapf: disable
-                )
-            elif instance_type == MastodonHelper.TYPE_PLEROMA:
-                self._logger.info("Publishing new post for Pleroma instance type")
-                return self._mastodon.status_post(
-                    status=status_post.status,
-                    in_reply_to_id=status_post.in_reply_to_id,
-                    media_ids=status_post.media_ids,
-                    sensitive=status_post.sensitive,
-                    visibility=status_post.visibility,
-                    spoiler_text=status_post.spoiler_text,
-                    language=status_post.language,
-                    idempotency_key=status_post.idempotency_key,
-                    content_type=status_post.content_type,
-                    scheduled_at=status_post.scheduled_at,
-                    poll=status_post.poll,
-                    quote_id=status_post.quote_id,
-                    # media_ids=posted_media if posted_media else None # yapf: disable
-                )
-            elif instance_type == MastodonHelper.TYPE_FIREFISH:
-                self._logger.info("Publishing new post for Firefish instance type")
-                return self._mastodon.status_post(
-                    status=status_post.status,
-                    in_reply_to_id=status_post.in_reply_to_id,
-                    media_ids=status_post.media_ids,
-                    sensitive=status_post.sensitive,
-                    visibility=status_post.visibility,
-                    spoiler_text=status_post.spoiler_text,
-                    language=status_post.language,
-                    idempotency_key=status_post.idempotency_key,
-                    content_type=status_post.content_type,
-                    scheduled_at=status_post.scheduled_at,
-                    poll=status_post.poll,
-                    quote_id=status_post.quote_id,
-                    # media_ids=posted_media if posted_media else None # yapf: disable
-                )
+            retry = 0
+            published = None
+            while published is None:
+                try:
+                    self._logger.info(
+                        f"Publishing new post (retry: {retry}) for " +
+                        f"instance type {instance_type}"
+                    )
+                    if instance_type == MastodonHelper.TYPE_MASTODON:
+                        published = self._mastodon.status_post(
+                            status=status_post.status,
+                            in_reply_to_id=status_post.in_reply_to_id,
+                            media_ids=status_post.media_ids,
+                            sensitive=status_post.sensitive,
+                            visibility=status_post.visibility,
+                            spoiler_text=status_post.spoiler_text,
+                            language=status_post.language,
+                            idempotency_key=status_post.idempotency_key,
+                            scheduled_at=status_post.scheduled_at,
+                            poll=status_post.poll,
+                            # media_ids=posted_media if posted_media else None # yapf: disable
+                        )
+                    elif instance_type == MastodonHelper.TYPE_PLEROMA:
+                        published = self._mastodon.status_post(
+                            status=status_post.status,
+                            in_reply_to_id=status_post.in_reply_to_id,
+                            media_ids=status_post.media_ids,
+                            sensitive=status_post.sensitive,
+                            visibility=status_post.visibility,
+                            spoiler_text=status_post.spoiler_text,
+                            language=status_post.language,
+                            idempotency_key=status_post.idempotency_key,
+                            content_type=status_post.content_type,
+                            scheduled_at=status_post.scheduled_at,
+                            poll=status_post.poll,
+                            quote_id=status_post.quote_id,
+                            # media_ids=posted_media if posted_media else None # yapf: disable
+                        )
+                    elif instance_type == MastodonHelper.TYPE_FIREFISH:
+                        published = self._mastodon.status_post(
+                            status=status_post.status,
+                            in_reply_to_id=status_post.in_reply_to_id,
+                            media_ids=status_post.media_ids,
+                            sensitive=status_post.sensitive,
+                            visibility=status_post.visibility,
+                            spoiler_text=status_post.spoiler_text,
+                            language=status_post.language,
+                            idempotency_key=status_post.idempotency_key,
+                            content_type=status_post.content_type,
+                            scheduled_at=status_post.scheduled_at,
+                            poll=status_post.poll,
+                            quote_id=status_post.quote_id,
+                            # media_ids=posted_media if posted_media else None # yapf: disable
+                        )
+                    return published
+                except Exception as e:
+                    self._logger.exception(e)
+                    self._logger.debug(f"sleeping {self.SLEEP_TIME} seconds")
+                    time.sleep(self.SLEEP_TIME)
+                    retry += 1
+                    if retry >= self.MAX_RETRIES:
+                        self._logger.error(
+                            f"MAX RETRIES of {self.MAX_RETRIES} is reached. Stop trying."
+                        )
+                        raise ConnectionError(f"Could not publish the post: {e}")
 
     def _post_media(self, media_file: str, description: str) -> dict:
         try:
@@ -126,12 +146,11 @@ class Publisher:
             self._logger.info("The queue is empty, skipping.")
             return
 
-        for queued_post in self._queue.get_all():
+        while not self._queue.is_empty():
+            queued_post = self._queue.pop()
             self.publish_one(queued_post)
 
-        self._logger.info("Cleaning stored queue")
         if not self._config.get("app.run_control.dry_run"):
-            self._queue.clean()
             self._queue.save()
 
     def publish_older_from_queue(self) -> None:

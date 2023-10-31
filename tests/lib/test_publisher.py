@@ -282,20 +282,20 @@ def test_publish_all_from_queue_not_is_empty_dry_run(queue_item_1, queue_item_2)
     publisher = get_instance()
 
     mocked_queue_is_empty = Mock()
-    mocked_queue_is_empty.return_value = False
-    mocked_queue_get_all = Mock()
-    mocked_queue_get_all.return_value = [queue_item_1, queue_item_2]
+    mocked_queue_is_empty.side_effect = [False, False, False, True]
+    mocked_queue_pop = Mock()
+    mocked_queue_pop.side_effect = [queue_item_1, queue_item_2]
     mocked_config_dry_run = Mock()
     mocked_config_dry_run.return_value = True
     mocked_publish_one = Mock()
     with patch.object(Queue, "is_empty", new=mocked_queue_is_empty):
-        with patch.object(Queue, "get_all", new=mocked_queue_get_all):
+        with patch.object(Queue, "pop", new=mocked_queue_pop):
             with patch.object(publisher, "publish_one", new=mocked_publish_one):
                 with patch.object(Config, "get", new=mocked_config_dry_run):
                     result = publisher.publish_all_from_queue()
 
-    mocked_queue_is_empty.assert_called_once()
-    mocked_queue_get_all.assert_called_once()
+    assert mocked_queue_is_empty.call_count == 4
+    assert mocked_queue_pop.call_count == 2
     mocked_config_dry_run.assert_called_once_with("app.run_control.dry_run")
     mocked_publish_one.assert_has_calls([call(queue_item_1), call(queue_item_2)])
     assert result is None
@@ -305,27 +305,24 @@ def test_publish_all_from_queue_not_is_empty_no_dry_run(queue_item_1, queue_item
     publisher = get_instance()
 
     mocked_queue_is_empty = Mock()
-    mocked_queue_is_empty.return_value = False
-    mocked_queue_get_all = Mock()
-    mocked_queue_get_all.return_value = [queue_item_1, queue_item_2]
+    mocked_queue_is_empty.side_effect = [False, False, False, True]
+    mocked_queue_pop = Mock()
+    mocked_queue_pop.side_effect = [queue_item_1, queue_item_2]
     mocked_config_dry_run = Mock()
     mocked_config_dry_run.return_value = False
     mocked_publish_one = Mock()
-    mocked_queue_clean = Mock()
     mocked_queue_save = Mock()
     with patch.object(Queue, "is_empty", new=mocked_queue_is_empty):
-        with patch.object(Queue, "get_all", new=mocked_queue_get_all):
+        with patch.object(Queue, "pop", new=mocked_queue_pop):
             with patch.object(publisher, "publish_one", new=mocked_publish_one):
                 with patch.object(Config, "get", new=mocked_config_dry_run):
-                    with patch.object(Queue, "clean", new=mocked_queue_clean):
-                        with patch.object(Queue, "save", new=mocked_queue_save):
-                            result = publisher.publish_all_from_queue()
+                    with patch.object(Queue, "save", new=mocked_queue_save):
+                        result = publisher.publish_all_from_queue()
 
-    mocked_queue_is_empty.assert_called_once()
-    mocked_queue_get_all.assert_called_once()
+    assert mocked_queue_is_empty.call_count == 4
+    assert mocked_queue_pop.call_count == 2
     mocked_config_dry_run.assert_called_once_with("app.run_control.dry_run")
     mocked_publish_one.assert_has_calls([call(queue_item_1), call(queue_item_2)])
-    mocked_queue_clean.assert_called_once()
     mocked_queue_save.assert_called_once()
     assert result is None
 

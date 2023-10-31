@@ -17,7 +17,8 @@ from datetime import datetime
 CONFIG = {
     "logger.name": "logger_test",
     "app.run_control.dry_run": False,
-    "publisher.media_storage": "storage/media/"
+    "publisher.media_storage": "storage/media/",
+    "publisher.only_oldest_post_every_iteration": False
 }
 
 CONFIG_MASTODON_CONN_PARAMS = {
@@ -323,7 +324,6 @@ def test_post_media():
     mocked_download_from_url.assert_called_once_with(
         media_url, CONFIG["publisher.media_storage"]
     )
-    mocked_config_get.assert_called_once_with("publisher.media_storage")
     assert result == {"id": 456}
 
 
@@ -341,88 +341,65 @@ def test_publish_all_from_queue_is_empty():
 
 def test_publish_all_from_queue_not_is_empty_dry_run(queue_item_1, queue_item_2):
     publisher = get_instance()
+    publisher._is_dry_run = True
+    publisher._only_oldest = False
 
     mocked_queue_is_empty = Mock()
     mocked_queue_is_empty.side_effect = [False, False, False, True]
     mocked_queue_pop = Mock()
     mocked_queue_pop.side_effect = [queue_item_1, queue_item_2]
-    mocked_config_get = Mock()
-    mocked_config_get.side_effect = [False, False, True]
     mocked_publish_one = Mock()
     with patch.object(Queue, "is_empty", new=mocked_queue_is_empty):
         with patch.object(Queue, "pop", new=mocked_queue_pop):
             with patch.object(publisher, "publish_one", new=mocked_publish_one):
-                with patch.object(Config, "get", new=mocked_config_get):
-                    result = publisher.publish_all_from_queue()
+                result = publisher.publish_all_from_queue()
 
     assert mocked_queue_is_empty.call_count == 4
     assert mocked_queue_pop.call_count == 2
-    mocked_config_get.assert_has_calls(
-        [
-            call("publisher.only_oldest_post_every_iteration", False),
-            call("publisher.only_oldest_post_every_iteration", False),
-            call("app.run_control.dry_run")
-        ]
-    )
     mocked_publish_one.assert_has_calls([call(queue_item_1), call(queue_item_2)])
     assert result is None
 
 
 def test_publish_all_from_queue_not_is_empty_dry_run_oldest(queue_item_1, queue_item_2):
     publisher = get_instance()
+    publisher._is_dry_run = True
+    publisher._only_oldest = True
 
     mocked_queue_is_empty = Mock()
     mocked_queue_is_empty.side_effect = [False, False, False, True]
     mocked_queue_pop = Mock()
     mocked_queue_pop.side_effect = [queue_item_1, queue_item_2]
-    mocked_config_get = Mock()
-    mocked_config_get.side_effect = [True, True]
     mocked_publish_one = Mock()
     with patch.object(Queue, "is_empty", new=mocked_queue_is_empty):
         with patch.object(Queue, "pop", new=mocked_queue_pop):
             with patch.object(publisher, "publish_one", new=mocked_publish_one):
-                with patch.object(Config, "get", new=mocked_config_get):
-                    result = publisher.publish_all_from_queue()
+                result = publisher.publish_all_from_queue()
 
     assert mocked_queue_is_empty.call_count == 2
     assert mocked_queue_pop.call_count == 1
-    mocked_config_get.assert_has_calls(
-        [
-            call("publisher.only_oldest_post_every_iteration", False),
-            call("app.run_control.dry_run")
-        ]
-    )
     mocked_publish_one.assert_called_once_with(queue_item_1)
     assert result is None
 
 
 def test_publish_all_from_queue_not_is_empty_no_dry_run(queue_item_1, queue_item_2):
     publisher = get_instance()
+    publisher._is_dry_run = False
+    publisher._only_oldest = False
 
     mocked_queue_is_empty = Mock()
     mocked_queue_is_empty.side_effect = [False, False, False, True]
     mocked_queue_pop = Mock()
     mocked_queue_pop.side_effect = [queue_item_1, queue_item_2]
-    mocked_config_get = Mock()
-    mocked_config_get.side_effect = [False, False, False]
     mocked_publish_one = Mock()
     mocked_queue_save = Mock()
     with patch.object(Queue, "is_empty", new=mocked_queue_is_empty):
         with patch.object(Queue, "pop", new=mocked_queue_pop):
             with patch.object(publisher, "publish_one", new=mocked_publish_one):
-                with patch.object(Config, "get", new=mocked_config_get):
-                    with patch.object(Queue, "save", new=mocked_queue_save):
-                        result = publisher.publish_all_from_queue()
+                with patch.object(Queue, "save", new=mocked_queue_save):
+                    result = publisher.publish_all_from_queue()
 
     assert mocked_queue_is_empty.call_count == 4
     assert mocked_queue_pop.call_count == 2
-    mocked_config_get.assert_has_calls(
-        [
-            call("publisher.only_oldest_post_every_iteration", False),
-            call("publisher.only_oldest_post_every_iteration", False),
-            call("app.run_control.dry_run")
-        ]
-    )
     mocked_publish_one.assert_has_calls([call(queue_item_1), call(queue_item_2)])
     mocked_queue_save.assert_called_once()
     assert result is None
@@ -430,30 +407,23 @@ def test_publish_all_from_queue_not_is_empty_no_dry_run(queue_item_1, queue_item
 
 def test_publish_all_from_queue_not_is_empty_no_dry_run_oldest(queue_item_1, queue_item_2):
     publisher = get_instance()
+    publisher._is_dry_run = False
+    publisher._only_oldest = True
 
     mocked_queue_is_empty = Mock()
     mocked_queue_is_empty.side_effect = [False, False, False, True]
     mocked_queue_pop = Mock()
     mocked_queue_pop.side_effect = [queue_item_1, queue_item_2]
-    mocked_config_get = Mock()
-    mocked_config_get.side_effect = [True, False]
     mocked_publish_one = Mock()
     mocked_queue_save = Mock()
     with patch.object(Queue, "is_empty", new=mocked_queue_is_empty):
         with patch.object(Queue, "pop", new=mocked_queue_pop):
             with patch.object(publisher, "publish_one", new=mocked_publish_one):
-                with patch.object(Config, "get", new=mocked_config_get):
-                    with patch.object(Queue, "save", new=mocked_queue_save):
-                        result = publisher.publish_all_from_queue()
+                with patch.object(Queue, "save", new=mocked_queue_save):
+                    result = publisher.publish_all_from_queue()
 
     assert mocked_queue_is_empty.call_count == 2
     assert mocked_queue_pop.call_count == 1
-    mocked_config_get.assert_has_calls(
-        [
-            call("publisher.only_oldest_post_every_iteration", False),
-            call("app.run_control.dry_run")
-        ]
-    )
     mocked_publish_one.assert_called_once_with(queue_item_1)
     mocked_queue_save.assert_called_once()
     assert result is None

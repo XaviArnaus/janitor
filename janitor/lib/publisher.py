@@ -35,10 +35,12 @@ class Publisher:
         self._mastodon = mastodon
         self._connection_params = connection_params
         self._formatter = Formatter(config, connection_params.status_params)
-        self._is_dry_run = self._config.get("app.run_control.dry_run")
+        self._is_dry_run = config.get("app.run_control.dry_run", False)
         self._instance_type = MastodonHelper.valid_or_raise(
             self._connection_params.instance_type
         )
+        self._only_oldest = config.get("publisher.only_oldest_post_every_iteration", False)
+        self._media_storage = self._config.get("publisher.media_storage")
 
     def publish_one(self, item: QueueItem) -> dict:
         """
@@ -75,9 +77,7 @@ class Publisher:
 
     def _post_media(self, media_file: str, description: str) -> dict:
         try:
-            downloaded = Media().download_from_url(
-                media_file, self._config.get("publisher.media_storage")
-            )
+            downloaded = Media().download_from_url(media_file, self._media_storage)
             return self._mastodon.media_post(
                 downloaded["file"], mime_type=downloaded["mime_type"], description=description
             )
@@ -96,11 +96,11 @@ class Publisher:
             self.publish_one(queued_post)
             # Do we want to publish only the oldest in every iteration?
             #   This means that the queue gets empty one item every run
-            if self._config.get("publisher.only_oldest_post_every_iteration", False):
+            if self._only_oldest:
                 self._logger.info("We're meant to publish only the oldest. Finishing.")
                 break
 
-        if not self._config.get("app.run_control.dry_run"):
+        if not self._is_dry_run:
             self._queue.save()
 
 

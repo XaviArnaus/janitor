@@ -1,9 +1,5 @@
 from pyxavi.config import Config
-from janitor.lib.mastodon_helper import MastodonHelper
-from janitor.objects.mastodon_connection_params import MastodonConnectionParams
 from janitor.lib.publisher import Publisher
-from janitor.objects.message import Message
-from janitor.objects.queue_item import QueueItem
 from janitor.lib.directnic_ddns import DirectnicDdns
 from janitor.runners.runner_protocol import RunnerProtocol
 from definitions import ROOT_DIR
@@ -23,23 +19,9 @@ class UpdateDdns(RunnerProtocol):
         self._logger = logger
         self._directnic = DirectnicDdns(self._config)
 
-    def _send_mastodon_message(self, text: str) -> None:
-        self._logger.info("Initializing Mastodon tooling")
-        conn_params = MastodonConnectionParams.from_dict(
-            self._config.get("mastodon.named_accounts.default")
+        self._service_publisher = Publisher(
+            config=self._config, named_account="default", base_path=ROOT_DIR
         )
-        mastodon = MastodonHelper.get_instance(
-            config=self._config, connection_params=conn_params, base_path=ROOT_DIR
-        )
-        publisher = Publisher(
-            config=self._config,
-            mastodon=mastodon,
-            connection_params=conn_params,
-            base_path=ROOT_DIR
-        )
-        queue_item = QueueItem(message=Message(text=text))
-        self._logger.info("Publishing Mastodon message")
-        _ = publisher.publish_one(queue_item)
 
     def run(self):
         '''
@@ -60,16 +42,16 @@ class UpdateDdns(RunnerProtocol):
                     result = self._directnic.send_update(updating_url=link)
                     if not result:
                         self._logger.error(f"Failed call to {link}")
-                        self._send_mastodon_message(
-                            f"Failed to update the new external IP to {link}"
+                        self._service_publisher.error(
+                            text=f"Failed to update the new external IP to {link}"
                         )
 
                 # Store the new external IP locally
                 self._directnic.save_current_ip()
 
                 # Publish into Mastodon
-                self._send_mastodon_message(
-                    f"New external IP updated to {len(items_to_update)} items."
+                self._service_publisher.info(
+                    text=f"New external IP updated to {len(items_to_update)} items."
                 )
 
         except RuntimeError as e:

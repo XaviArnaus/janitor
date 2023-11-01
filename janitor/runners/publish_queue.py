@@ -1,6 +1,4 @@
 from pyxavi.config import Config
-from janitor.lib.mastodon_helper import MastodonHelper
-from janitor.objects.mastodon_connection_params import MastodonConnectionParams
 from janitor.lib.publisher import Publisher
 from janitor.runners.runner_protocol import RunnerProtocol
 from definitions import ROOT_DIR
@@ -23,21 +21,14 @@ class PublishQueue(RunnerProtocol):
         Just publishes the queue
         '''
         try:
-            # All actions are done under a Mastodon API instance
-            conn_params = MastodonConnectionParams.from_dict(
-                self._config.get("mastodon.named_accounts.default")
-            )
-            mastodon = MastodonHelper.get_instance(
-                config=self._config, connection_params=conn_params, base_path=ROOT_DIR
-            )
-
-            # Read from the queue the toots to publish
-            # and publishes all of them
+            # Read from the queue the toots to publish and publishes all of them
+            #   This runner WILL ALWAYS run in ONLY OLDEST mode, as it is meant to
+            #   be added as a scheduler task to run every n minutes (10?)
             publisher = Publisher(
                 config=self._config,
-                mastodon=mastodon,
-                connection_params=conn_params,
-                base_path=ROOT_DIR
+                named_account="default",
+                base_path=ROOT_DIR,
+                only_oldest=True
             )
             self._logger.info("Publishing the whole queue")
             publisher.publish_all_from_queue()

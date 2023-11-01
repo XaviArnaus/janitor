@@ -230,24 +230,7 @@ def test_clean(queue_item_1, queue_item_2, queue_item_3):
     assert queue.is_empty() is True
 
 
-def test_pop_with_dry_run(queue_item_1, queue_item_2, queue_item_3):
-    queue = get_instance()
-    queue.append(queue_item_1)
-    queue.append(queue_item_2)
-    queue.append(queue_item_3)
-
-    assert len(queue.get_all()), 3
-
-    mocked_get_dry_run = Mock()
-    mocked_get_dry_run.return_value = True
-    with patch.object(Config, "get", new=mocked_get_dry_run):
-        queue_item = queue.pop()
-
-    assert queue_item, queue_item_1
-    assert len(queue.get_all()), 3
-
-
-def test_pop_with_no_dry_run(queue_item_1, queue_item_2, queue_item_3):
+def test_pop(queue_item_1, queue_item_2, queue_item_3):
     queue = get_instance()
     queue.append(queue_item_1)
     queue.append(queue_item_2)
@@ -262,3 +245,23 @@ def test_pop_with_no_dry_run(queue_item_1, queue_item_2, queue_item_3):
 
     assert queue_item, queue_item_1
     assert len(queue.get_all()), 2
+
+
+def test_unpop(queue_item_1, queue_item_2, queue_item_3):
+    queue = get_instance()
+    queue.append(queue_item_1)
+    queue.append(queue_item_2)
+
+    assert len(queue.get_all()), 2
+
+    mocked_get_dry_run = Mock()
+    mocked_get_dry_run.return_value = False
+    with patch.object(Config, "get", new=mocked_get_dry_run):
+        queue.unpop(item=queue_item_3)
+
+    stack = queue.get_all()
+    assert len(stack), 3
+    # The unpop() should add it at the beginning
+    assert stack[0] == queue_item_3
+    assert stack[1] == queue_item_1
+    assert stack[2] == queue_item_2

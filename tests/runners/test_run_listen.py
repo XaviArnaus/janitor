@@ -3,9 +3,7 @@ from pyxavi.logger import Logger
 from janitor.lib.system_info import SystemInfo
 from janitor.lib.system_info_templater import SystemInfoTemplater
 from janitor.lib.publisher import Publisher
-from janitor.lib.mastodon_helper import MastodonHelper
 from janitor.objects.message import Message, MessageType
-from janitor.objects.queue_item import QueueItem
 from janitor.runners.listen import ListenMessage, ListenSysInfo
 from unittest.mock import patch, Mock, call
 import pytest
@@ -97,11 +95,7 @@ def patched_config_get(self, param):
         return CONFIG_MASTODON_CONN_PARAMS
 
 
-def patched_mastodon_get_instance(config, connection_params, base_path):
-    pass
-
-
-def patched_publisher_init(self, config, mastodon, connection_params, base_path):
+def patched_publisher_init(self, config, named_account, base_path):
     pass
 
 
@@ -172,7 +166,6 @@ def test_post_data_comes_in_post_no_crossed_thresholds(collected_data):
 
 @patch.object(reqparse.RequestParser, "add_argument", new=patched_parser_add_argument)
 @patch.object(SystemInfoTemplater, "__init__", new=patched_generic_init_with_config)
-@patch.object(MastodonHelper, "get_instance", new=patched_mastodon_get_instance)
 @patch.object(Config, "get", new=patched_config_get)
 @patch.object(Publisher, "__init__", new=patched_publisher_init)
 def test_post_data_comes_in_post_crossed_thresholds(collected_data):
@@ -186,27 +179,23 @@ def test_post_data_comes_in_post_crossed_thresholds(collected_data):
     mocked_crossed_thresholds.return_value = True
     mocked_templater_process_report = Mock()
     mocked_templater_process_report.return_value = message
-    mocked_publisher_publish_one = Mock()
-    mocked_queue_item_init = Mock()
-    mocked_queue_item_init.__class__ = QueueItem
-    mocked_queue_item_init.return_value = None
+    mocked_publisher_publish_message = Mock()
     with patch.object(listener._parser, "parse_args", new=mocked_parse_args):
         with patch.object(SystemInfo, "crossed_thresholds", new=mocked_crossed_thresholds):
             with patch.object(SystemInfoTemplater,
                               "process_report",
                               new=mocked_templater_process_report):
-                with patch.object(QueueItem, "__init__", new=mocked_queue_item_init):
-                    with patch.object(Publisher,
-                                      "publish_one",
-                                      new=mocked_publisher_publish_one):
-                        code = listener.post()
+                with patch.object(Publisher,
+                                  "publish_message",
+                                  new=mocked_publisher_publish_message):
+                    code = listener.post()
 
     mocked_parse_args.assert_called_once()
     mocked_crossed_thresholds.assert_called_once_with(collected_data, ["hostname"])
     mocked_templater_process_report.assert_called_once_with(collected_data)
-    mocked_queue_item_init.assert_called_once_with(message)
-    # For any reason I can't ensure that publish_one() is called with the mocked queue item!
-    mocked_publisher_publish_one.assert_called_once()
+    # For any reason I can't ensure that publish_queue_item()
+    #   is called with the mocked queue item!
+    mocked_publisher_publish_message.assert_called_once()
     assert code == 200
 
 
@@ -295,7 +284,6 @@ def test_init_message():
     ],
 )
 @patch.object(reqparse.RequestParser, "add_argument", new=patched_parser_add_argument)
-@patch.object(MastodonHelper, "get_instance", new=patched_mastodon_get_instance)
 @patch.object(Publisher, "__init__", new=patched_publisher_init)
 @patch.object(Config, "get", new=patched_config_get)
 def test_post_optional_params_not_present(
@@ -324,21 +312,17 @@ def test_post_optional_params_not_present(
     mocked_message_init = Mock()
     mocked_message_init.__class__ = Message
     mocked_message_init.return_value = None
-    mocked_publisher_publish_one = Mock()
-    mocked_queue_item_init = Mock()
-    mocked_queue_item_init.__class__ = QueueItem
-    mocked_queue_item_init.return_value = None
+    mocked_publisher_publish_message = Mock()
     mocked_message_type_icon = Mock()
     mocked_message_type_icon.return_value = ICONS[message_type]\
         if message_type is not None else ""
     with patch.object(listener._parser, "parse_args", new=mocked_parse_args):
         with patch.object(MessageType, "icon_per_type", new=mocked_message_type_icon):
             with patch.object(Message, "__init__", new=mocked_message_init):
-                with patch.object(QueueItem, "__init__", new=mocked_queue_item_init):
-                    with patch.object(Publisher,
-                                      "publish_one",
-                                      new=mocked_publisher_publish_one):
-                        result = listener.post()
+                with patch.object(Publisher,
+                                  "publish_message",
+                                  new=mocked_publisher_publish_message):
+                    result = listener.post()
 
     mocked_parse_args.assert_called_once()
     if expected_code == 200:
@@ -351,15 +335,13 @@ def test_post_optional_params_not_present(
             )
         else:
             mocked_message_init.assert_called_once_with(text=expected_message_text)
-        # For any reason I can't ensure that publish_one() is called with the mocked message!
-        mocked_queue_item_init.assert_called_once()
-        # For any reason I can't ensure that publish_one() is called with the mocked queue item!
-        mocked_publisher_publish_one.assert_called_once()
+        # For any reason I can't ensure that publish_message()
+        #   is called with the mocked queue item!
+        mocked_publisher_publish_message.assert_called_once()
     else:
         mocked_message_type_icon.assert_not_called()
         mocked_message_init.assert_not_called()
-        mocked_queue_item_init.assert_not_called()
-        mocked_publisher_publish_one.assert_not_called()
+        mocked_publisher_publish_message.assert_not_called()
 
     if isinstance(result, tuple):
         return_message, code = result

@@ -49,3 +49,5 @@ class Scheduler(RunnerProtocol):
             GitChanges(config=self._config, logger=self._logger).run()
         elif action == "rotate_log":
             LogRotate(config=self._config, logger=self._logger).run()
+        elif action == "publish_queue":
+            LogRotate(config=self._config, logger=self._logger).run()

@@ -20,6 +20,14 @@ class GitChanges(RunnerProtocol):
         self._config = config
         self._logger = logger
 
+        self._service_publisher = Publisher(
+            config=self._config,
+            connection_params=MastodonConnectionParams.from_dict(
+                config.get("mastodon.named_accounts.default")
+            ),
+            base_path=ROOT_DIR
+        )
+
     def run(self):
         '''
         Get the changes and publish them
@@ -71,34 +79,18 @@ class GitChanges(RunnerProtocol):
 
             if len(published_projects) > 0:
                 self._logger.debug("Publishing an notice into account default")
-                self._publish_notification(
-                    message=Message(
-                        text="Published an update for:\n\n" + "\n".join(published_projects)
-                    )
+                self._service_publisher.info(
+                    "Published an update for:\n\n" + "\n".join(published_projects)
                 )
 
         except Exception as e:
             self._logger.exception(e)
-
-            self._publish_notification(
-                message=Message(text="Error while publishing updates:\n\n" + str(e))
-            )
+            self._service_publisher.error("Error while publishing updates:\n\n" + str(e))
 
     def _publish_update(self, message: Message, named_account: str = "updates"):
         # We want to publish to a different account,
         #   which only publishes updates.
         #   This means to instantiate a different Mastodon helper
-        conn_params = MastodonConnectionParams.from_dict(
-            self._config.get(f"mastodon.named_accounts.{named_account}")
-        )
-        # Now publish the message
-        _ = Publisher(
-            config=self._config, connection_params=conn_params, base_path=ROOT_DIR
-        ).publish_message(message=message)
-
-    def _publish_notification(self, message: Message, named_account: str = "default"):
-        # This is the notification that we publish to
-        #   the usual account, just to say who the action went.
         conn_params = MastodonConnectionParams.from_dict(
             self._config.get(f"mastodon.named_accounts.{named_account}")
         )

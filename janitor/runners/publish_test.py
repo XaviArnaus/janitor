@@ -1,7 +1,6 @@
 from pyxavi.config import Config
 from janitor.objects.mastodon_connection_params import MastodonConnectionParams
 from janitor.lib.publisher import Publisher
-from janitor.objects.message import Message
 from janitor.runners.runner_protocol import RunnerProtocol
 from definitions import ROOT_DIR
 import logging
@@ -58,13 +57,9 @@ class PublishTest(RunnerProtocol):
                 config=self._config, connection_params=conn_params, base_path=ROOT_DIR
             )
 
-            # Prepare a test message
-            self._logger.info("Preparing a test message")
-            message = Message(text="this is a **test**")
-
-            # Publish the item
-            self._logger.info("Publishing the test queue item")
-            _ = publisher.publish_message(message=message)
+            # Publish the message
+            self._logger.info("Publishing the test message")
+            publisher.info("this is a **test**")
 
         except Exception as e:
             self._logger.exception(e)

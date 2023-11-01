@@ -24,7 +24,11 @@ class Publisher:
     SLEEP_TIME = 10
 
     def __init__(
-        self, config: Config, named_account: str = "default", base_path: str = None
+        self,
+        config: Config,
+        named_account: str = "default",
+        base_path: str = None,
+        only_oldest: bool = None
     ) -> None:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
@@ -38,7 +42,8 @@ class Publisher:
         )
         self._base_path = base_path
         self._is_dry_run = config.get("app.run_control.dry_run", False)
-        self._only_oldest = config.get("publisher.only_oldest_post_every_iteration", False)
+        self._only_oldest = only_oldest if only_oldest is not None\
+            else config.get("publisher.only_oldest_post_every_iteration", False)
         self._media_storage = self._config.get("publisher.media_storage")
 
         self._mastodon = self._get_mastodon_instance()

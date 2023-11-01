@@ -10,12 +10,14 @@
 - Re-queue the message in case of total failure while publishing ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 - Support *publish only oldest in queue every iteration* feature, based on the [Mastodon Echo Bot](https://github.com/XaviArnaus/mastodon-echo-bot) ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 - Add a set of Publisher's methods to improve internal code ([#35](https://github.com/XaviArnaus/janitor/pull/35))
+- Support for `publish_queue` for the Scheduler ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 
 ### Changed
 
 - Now the System metrics templates live in the config file, not in the class ([#34](https://github.com/XaviArnaus/janitor/pull/34))
 - Now the messages sent as DIRECT and PRIVATE must come with a mention and will appear private only ([#34](https://github.com/XaviArnaus/janitor/pull/34))
 - Manage the `MastodonHelper` internally in the Publisher ([#35](https://github.com/XaviArnaus/janitor/pull/35))
+- Manage the `MastodonConnectionParams` internally in the Publisher ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 
 ## [v0.5.1](https://github.com/XaviArnaus/janitor/releases/tag/v0.5.1)
 

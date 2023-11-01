@@ -21,10 +21,14 @@ class PublishQueue(RunnerProtocol):
         Just publishes the queue
         '''
         try:
-            # Read from the queue the toots to publish
-            # and publishes all of them
+            # Read from the queue the toots to publish and publishes all of them
+            #   This runner WILL ALWAYS run in ONLY OLDEST mode, as it is meant to
+            #   be added as a scheduler task to run every n minutes (10?)
             publisher = Publisher(
-                config=self._config, named_account="default", base_path=ROOT_DIR
+                config=self._config,
+                named_account="default",
+                base_path=ROOT_DIR,
+                only_oldest=True
             )
             self._logger.info("Publishing the whole queue")
             publisher.publish_all_from_queue()

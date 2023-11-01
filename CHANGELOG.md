@@ -9,7 +9,7 @@
 - The Publisher retries 3 times with a sleep of 10 seconds in between ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 - Re-queue the message in case of total failure while publishing ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 - Support *publish only oldest in queue every iteration* feature, based on the [Mastodon Echo Bot](https://github.com/XaviArnaus/mastodon-echo-bot) ([#35](https://github.com/XaviArnaus/janitor/pull/35))
-- Add a set of Publisher's methods to improve internal code: `publish_message`, `publish_status_post` ([#35](https://github.com/XaviArnaus/janitor/pull/35))
+- Add a set of Publisher's methods to improve internal code ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 
 ### Changed
 

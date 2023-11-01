@@ -53,3 +53,49 @@ publisher:
   # [Bool] Publish only the older post
   # Useful if we have this bot executed often, so publishes a single post in every run
   only_oldest_post_every_iteration: True
+
+formatter:
+  # [Bool] Merge summary into the main body of the message
+  #   This is useful for Mastodon APIs like Firefish that do not support "summary"
+  #   It will look at the parameter merge_summary_into_text_strategy to know how
+  merge_summary_into_text: True
+  # Templates used, classified per area
+  templates:
+    # Strategies for merging extra values into the current templates
+    merge_strategies:
+      # [String] Strategy to merge both summary and text into text.
+      summary_into_text: "$summary\n\n$text"
+      # [String] Strategy to merge the DM mention into the text when needed
+      mention_into_text: "$text\n\n🤫 Only for your eyes, $mention"
+    # Templates depending on the Message Type
+    message_type:
+      # For the message_type NONE
+      none:
+        # [String] Summary line.
+        summary: "$summary"
+        # [String] Text line.
+        text: "$text"
+      # For the message_type INFO
+      info:
+        # [String] Summary line.
+        summary: "ℹ️ $summary"
+        # [String] Text line.
+        text: "$text"
+      # For the message_type WARNING
+      warning:
+        # [String] Summary line.
+        summary: "⚠️ $summary"
+        # [String] Text line.
+        text: "$text"
+      # For the message_type ERROR
+      error:
+        # [String] Summary line.
+        summary: "🔥 $summary"
+        # [String] Text line.
+        text: "$text"
+      # For the message_type ALARM
+      error:
+        # [String] Summary line.
+        summary: "🚨 $summary"
+        # [String] Text line.
+        text: "$text"

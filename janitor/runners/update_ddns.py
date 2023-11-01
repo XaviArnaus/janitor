@@ -1,5 +1,4 @@
 from pyxavi.config import Config
-from janitor.objects.mastodon_connection_params import MastodonConnectionParams
 from janitor.lib.publisher import Publisher
 from janitor.lib.directnic_ddns import DirectnicDdns
 from janitor.runners.runner_protocol import RunnerProtocol
@@ -21,11 +20,7 @@ class UpdateDdns(RunnerProtocol):
         self._directnic = DirectnicDdns(self._config)
 
         self._service_publisher = Publisher(
-            config=self._config,
-            connection_params=MastodonConnectionParams.from_dict(
-                config.get("mastodon.named_accounts.default")
-            ),
-            base_path=ROOT_DIR
+            config=self._config, named_account="default", base_path=ROOT_DIR
         )
 
     def run(self):

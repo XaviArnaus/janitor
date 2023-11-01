@@ -7,8 +7,7 @@ from janitor.lib.mastodon_helper import MastodonHelper
 from janitor.objects.message import Message, MessageType
 from janitor.objects.queue_item import QueueItem
 from janitor.objects.status_post import StatusPost
-from janitor.objects.mastodon_connection_params import\
-    MastodonConnectionParams, MastodonStatusParams
+from janitor.objects.mastodon_connection_params import MastodonStatusParams
 from mastodon import Mastodon
 from unittest.mock import patch, Mock, call
 import pytest
@@ -20,25 +19,57 @@ CONFIG = {
     "logger.name": "logger_test",
     "app.run_control.dry_run": False,
     "publisher.media_storage": "storage/media/",
-    "publisher.only_oldest_post_every_iteration": False
-}
-
-CONFIG_MASTODON_CONN_PARAMS = {
-    "app_type": "SuperApp",
-    "instance_type": "mastodon",
-    "api_base_url": "https://mastodont.cat",
-    "credentials": {
-        "user_file": "user.secret",
-        "client_file": "client.secret",
-        "user": {
-            "email": "bot+syscheck@my-fancy.site",
-            "password": "SuperSecureP4ss",
+    "publisher.only_oldest_post_every_iteration": False,
+    "mastodon.named_accounts.mastodon": {
+        "app_type": "SuperApp",
+        "instance_type": "mastodon",
+        "api_base_url": "https://mastodont.cat",
+        "credentials": {
+            "user_file": "user.secret",
+            "client_file": "client.secret",
+            "user": {
+                "email": "bot+syscheck@my-fancy.site",
+                "password": "SuperSecureP4ss",
+            }
+        },
+        "status_params": {
+            "max_length": 5000
         }
     },
-    "status_params": {
-        "max_length": 500
+    "mastodon.named_accounts.pleroma": {
+        "app_type": "SuperApp",
+        "instance_type": "pleroma",
+        "api_base_url": "https://mastodont.cat",
+        "credentials": {
+            "user_file": "user.secret",
+            "client_file": "client.secret",
+            "user": {
+                "email": "bot+syscheck@my-fancy.site",
+                "password": "SuperSecureP4ss",
+            }
+        },
+        "status_params": {
+            "max_length": 5000
+        }
     }
 }
+
+# CONFIG_MASTODON_CONN_PARAMS = {
+#     "app_type": "SuperApp",
+#     "instance_type": "mastodon",
+#     "api_base_url": "https://mastodont.cat",
+#     "credentials": {
+#         "user_file": "user.secret",
+#         "client_file": "client.secret",
+#         "user": {
+#             "email": "bot+syscheck@my-fancy.site",
+#             "password": "SuperSecureP4ss",
+#         }
+#     },
+#     "status_params": {
+#         "max_length": 500
+#     }
+# }
 
 _mocked_mastodon_instance: Mastodon = Mock()
 _mocked_queue_instance = Mock()
@@ -60,18 +91,13 @@ def patched_formatter_init(self, config: Config, status_params: MastodonStatusPa
     pass
 
 
-def get_instance(mastodon_connection_params: MastodonConnectionParams = None) -> Publisher:
+def get_instance(named_account: str = "mastodon") -> Publisher:
     _mocked_mastodon_instance.__class__ = Mastodon
     _mocked_mastodon_instance.status_post = Mock()
     _mocked_mastodon_instance.status_post.return_value = {"id": 123}
     _mocked_mastodon_instance.media_post = Mock()
     _mocked_mastodon_instance.media_post.return_value = {"id": 456}
     _mocked_queue_instance.return_value = None
-
-    if mastodon_connection_params is None:
-        mastodon_connection_params = MastodonConnectionParams.from_dict(
-            CONFIG_MASTODON_CONN_PARAMS
-        )
 
     mocked_get_mastodon_instance = Mock()
     mocked_get_mastodon_instance.return_value = _mocked_mastodon_instance
@@ -83,9 +109,7 @@ def get_instance(mastodon_connection_params: MastodonConnectionParams = None) ->
                                       "_get_mastodon_instance",
                                       new=mocked_get_mastodon_instance):
                         return Publisher(
-                            config=Config(),
-                            connection_params=mastodon_connection_params,
-                            base_path="bla"
+                            config=Config(), named_account=named_account, base_path="bla"
                         )
 
 
@@ -146,9 +170,7 @@ def queue_item_long(datetime_2) -> QueueItem:
 
 def test_do_status_publish_pleroma(queue_item_1: QueueItem):
     status_post = StatusPost(status=queue_item_1.message.text)
-    mastodon_connection_params = MastodonConnectionParams.from_dict(CONFIG_MASTODON_CONN_PARAMS)
-    mastodon_connection_params.instance_type = MastodonConnectionParams.TYPE_PLEROMA
-    publisher = get_instance(mastodon_connection_params=mastodon_connection_params)
+    publisher = get_instance(named_account="pleroma")
     publisher._is_dry_run = False
 
     result = publisher._do_status_publish(status_post)
@@ -217,9 +239,7 @@ def test_publish_status_post_not_dry_run_cut_text(queue_item_long: QueueItem):
 
 def test_publish_status_post_not_dry_run(queue_item_1: QueueItem):
     status_post = StatusPost(status=queue_item_1.message.text)
-    mastodon_connection_params = MastodonConnectionParams.from_dict(CONFIG_MASTODON_CONN_PARAMS)
-    mastodon_connection_params.instance_type = MastodonConnectionParams.TYPE_PLEROMA
-    publisher = get_instance(mastodon_connection_params=mastodon_connection_params)
+    publisher = get_instance(named_account="pleroma")
     publisher._is_dry_run = False
 
     mocked_build_status_post = Mock()

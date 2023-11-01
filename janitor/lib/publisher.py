@@ -24,16 +24,15 @@ class Publisher:
     SLEEP_TIME = 10
 
     def __init__(
-        self,
-        config: Config,
-        connection_params: MastodonConnectionParams,
-        base_path: str = None
+        self, config: Config, named_account: str = "default", base_path: str = None
     ) -> None:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
         self._queue = Queue(config, base_path=base_path)
-        self._connection_params = connection_params
-        self._formatter = Formatter(config, connection_params.status_params)
+        self._connection_params = MastodonConnectionParams.from_dict(
+            config.get(f"mastodon.named_accounts.{named_account}")
+        )
+        self._formatter = Formatter(config, self._connection_params.status_params)
         self._instance_type = MastodonHelper.valid_or_raise(
             self._connection_params.instance_type
         )

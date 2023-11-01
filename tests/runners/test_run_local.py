@@ -86,7 +86,7 @@ def patched_generic_init_with_config(self, config):
     pass
 
 
-def patched_publisher_init(self, config, connection_params, base_path):
+def patched_publisher_init(self, config, named_account, base_path):
     pass
 
 

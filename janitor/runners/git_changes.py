@@ -1,7 +1,5 @@
 from pyxavi.config import Config
-from janitor.objects.mastodon_connection_params import MastodonConnectionParams
 from janitor.lib.publisher import Publisher
-from janitor.objects.message import Message
 from janitor.lib.git_monitor import GitMonitor
 from janitor.runners.runner_protocol import RunnerProtocol
 from definitions import ROOT_DIR
@@ -21,11 +19,7 @@ class GitChanges(RunnerProtocol):
         self._logger = logger
 
         self._service_publisher = Publisher(
-            config=self._config,
-            connection_params=MastodonConnectionParams.from_dict(
-                config.get("mastodon.named_accounts.default")
-            ),
-            base_path=ROOT_DIR
+            config=self._config, named_account="default", base_path=ROOT_DIR
         )
 
     def run(self):
@@ -64,7 +58,11 @@ class GitChanges(RunnerProtocol):
                 self._logger.debug(
                     f"Publishing an update message into account {repository['named_account']}"
                 )
-                self._publish_update(message=message, named_account=repository["named_account"])
+                Publisher(
+                    config=self._config,
+                    named_account=repository["named_account"],
+                    base_path=ROOT_DIR
+                ).publish_message(message=message)
 
                 # Add a note about the project to publish them all together
                 published_projects.append(
@@ -86,15 +84,3 @@ class GitChanges(RunnerProtocol):
         except Exception as e:
             self._logger.exception(e)
             self._service_publisher.error("Error while publishing updates:\n\n" + str(e))
-
-    def _publish_update(self, message: Message, named_account: str = "updates"):
-        # We want to publish to a different account,
-        #   which only publishes updates.
-        #   This means to instantiate a different Mastodon helper
-        conn_params = MastodonConnectionParams.from_dict(
-            self._config.get(f"mastodon.named_accounts.{named_account}")
-        )
-        # Now publish the message
-        _ = Publisher(
-            config=self._config, connection_params=conn_params, base_path=ROOT_DIR
-        ).publish_message(message=message)

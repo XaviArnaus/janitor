@@ -1,5 +1,4 @@
 from pyxavi.config import Config
-from janitor.objects.mastodon_connection_params import MastodonConnectionParams
 from janitor.lib.publisher import Publisher
 from janitor.runners.runner_protocol import RunnerProtocol
 from definitions import ROOT_DIR
@@ -49,17 +48,13 @@ class PublishTest(RunnerProtocol):
         Just publish a test
         '''
         try:
-            # All actions are done under a Mastodon API instance
-            conn_params = MastodonConnectionParams.from_dict(self._params["named_account"])
-
-            # Prepare the Publisher
-            publisher = Publisher(
-                config=self._config, connection_params=conn_params, base_path=ROOT_DIR
-            )
-
             # Publish the message
             self._logger.info("Publishing the test message")
-            publisher.info("this is a **test**")
+            Publisher(
+                config=self._config,
+                named_account=self._params["named_account"],
+                base_path=ROOT_DIR
+            ).info("this is a **test**")
 
         except Exception as e:
             self._logger.exception(e)

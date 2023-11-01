@@ -95,7 +95,7 @@ def patched_config_get(self, param):
         return CONFIG_MASTODON_CONN_PARAMS
 
 
-def patched_publisher_init(self, config, connection_params, base_path):
+def patched_publisher_init(self, config, named_account, base_path):
     pass
 
 

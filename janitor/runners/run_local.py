@@ -3,7 +3,6 @@ from janitor.lib.system_info import SystemInfo
 from janitor.lib.system_info_templater import SystemInfoTemplater
 from janitor.lib.publisher import Publisher
 from janitor.objects.mastodon_connection_params import MastodonConnectionParams
-from janitor.objects.queue_item import QueueItem
 from janitor.runners.runner_protocol import RunnerProtocol
 from definitions import ROOT_DIR
 import logging
@@ -40,12 +39,9 @@ class RunLocal(RunnerProtocol):
         conn_params = MastodonConnectionParams.from_dict(
             self._config.get("mastodon.named_accounts.default")
         )
-        publisher = Publisher(
+        Publisher(
             config=self._config, connection_params=conn_params, base_path=ROOT_DIR
-        )
-        self._logger.info("Publishing the whole queue")
-        queue_item = QueueItem(message)
-        publisher.publish_queue_item(queue_item)
+        ).publish_message(message=message)
 
         self._logger.info("End.")
 

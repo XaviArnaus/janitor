@@ -2,7 +2,6 @@ from pyxavi.config import Config
 from janitor.objects.mastodon_connection_params import MastodonConnectionParams
 from janitor.lib.publisher import Publisher
 from janitor.objects.message import Message
-from janitor.objects.queue_item import QueueItem
 from janitor.lib.git_monitor import GitMonitor
 from janitor.runners.runner_protocol import RunnerProtocol
 from definitions import ROOT_DIR
@@ -95,7 +94,7 @@ class GitChanges(RunnerProtocol):
         # Now publish the message
         _ = Publisher(
             config=self._config, connection_params=conn_params, base_path=ROOT_DIR
-        ).publish_queue_item(QueueItem(message))
+        ).publish_message(message=message)
 
     def _publish_notification(self, message: Message, named_account: str = "default"):
         # This is the notification that we publish to
@@ -106,4 +105,4 @@ class GitChanges(RunnerProtocol):
         # Now publish the message
         _ = Publisher(
             config=self._config, connection_params=conn_params, base_path=ROOT_DIR
-        ).publish_queue_item(QueueItem(message))
+        ).publish_message(message=message)

@@ -2,7 +2,6 @@ from pyxavi.config import Config
 from janitor.objects.mastodon_connection_params import MastodonConnectionParams
 from janitor.lib.publisher import Publisher
 from janitor.objects.message import Message
-from janitor.objects.queue_item import QueueItem
 from janitor.lib.directnic_ddns import DirectnicDdns
 from janitor.runners.runner_protocol import RunnerProtocol
 from definitions import ROOT_DIR
@@ -27,12 +26,10 @@ class UpdateDdns(RunnerProtocol):
         conn_params = MastodonConnectionParams.from_dict(
             self._config.get("mastodon.named_accounts.default")
         )
-        publisher = Publisher(
-            config=self._config, connection_params=conn_params, base_path=ROOT_DIR
-        )
-        queue_item = QueueItem(message=Message(text=text))
         self._logger.info("Publishing Mastodon message")
-        _ = publisher.publish_queue_item(queue_item)
+        Publisher(
+            config=self._config, connection_params=conn_params, base_path=ROOT_DIR
+        ).publish_message(message=Message(text=text))
 
     def run(self):
         '''

@@ -4,7 +4,6 @@ from janitor.lib.system_info import SystemInfo
 from janitor.lib.system_info_templater import SystemInfoTemplater
 from janitor.lib.publisher import Publisher
 from janitor.objects.message import Message
-from janitor.objects.queue_item import QueueItem
 from janitor.runners.run_local import RunLocal
 from unittest.mock import patch, Mock
 import pytest
@@ -143,22 +142,17 @@ def test_run_crossed_thresholds(collected_data):
     mocked_crossed_thresholds.return_value = True
     mocked_templater_process_report = Mock()
     mocked_templater_process_report.return_value = message
-    mocked_publisher_publish_queue_item = Mock()
-    mocked_queue_item_init = Mock()
-    mocked_queue_item_init.__class__ = QueueItem
-    mocked_queue_item_init.return_value = None
+    mocked_publisher_publish_message = Mock()
     with patch.object(SystemInfo, "crossed_thresholds", new=mocked_crossed_thresholds):
         with patch.object(SystemInfoTemplater,
                           "process_report",
                           new=mocked_templater_process_report):
-            with patch.object(QueueItem, "__init__", new=mocked_queue_item_init):
-                with patch.object(Publisher,
-                                  "publish_queue_item",
-                                  new=mocked_publisher_publish_queue_item):
-                    runner.run()
+            with patch.object(Publisher,
+                              "publish_message",
+                              new=mocked_publisher_publish_message):
+                runner.run()
 
     mocked_templater_process_report.assert_called_once_with(collected_data)
-    mocked_queue_item_init.assert_called_once_with(message)
-    # For any reason I can't ensure that publish_queue_item()
+    # For any reason I can't ensure that publish_message()
     #   is called with the mocked queue item!
-    mocked_publisher_publish_queue_item.assert_called_once()
+    mocked_publisher_publish_message.assert_called_once()

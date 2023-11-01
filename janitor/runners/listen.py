@@ -2,9 +2,6 @@ from pyxavi.config import Config
 from janitor.lib.system_info import SystemInfo
 from janitor.lib.system_info_templater import SystemInfoTemplater
 from janitor.lib.publisher import Publisher
-from janitor.lib.mastodon_helper import MastodonHelper
-from janitor.objects.mastodon_connection_params import MastodonConnectionParams
-from janitor.objects.queue_item import QueueItem
 from janitor.objects.message import Message, MessageType
 from janitor.runners.runner_protocol import RunnerProtocol
 from definitions import ROOT_DIR
@@ -92,21 +89,11 @@ class ListenSysInfo(Resource):
         # Make it a message
         message = SystemInfoTemplater(self._config).process_report(sys_data)
 
-        # Publish the queue
-        conn_params = MastodonConnectionParams.from_dict(
-            self._config.get(f"mastodon.named_accounts.{MASTODON_NAMED_ACCOUNT}")
-        )
-        mastodon = MastodonHelper.get_instance(
-            config=self._config, connection_params=conn_params, base_path=ROOT_DIR
-        )
-        publisher = Publisher(
-            config=self._config,
-            mastodon=mastodon,
-            connection_params=conn_params,
-            base_path=ROOT_DIR
-        )
+        # Publish the message
         self._logger.info("Publishing one message")
-        publisher.publish_one(QueueItem(message))
+        Publisher(
+            config=self._config, named_account=MASTODON_NAMED_ACCOUNT, base_path=ROOT_DIR
+        ).publish_message(message=message)
 
         self._logger.info("End.")
         return 200
@@ -190,21 +177,11 @@ class ListenMessage(Resource):
         else:
             message = Message(summary=f"{icon} {hostname}:\n\n{summary}", text=f"{text}")
 
-        # Publish the queue
-        conn_params = MastodonConnectionParams.from_dict(
-            self._config.get(f"mastodon.named_accounts.{MASTODON_NAMED_ACCOUNT}")
-        )
-        mastodon = MastodonHelper.get_instance(
-            config=self._config, connection_params=conn_params, base_path=ROOT_DIR
-        )
-        publisher = Publisher(
-            config=self._config,
-            mastodon=mastodon,
-            connection_params=conn_params,
-            base_path=ROOT_DIR
-        )
+        # Publish the message
         self._logger.info("Publishing one message")
-        publisher.publish_one(QueueItem(message))
+        Publisher(
+            config=self._config, named_account=MASTODON_NAMED_ACCOUNT, base_path=ROOT_DIR
+        ).publish_message(message=message)
 
         self._logger.info("End.")
         return 200

@@ -1,7 +1,5 @@
 # ToDo
 
-- The `formatter` has the the `MessageType` ignored when building the post
-    - This means going through all messagings and change the icon in the body for the MessageType
 - Simplify the messaging:
     - Merge `Message` and `QueueItem`.
     - Make `QueueItem` just a protocol
@@ -32,3 +30,4 @@
 ✅ Make the `git_monitor` to be able to publish to several other Mastodon accounts (example: own repositories vs. external repositories)
 ✅ A command to request for the external IP, reusing the logic we already have
 ✅ Rotate the logs
+✅ The `formatter` has the the `MessageType` ignored when building the post

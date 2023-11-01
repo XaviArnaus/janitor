@@ -3,9 +3,7 @@ from pyxavi.logger import Logger
 from janitor.lib.system_info import SystemInfo
 from janitor.lib.system_info_templater import SystemInfoTemplater
 from janitor.lib.publisher import Publisher
-from janitor.lib.mastodon_helper import MastodonHelper
 from janitor.objects.message import Message
-from janitor.objects.queue_item import QueueItem
 from janitor.runners.run_local import RunLocal
 from unittest.mock import patch, Mock
 import pytest
@@ -88,11 +86,7 @@ def patched_generic_init_with_config(self, config):
     pass
 
 
-def patched_mastodon_get_instance(config, connection_params, base_path):
-    pass
-
-
-def patched_publisher_init(self, config, mastodon, connection_params, base_path):
+def patched_publisher_init(self, config, named_account, base_path):
     pass
 
 
@@ -137,7 +131,6 @@ def test_run_no_crossed_thresholds():
 @patch.object(SystemInfo, "get_mem_data", new=patched_get_mem_data)
 @patch.object(SystemInfo, "get_disk_data", new=patched_get_disk_data)
 @patch.object(SystemInfoTemplater, "__init__", new=patched_generic_init_with_config)
-@patch.object(MastodonHelper, "get_instance", new=patched_mastodon_get_instance)
 @patch.object(Publisher, "__init__", new=patched_publisher_init)
 @patch.object(Config, "get", new=patched_config_get)
 def test_run_crossed_thresholds(collected_data):
@@ -149,19 +142,17 @@ def test_run_crossed_thresholds(collected_data):
     mocked_crossed_thresholds.return_value = True
     mocked_templater_process_report = Mock()
     mocked_templater_process_report.return_value = message
-    mocked_publisher_publish_one = Mock()
-    mocked_queue_item_init = Mock()
-    mocked_queue_item_init.__class__ = QueueItem
-    mocked_queue_item_init.return_value = None
+    mocked_publisher_publish_message = Mock()
     with patch.object(SystemInfo, "crossed_thresholds", new=mocked_crossed_thresholds):
         with patch.object(SystemInfoTemplater,
                           "process_report",
                           new=mocked_templater_process_report):
-            with patch.object(QueueItem, "__init__", new=mocked_queue_item_init):
-                with patch.object(Publisher, "publish_one", new=mocked_publisher_publish_one):
-                    runner.run()
+            with patch.object(Publisher,
+                              "publish_message",
+                              new=mocked_publisher_publish_message):
+                runner.run()
 
     mocked_templater_process_report.assert_called_once_with(collected_data)
-    mocked_queue_item_init.assert_called_once_with(message)
-    # For any reason I can't ensure that publish_one() is called with the mocked queue item!
-    mocked_publisher_publish_one.assert_called_once()
+    # For any reason I can't ensure that publish_message()
+    #   is called with the mocked queue item!
+    mocked_publisher_publish_message.assert_called_once()

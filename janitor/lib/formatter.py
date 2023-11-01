@@ -13,12 +13,53 @@ class Formatter:
     to the StatusPost that we use only at publishing stage.
     """
 
-    TEMPLATE_TEXT_WITH_MENTION = "$text\n\n🤫 Only for your eyes, $mention"
-
     def __init__(self, config: Config, status_params: MastodonStatusParams) -> None:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
         self._status_params = status_params
+        self._merge_summary_into_text = config.get("formatter.merge_summary_into_text", False)
+        self._templates = {
+            "merge_strategies": {
+                "text_with_mention": config.get(
+                    "formatter.templates.merge_strategies.mention_into_text",
+                    "$text\n\n$mention"
+                ),
+                "summary_into_text": config.get(
+                    "formatter.templates.merge_strategies.summary_into_text",
+                    "$summary\n\n$text"
+                ),
+            },
+            MessageType.NONE: {
+                "summary": config.get(
+                    "formatter.templates.message_type.none.summary", "$summary"
+                ),
+                "text": config.get("formatter.templates.message_type.none.text", "$text")
+            },
+            MessageType.INFO: {
+                "summary": config.get(
+                    "formatter.templates.message_type.info.summary", "$summary"
+                ),
+                "text": config.get("formatter.templates.message_type.info.text", "$text")
+            },
+            MessageType.WARNING: {
+                "summary": config.get(
+                    "formatter.templates.message_type.warning.summary", "$summary"
+                ),
+                "text": config.get("formatter.templates.message_type.warning.text", "$text")
+            },
+            MessageType.ERROR: {
+                "summary": config.get(
+                    "formatter.templates.message_type.error.summary", "$summary"
+                ),
+                "text": config.get("formatter.templates.message_type.error.text", "$text")
+            },
+            MessageType.ALARM: {
+                "summary": config.get(
+                    "formatter.templates.message_type.alarm.summary", "$summary"
+                ),
+                "text": config.get("formatter.templates.message_type.alarm.text", "$text")
+            }
+        }
 
     def build_status_post(self, message: Message) -> StatusPost:
         status_post = StatusPost()
@@ -27,14 +68,8 @@ class Formatter:
         #   Yes: Then we'll use the spoiler text
         #   No: Then whatever it comes becomes the status itself
         if message.summary and message.text:
-            status_post.spoiler_text = self._format_spoiler(
-                message.summary, message.message_type
-            )
-            status_post.status = self._format_status(message.text, MessageType.NONE)
-        else:
-            status_post.status = self._format_status(
-                message.text if message.text else message.summary, message.message_type
-            )
+            status_post.spoiler_text = self._format_spoiler(message)
+        status_post.status = self._format_status(message)
 
         # Now the rest of the details
         status_post.content_type = self._status_params.content_type
@@ -48,10 +83,25 @@ class Formatter:
 
         return status_post
 
-    def _format_spoiler(self, content: str, message_type: MessageType) -> str:
+    def _format_spoiler(self, message: Message) -> str:
+        content = Template(self._templates[message.message_type]["summary"]
+                           ).substitute(summary=message.summary)
         return content
 
-    def _format_status(self, content: str, message_type: MessageType) -> str:
+    def _format_status(self, message: Message) -> str:
+        # Can happen that we receive only the summary, then we use it as text
+        content = Template(self._templates[message.message_type]["text"]
+                           ).substitute(text=message.text if message.text else message.summary)
+
+        # Following up, even we are meant to merge summary and text,
+        #   if there is no text we just ignore, as we already used summary as text.
+        if self._merge_summary_into_text and message.summary and message.text:
+            summary = self._format_spoiler(message=message)
+            content = Template(self._templates["merge_strategies"]["text_with_mention"])\
+                .substitute(
+                    summary=summary,
+                    text=content
+                )
         return content
 
     def add_mention_to_message_if_direct_visibility(self, text: str) -> str:
@@ -62,9 +112,8 @@ class Formatter:
 
         if is_dm and mention:
             self._logger.info(f"It's a DM posting, applying mention to {mention}")
-            return Template(self.TEMPLATE_TEXT_WITH_MENTION).substitute(
-                mention=mention, text=text
-            )
+            return Template(self._templates["merge_strategies"]["text_with_mention"])\
+                .substitute(mention=mention, text=text)
         else:
             if is_dm and not mention:
                 self._logger.error(

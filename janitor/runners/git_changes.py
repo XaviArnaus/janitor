@@ -74,7 +74,7 @@ class GitChanges(RunnerProtocol):
                     config=self._config,
                     named_account=repo.get('named_account'),
                     base_path=ROOT_DIR
-                ).publish_message(message=message)
+                ).info(content=message)
 
                 # Add a note about the project to publish them all together by the Service
                 published_projects.append(f"- {repo.get('name')}: {monitor.get_changes_note()}")

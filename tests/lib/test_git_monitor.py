@@ -4,7 +4,6 @@ from pyxavi.storage import Storage
 from pyxavi.dictionary import Dictionary
 from janitor.lib.git_monitor import GitMonitor, ChangelogChanges,\
     ChangesProtocol, CommitsChanges
-from janitor.objects.message import Message
 from unittest.mock import patch, Mock, mock_open, MagicMock, call
 import pytest
 from unittest import TestCase
@@ -531,10 +530,9 @@ def test_changelog_discover_changes_reads_file_when_isfile(
 
 def test_changelog_build_update_message_with_one_update(content_3):
     parsed_content = {"v3.0": content_3.replace("## [", "[")}
-    expected_content = Message(
-        text="**[pyxavi](https://github.com/XaviArnaus/pyxavi) v3.0** published!\n\n" +
+    expected_content = "**[pyxavi](https://github.com/XaviArnaus/pyxavi)" +\
+        " v3.0** published!\n\n" +\
         "[v3.0](link.html)\n\n**Added**\n- Action 3\n\n#Python #library\n"
-    )
 
     mocked_repo = Mock()
     controller = get_changelog_instance(
@@ -546,18 +544,16 @@ def test_changelog_build_update_message_with_one_update(content_3):
 
     message = controller.build_update_message()
 
-    assert message.to_dict() == expected_content.to_dict()
+    assert message == expected_content
 
 
 def test_changelog_build_update_message_with_two_updates(content_3, content_2):
     parsed_content = {
         "v3.0": content_3.replace("## [", "["), "v2.0": content_2.replace("## [", "[")
     }
-    expected_content = Message(
-        text="**[pyxavi](https://github.com/XaviArnaus/pyxavi) " +
-        "v2.0 & v3.0** published!\n\n[v3.0](link.html)\n\n**Added**\n- Action 3\n\n" +
+    expected_content = "**[pyxavi](https://github.com/XaviArnaus/pyxavi) " +\
+        "v2.0 & v3.0** published!\n\n[v3.0](link.html)\n\n**Added**\n- Action 3\n\n" +\
         "[v2.0](link.html)\n\n**Changed**\n- Action 2\n\n#Python #library\n"
-    )
 
     mocked_repo = Mock()
     controller = get_changelog_instance(
@@ -569,7 +565,7 @@ def test_changelog_build_update_message_with_two_updates(content_3, content_2):
 
     message = controller.build_update_message()
 
-    assert message.to_dict() == expected_content.to_dict()
+    assert message == expected_content
 
 
 def test_changelog_write_new_last_known():
@@ -781,10 +777,9 @@ def test_commits_build_update_message_with_one_update(content_3):
             "author": "Xavi", "message": "Description 1"
         },
     }
-    expected_content = Message(
-        text="**[pyxavi](https://github.com/XaviArnaus/pyxavi) 1 new commits** published!\n" +
+    expected_content = "**[pyxavi](https://github.com/XaviArnaus/pyxavi)" +\
+        " 1 new commits** published!\n" +\
         "\n- *Xavi*: Description 1\n#Python #library\n"
-    )
 
     mocked_repo = Mock()
     controller = get_commits_instance(
@@ -796,7 +791,7 @@ def test_commits_build_update_message_with_one_update(content_3):
 
     message = controller.build_update_message()
 
-    assert message.to_dict() == expected_content.to_dict()
+    assert message == expected_content
 
 
 def test_commits_build_update_message_with_two_updates(content_3, content_2):
@@ -808,10 +803,9 @@ def test_commits_build_update_message_with_two_updates(content_3, content_2):
             "author": "Xavi", "message": "Description 2"
         },
     }
-    expected_content = Message(
-        text="**[pyxavi](https://github.com/XaviArnaus/pyxavi) 2 new commits** published!\n" +
+    expected_content = "**[pyxavi](https://github.com/XaviArnaus/pyxavi)" +\
+        " 2 new commits** published!\n" +\
         "\n- *Xavi*: Description 1\n- *Xavi*: Description 2\n#Python #library\n"
-    )
 
     mocked_repo = Mock()
     controller = get_commits_instance(
@@ -823,7 +817,7 @@ def test_commits_build_update_message_with_two_updates(content_3, content_2):
 
     message = controller.build_update_message()
 
-    assert message.to_dict() == expected_content.to_dict()
+    assert message == expected_content
 
 
 def test_commits_write_new_last_known():

@@ -1,7 +1,6 @@
 from pyxavi.config import Config
 from pyxavi.storage import Storage
 from pyxavi.dictionary import Dictionary
-from janitor.objects.message import Message
 from typing import Protocol
 from git import Repo
 from string import Template
@@ -40,7 +39,7 @@ class ChangesProtocol(Protocol):
     def get_new_last_known(self) -> str:
         """Gets the new last known item, usually is the last parsed item"""
 
-    def build_update_message(self, parameters: dict = None) -> Message:
+    def build_update_message(self, parameters: dict = None) -> str:
         """Constructs the message to publish as an update"""
 
     def write_new_last_known(self, value: str) -> None:
@@ -91,7 +90,7 @@ class BaseChanges(ChangesProtocol):
         else:
             return None
 
-    def build_update_message(self, parameters: dict = None) -> Message:
+    def build_update_message(self, parameters: dict = None) -> str:
         raise NotImplementedError("The child class does not implement this method yet")
 
     def write_new_last_known(self, value: str) -> None:
@@ -121,16 +120,15 @@ class ChangelogChanges(BaseChanges):
     def get_current_last_known(self) -> str:
         return self._storage.get(self._get_param_name(self.STORAGE_PARAMETER_NAME), None)
 
-    def build_update_message(self, parameters: dict = None) -> Message:
-        return Message(
-            text=Template(TEMPLATE_UPDATE_TEXT).substitute(
-                project=self._repo_info.get("name"),
-                link=self._repo_info.get("url"),
-                version=self.get_changes_note(),
-                text="\n".
-                join([self._clean_markdown(text) for text in self._changes_stack.values()]),
-                tags=" ".join(self._repo_info.get("tags", ""))
-            )
+    def build_update_message(self, parameters: dict = None) -> str:
+        return Template(TEMPLATE_UPDATE_TEXT).substitute(
+            project=self._repo_info.get("name"),
+            link=self._repo_info.get("url"),
+            version=self.get_changes_note(),
+            text="\n".join(
+                [self._clean_markdown(text) for text in self._changes_stack.values()]
+            ),
+            tags=" ".join(self._repo_info.get("tags", ""))
         )
 
     def write_new_last_known(self, value: str) -> None:
@@ -240,20 +238,15 @@ class CommitsChanges(BaseChanges):
     def get_current_last_known(self) -> str:
         return self._storage.get(self._get_param_name(self.STORAGE_PARAMETER_NAME), None)
 
-    def build_update_message(self, parameters: dict = None) -> Message:
-        return Message(
-            text=Template(TEMPLATE_UPDATE_TEXT).substitute(
-                project=self._repo_info.get("name"),
-                link=self._repo_info.get("url"),
-                version=self.get_changes_note(),
-                text="\n".join(
-                    [
-                        f"- *{c['author']}*: {c['message']}"
-                        for c in self._changes_stack.values()
-                    ]
-                ),
-                tags=" ".join(self._repo_info.get("tags", ""))
-            )
+    def build_update_message(self, parameters: dict = None) -> str:
+        return Template(TEMPLATE_UPDATE_TEXT).substitute(
+            project=self._repo_info.get("name"),
+            link=self._repo_info.get("url"),
+            version=self.get_changes_note(),
+            text="\n".join(
+                [f"- *{c['author']}*: {c['message']}" for c in self._changes_stack.values()]
+            ),
+            tags=" ".join(self._repo_info.get("tags", ""))
         )
 
     def write_new_last_known(self, value: str) -> None:
@@ -336,7 +329,7 @@ class GitMonitor:
     def get_new_last_known(self) -> str:
         return self.get_changes_instance().get_new_last_known()
 
-    def get_update_message(self, parameters: dict = None) -> Message:
+    def get_update_message(self, parameters: dict = None) -> str:
         return self.get_changes_instance().build_update_message(parameters=parameters)
 
     def get_changes_note(self) -> str:

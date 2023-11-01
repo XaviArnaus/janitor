@@ -2,7 +2,7 @@ from pyxavi.config import Config
 from pyxavi.media import Media
 from janitor.objects.queue_item import QueueItem
 from janitor.objects.status_post import StatusPost
-from janitor.objects.message import Message
+from janitor.objects.message import Message, MessageType
 from .queue import Queue
 from .formatter import Formatter
 from mastodon import Mastodon
@@ -43,6 +43,53 @@ class Publisher:
         self._media_storage = self._config.get("publisher.media_storage")
 
         self._mastodon = self._get_mastodon_instance()
+
+    def text(self, content: str, summary: str = None, requeue_if_fails: bool = False) -> dict:
+        """
+        Shorthand to publish a message with MessageType.NONE
+        """
+        return self.publish_message(
+            message=Message(summary=summary, text=content, message_type=MessageType.NONE),
+            requeue_if_fails=requeue_if_fails
+        )
+
+    def info(self, content: str, summary: str = None, requeue_if_fails: bool = False) -> dict:
+        """
+        Shorthand to publish a message with MessageType.INFO
+        """
+        return self.publish_message(
+            message=Message(summary=summary, text=content, message_type=MessageType.INFO),
+            requeue_if_fails=requeue_if_fails
+        )
+
+    def warning(
+        self, content: str, summary: str = None, requeue_if_fails: bool = False
+    ) -> dict:
+        """
+        Shorthand to publish a message with MessageType.WARNING
+        """
+        return self.publish_message(
+            message=Message(summary=summary, text=content, message_type=MessageType.WARNING),
+            requeue_if_fails=requeue_if_fails
+        )
+
+    def error(self, content: str, summary: str = None, requeue_if_fails: bool = False) -> dict:
+        """
+        Shorthand to publish a message with MessageType.ERROR
+        """
+        return self.publish_message(
+            message=Message(summary=summary, text=content, message_type=MessageType.ERROR),
+            requeue_if_fails=requeue_if_fails
+        )
+
+    def alarm(self, content: str, summary: str = None, requeue_if_fails: bool = False) -> dict:
+        """
+        Shorthand to publish a message with MessageType.ALARM
+        """
+        return self.publish_message(
+            message=Message(summary=summary, text=content, message_type=MessageType.ALARM),
+            requeue_if_fails=requeue_if_fails
+        )
 
     def publish_queue_item(self, item: QueueItem) -> dict:
         """

@@ -4,7 +4,7 @@ from janitor.lib.publisher import Publisher, PublisherException
 from janitor.lib.formatter import Formatter
 from janitor.lib.queue import Queue
 from janitor.lib.mastodon_helper import MastodonHelper
-from janitor.objects.message import Message
+from janitor.objects.message import Message, MessageType
 from janitor.objects.queue_item import QueueItem
 from janitor.objects.status_post import StatusPost
 from janitor.objects.mastodon_connection_params import\
@@ -475,3 +475,27 @@ def test_get_mastodon_instance_secret_not_exists():
     mocked_get_instance.assert_called_once_with(
         config=publisher._config, connection_params=publisher._connection_params
     )
+
+
+@pytest.mark.parametrize(
+    argnames=('content', 'summary', 'method', 'expected_message_type'),
+    argvalues=[
+        ("I am a message", "I am a summary", "text", MessageType.NONE),
+        ("I am a message", "I am a summary", "info", MessageType.INFO),
+        ("I am a message", "I am a summary", "warning", MessageType.WARNING),
+        ("I am a message", "I am a summary", "error", MessageType.ERROR),
+        ("I am a message", "I am a summary", "alarm", MessageType.ALARM),
+    ],
+)
+def test_shortcut(content, summary, method, expected_message_type):
+    publisher = get_instance()
+
+    mock_publish_message = Mock()
+    with patch.object(publisher, "publish_message", new=mock_publish_message):
+        _ = getattr(publisher, method)(content=content, summary=summary)
+
+    called_message = mock_publish_message.call_args[1]["message"]
+    assert isinstance(called_message, Message)
+    assert called_message.summary == summary
+    assert called_message.text == content
+    assert called_message.message_type == expected_message_type

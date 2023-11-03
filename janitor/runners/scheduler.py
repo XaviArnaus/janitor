@@ -36,7 +36,7 @@ class Scheduler(RunnerProtocol):
                 if croniter.match(schedule["when"], now_dt):
                     self._logger.info(
                         f"{TerminalColor.YELLOW_BRIGHT}Running schedule" +
-                        f"{TerminalColor.ORANGE_BRIGHT}" + schedule["name"] +
+                        f" {TerminalColor.ORANGE_BRIGHT}" + schedule["name"] +
                         f"{TerminalColor.END}"
                     )
                     self._execute_action(schedule["action"])

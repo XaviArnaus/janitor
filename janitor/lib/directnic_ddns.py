@@ -3,6 +3,7 @@ from pyxavi.storage import Storage
 from pyxavi.network import Network
 import logging
 import requests
+import os
 
 DEFAULT_FILENAME = "storage/external_ip.yaml"
 
@@ -11,10 +12,17 @@ class DirectnicDdns:
 
     current_external_ip: str = None
 
-    def __init__(self, config: Config) -> None:
+    def __init__(
+        self,
+        config: Config,
+        base_path: str = None,
+    ) -> None:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
-        self._storage = Storage(self._config.get("directnic_ddns.file", DEFAULT_FILENAME))
+        file_name = self._config.get("directnic_ddns.file", DEFAULT_FILENAME)
+        if base_path is not None:
+            file_name = os.path.join(base_path, file_name)
+        self._storage = Storage(filename=file_name)
 
     def get_external_ip(self) -> str:
         if self.current_external_ip is None:

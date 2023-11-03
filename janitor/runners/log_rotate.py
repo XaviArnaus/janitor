@@ -1,10 +1,12 @@
 from pyxavi.config import Config
 from janitor.runners.runner_protocol import RunnerProtocol
+from definitions import ROOT_DIR
 import logging
 from datetime import datetime
 import os
+import shutil
 
-ROTATED_DATETIME = "%Y%m%d%H%I%S"
+ROTATED_DATETIME = "%Y%m%d_%H%I%S"
 
 
 class LogRotate(RunnerProtocol):
@@ -24,7 +26,8 @@ class LogRotate(RunnerProtocol):
         '''
         self._logger.debug("Rotating the logs")
         # So the strategy is the following:
-        #   1. Rename the current log file to f"{current_log_file.log}.old-{datetime}"
+        #   1. Copy the current log file to f"{current_log_file.log}.old-{datetime}"
+        #   2. Remove the current log file f"{current_log_file.log}"
         #   2. The logging system will create automatically the new f"{current_log_file.log}"
 
         current_log_file = self._config.get("logger.filename")
@@ -35,5 +38,9 @@ class LogRotate(RunnerProtocol):
         now = datetime.now().strftime(ROTATED_DATETIME)
         new_log_file_name = f"{current_log_file}.old-{now}"
         self._logger.debug(f"Will rotate the log {current_log_file} to {new_log_file_name}")
-        os.rename(current_log_file, new_log_file_name)
+        shutil.copyfile(
+            os.path.join(ROOT_DIR, current_log_file),
+            os.path.join(ROOT_DIR, new_log_file_name),
+        )
+        os.remove(current_log_file)
         self._logger.info(f"Log rotate {current_log_file} to {new_log_file_name}")

@@ -11,7 +11,6 @@ from janitor.objects.mastodon_connection_params import MastodonConnectionParams
 import logging
 import time
 import os
-from pyxavi.debugger import dd
 
 
 class Publisher:

@@ -2,6 +2,7 @@ from pyxavi.config import Config
 from croniter import croniter
 from datetime import datetime
 from janitor.runners.runner_protocol import RunnerProtocol
+from pyxavi.terminal_color import TerminalColor
 import logging
 
 from janitor.runners.run_local import RunLocal
@@ -33,7 +34,11 @@ class Scheduler(RunnerProtocol):
 
             for schedule in schedules:
                 if croniter.match(schedule["when"], now_dt):
-                    self._logger.info("Running schedule " + schedule["name"])
+                    self._logger.info(
+                        f"{TerminalColor.YELLOW_BRIGHT}Running schedule" +
+                        f"{TerminalColor.ORANGE_BRIGHT}" + schedule["name"] +
+                        f"{TerminalColor.END}"
+                    )
                     self._execute_action(schedule["action"])
 
         except Exception as e:

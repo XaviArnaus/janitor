@@ -12,7 +12,7 @@ class Queue:
     def __init__(self, config: Config, base_path: str = None) -> None:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
-        file_name = self._config.get("queue_storage.file")
+        file_name = config.get("queue_storage.file")
         if base_path is not None:
             file_name = os.path.join(base_path, file_name)
         self._queue_manager = Storage(filename=file_name)

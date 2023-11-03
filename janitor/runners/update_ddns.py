@@ -17,7 +17,7 @@ class UpdateDdns(RunnerProtocol):
     ) -> None:
         self._config = config
         self._logger = logger
-        self._directnic = DirectnicDdns(self._config)
+        self._directnic = DirectnicDdns(config=self._config, base_path=ROOT_DIR)
 
         self._service_publisher = Publisher(
             config=self._config, named_account="default", base_path=ROOT_DIR
@@ -43,7 +43,7 @@ class UpdateDdns(RunnerProtocol):
                     if not result:
                         self._logger.error(f"Failed call to {link}")
                         self._service_publisher.error(
-                            text=f"Failed to update the new external IP to {link}"
+                            content=f"Failed to update the new external IP to {link}"
                         )
 
                 # Store the new external IP locally
@@ -51,13 +51,13 @@ class UpdateDdns(RunnerProtocol):
 
                 # Publish into Mastodon
                 self._service_publisher.info(
-                    text=f"New external IP updated to {len(items_to_update)} items."
+                    content=f"New external IP updated to {len(items_to_update)} items."
                 )
 
         except RuntimeError as e:
             self._logger.exception(e)
             try:
-                self._send_mastodon_message(str(e))
+                self._logger.error(str(e))
             except Exception as e:
                 self._logger.exception(e)
         except Exception as e:

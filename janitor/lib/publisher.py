@@ -116,7 +116,6 @@ class Publisher:
         """
 
         status_post = self._formatter.build_status_post(message=message)
-
         try:
             return self.publish_status_post(status_post=status_post)
         except PublisherException as e:
@@ -187,7 +186,8 @@ class Publisher:
                     f"Publishing new post (retry: {retry}) for " +
                     f"instance type {self._instance_type}"
                 )
-                return self._do_status_publish(status_post=status_post)
+                published = self._do_status_publish(status_post=status_post)
+                return published
             except Exception as e:
                 self._logger.exception(e)
                 self._logger.debug(f"sleeping {self.SLEEP_TIME} seconds")

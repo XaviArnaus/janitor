@@ -9,6 +9,7 @@ from janitor.runners.run_remote import RunRemote
 from janitor.runners.update_ddns import UpdateDdns
 from janitor.runners.git_changes import GitChanges
 from janitor.runners.log_rotate import LogRotate
+from janitor.runners.publish_queue import PublishQueue
 
 
 class Scheduler(RunnerProtocol):
@@ -50,4 +51,4 @@ class Scheduler(RunnerProtocol):
         elif action == "rotate_log":
             LogRotate(config=self._config, logger=self._logger).run()
         elif action == "publish_queue":
-            LogRotate(config=self._config, logger=self._logger).run()
+            PublishQueue(config=self._config, logger=self._logger).run()

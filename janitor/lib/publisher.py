@@ -11,7 +11,6 @@ from janitor.objects.mastodon_connection_params import MastodonConnectionParams
 import logging
 import time
 import os
-from pyxavi.debugger import dd
 
 
 class Publisher:
@@ -188,7 +187,6 @@ class Publisher:
                     f"instance type {self._instance_type}"
                 )
                 published = self._do_status_publish(status_post=status_post)
-                dd(published, max_depth=2)
                 return published
             except Exception as e:
                 self._logger.exception(e)

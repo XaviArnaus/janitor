@@ -6,7 +6,7 @@ from janitor.lib.publisher import Publisher
 from janitor.objects.message import Message, MessageType
 from janitor.runners.runner_protocol import RunnerProtocol
 from definitions import ROOT_DIR
-from flask import Flask
+from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
 import logging
 
@@ -60,6 +60,7 @@ class ListenSysInfo(Resource):
     def __init__(self, config: Config = None, logger: logging = None) -> None:
         self._config = config
         self._logger = logger
+        self._current_flask_app = app
         self._sys_info = SystemInfo(self._config)
         self._parser = reqparse.RequestParser()
         self._parser.add_argument(
@@ -74,7 +75,8 @@ class ListenSysInfo(Resource):
         """
 
         self._logger.info(
-            f"{TerminalColor.MAGENTA}System Info Listener{TerminalColor.END} received a request"
+            f"{TerminalColor.MAGENTA}System Info Listener{TerminalColor.END}" +
+            f" received a request from {request.remote_addr}"
         )
 
         # Get the data
@@ -113,6 +115,7 @@ class ListenMessage(Resource):
     def __init__(self, config: Config = None, logger: logging = None) -> None:
         self._config = config
         self._logger = logger
+        self._current_flask_app = app
         self._parser = reqparse.RequestParser()
         self._parser.add_argument(
             'summary',
@@ -151,7 +154,8 @@ class ListenMessage(Resource):
         """
 
         self._logger.info(
-            f"{TerminalColor.MAGENTA}Message Listener{TerminalColor.END} received a request"
+            f"{TerminalColor.MAGENTA}Message Listener{TerminalColor.END}" +
+            f" received a request from {request.remote_addr}"
         )
 
         # Get the data

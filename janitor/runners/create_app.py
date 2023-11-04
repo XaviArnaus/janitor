@@ -1,4 +1,5 @@
 from pyxavi.config import Config
+from pyxavi.terminal_color import TerminalColor
 from janitor.lib.mastodon_helper import MastodonHelper
 from janitor.runners.runner_protocol import RunnerProtocol
 from definitions import ROOT_DIR
@@ -16,10 +17,9 @@ class CreateApp(RunnerProtocol):
     ) -> None:
         self._config = config
         self._logger = logger
-        self._logger.info("Run Create App")
 
     def run(self):
-        self._logger.info("Run Create App")
+        self._logger.info(f"{TerminalColor.MAGENTA}Starting Create App{TerminalColor.END}")
         MastodonHelper.create_app(
             self._config.get("mastodon.named_accounts.default.instance_type"),
             self._config.get("mastodon.named_accounts.default.app_name"),

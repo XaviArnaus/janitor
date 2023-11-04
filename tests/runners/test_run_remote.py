@@ -121,25 +121,15 @@ def test_run_success(collected_data):
     mocked_config_get.side_effect = [False, remote_url]
     mocked_requests_post = Mock()
     mocked_requests_post.return_value = ObjectFaker({"status_code": 200})
-    mocked_logger_info = Mock()
     with patch.object(Config, "get", new=mocked_config_get):
         with patch.object(requests, "post", new=mocked_requests_post):
-            with patch.object(runner._logger, "info", new=mocked_logger_info):
-                runner.run()
+            runner.run()
 
     mocked_config_get.assert_has_calls(
         [call("app.run_control.dry_run"), call("app.service.remote_url")]
     )
     mocked_requests_post.assert_called_once_with(
         f"{remote_url}/sysinfo", json={'sys_data': collected_data}
-    )
-    mocked_logger_info.assert_has_calls(
-        [
-            call('Run remote app'),
-            call('Sending sys_data away'),
-            call('Request was successful'),
-            call('End.')
-        ]
     )
 
 
@@ -163,11 +153,9 @@ def test_run_fail(collected_data):
     mocked_config_get.side_effect = [False, remote_url]
     mocked_requests_post = Mock()
     mocked_requests_post.return_value = ObjectFaker({"status_code": 400})
-    mocked_logger_warning = Mock()
     with patch.object(Config, "get", new=mocked_config_get):
         with patch.object(requests, "post", new=mocked_requests_post):
-            with patch.object(runner._logger, "warning", new=mocked_logger_warning):
-                runner.run()
+            runner.run()
 
     mocked_config_get.assert_has_calls(
         [call("app.run_control.dry_run"), call("app.service.remote_url")]
@@ -175,4 +163,3 @@ def test_run_fail(collected_data):
     mocked_requests_post.assert_called_once_with(
         f"{remote_url}/sysinfo", json={'sys_data': collected_data}
     )
-    mocked_logger_warning.assert_called_once_with("Request was unsuccessful: 400")

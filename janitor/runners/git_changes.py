@@ -1,3 +1,4 @@
+from pyxavi.terminal_color import TerminalColor
 from pyxavi.config import Config
 from janitor.lib.publisher import Publisher
 from janitor.lib.git_monitor import GitMonitor
@@ -27,6 +28,9 @@ class GitChanges(RunnerProtocol):
         Get the changes and publish them
         '''
         try:
+            self._logger.info(
+                f"{TerminalColor.MAGENTA}Starting Git Changes Monitoring{TerminalColor.END}"
+            )
             # Initialize
             monitor = GitMonitor(self._config)
 
@@ -50,9 +54,15 @@ class GitChanges(RunnerProtocol):
                 # Build the message to publish
                 message = monitor.build_update_message(parsed_content=parsed_content)
                 if message is None:
-                    self._logger.info("No new version for repository " + repo_name)
+                    self._logger.info(
+                        f"{TerminalColor.BLUE}No new version for repository " +
+                        f"{repo_name}{TerminalColor.END}"
+                    )
                     continue
-                self._logger.info("New version for repository " + repo_name)
+                self._logger.info(
+                    f"{TerminalColor.BLUE}New version for repository " +
+                    f"{repo_name}{TerminalColor.END}"
+                )
 
                 # Publish the changes into the Updates account
                 self._logger.debug(

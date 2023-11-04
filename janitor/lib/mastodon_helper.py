@@ -35,7 +35,7 @@ class MastodonHelper:
             client_file = os.path.join(base_path, client_file)
 
         # All actions are done under a Mastodon API instance
-        logger.info("Starting new Mastodon API instance")
+        logger.debug("Starting new Mastodon API instance")
         if (os.path.exists(user_file)):
             logger.debug("Reusing stored User Credentials")
             mastodon = MastodonHelper.WRAPPER[instance_type](

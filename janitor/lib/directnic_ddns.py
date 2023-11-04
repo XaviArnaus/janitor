@@ -26,10 +26,8 @@ class DirectnicDdns:
 
     def get_external_ip(self) -> str:
         if self.current_external_ip is None:
-            self._logger.debug("Getting external IP from service")
             # The class raises RuntimeError if could not succeed
             self.current_external_ip = Network.get_external_ipv4(self._logger)
-            self._logger.info(f"External IP is {self.current_external_ip}")
 
         return self.current_external_ip
 
@@ -38,10 +36,8 @@ class DirectnicDdns:
         self._logger.debug(f"Last external IP was {last_external_ip}")
 
         if last_external_ip != self.get_external_ip():
-            self._logger.info("Current external IP is different from the previous known.")
             return True
 
-        self._logger.info("Current external IP is the same as the previous known.")
         return False
 
     def build_updating_link(self, partial_url: str) -> str:
@@ -50,14 +46,14 @@ class DirectnicDdns:
         return updating_url
 
     def send_update(self, updating_url: str) -> bool:
-        self._logger.info("Sending update call")
+        self._logger.debug("Sending update call")
         response = requests.get(url=updating_url)
 
         if response.status_code == 200:
-            self._logger.info("Update succeeded")
+            self._logger.debug("Update succeeded")
             return True
         else:
-            self._logger.info("Update failed")
+            self._logger.debug("Update failed")
             return False
 
     def save_current_ip(self) -> None:

@@ -399,13 +399,16 @@ def get_changelog_instance(
                                 with patch.object(ChangelogChanges,
                                                   "discover_changes",
                                                   new=mock_discover_changes):
-                                    config = Config()
-                                    return ChangelogChanges(
-                                        config=config,
-                                        logger=mock_logger,
-                                        repository_info=repo_info,
-                                        repository_object=repo_object
-                                    )
+                                    with patch.object(ChangelogChanges,
+                                                      "get_current_last_known",
+                                                      new=Mock()):
+                                        config = Config()
+                                        return ChangelogChanges(
+                                            config=config,
+                                            logger=mock_logger,
+                                            repository_info=repo_info,
+                                            repository_object=repo_object
+                                        )
                             else:
                                 config = Config()
                                 return ChangelogChanges(
@@ -431,10 +434,11 @@ def test_changelog_discover_changes_exception_when_not_file():
     with patch.object(mocked_repo, "working_tree_dir", new=mocked_working_tree_dir):
         with patch.object(os.path, "join", new=mocked_path_join):
             with patch.object(os.path, "isfile", new=mocked_path_isfile):
-                with TestCase.assertRaises(ChangelogChanges, RuntimeError):
-                    _ = get_changelog_instance(
-                        repo_info=Dictionary(REPOSITORY_CHANGELOG), repo_object=mocked_repo
-                    )
+                with patch.object(ChangelogChanges, "get_current_last_known", new=Mock()):
+                    with TestCase.assertRaises(ChangelogChanges, RuntimeError):
+                        _ = get_changelog_instance(
+                            repo_info=Dictionary(REPOSITORY_CHANGELOG), repo_object=mocked_repo
+                        )
 
     mocked_path_join.assert_called_once_with(
         mocked_working_tree_dir, REPOSITORY_CHANGELOG["params"]["file"]
@@ -492,7 +496,7 @@ def test_changelog_discover_changes_reads_file_when_isfile(
     mocked_path_isfile.return_value = is_file
     mocked_open_file = MagicMock()
     mocked_storage_get = Mock()
-    mocked_storage_get.side_effect = [{}, last_version]
+    mocked_storage_get.side_effect = [{}, last_version, {}, last_version]
     mocked_storage_set = Mock()
     with patch.object(Storage, "get", new=mocked_storage_get):
         with patch.object(Storage, "set", new=mocked_storage_set):
@@ -673,10 +677,21 @@ def get_commits_instance(
                 with patch.object(mock_logger, "get_logger", new=mock_logging):
                     with patch.object(mock_logging_instance, "debug", new=mocked_logging_debug):
                         with patch.object(Storage, "__init__", new=patched_storage_init):
-                            if avoid_discover_changes:
-                                with patch.object(CommitsChanges,
-                                                  "discover_changes",
-                                                  new=mock_discover_changes):
+                            with patch.object(CommitsChanges,
+                                              "get_current_last_known",
+                                              new=Mock()):
+                                if avoid_discover_changes:
+                                    with patch.object(CommitsChanges,
+                                                      "discover_changes",
+                                                      new=mock_discover_changes):
+                                        config = Config()
+                                        return CommitsChanges(
+                                            config=config,
+                                            logger=mock_logger,
+                                            repository_info=repo_info,
+                                            repository_object=repo_object
+                                        )
+                                else:
                                     config = Config()
                                     return CommitsChanges(
                                         config=config,
@@ -684,14 +699,6 @@ def get_commits_instance(
                                         repository_info=repo_info,
                                         repository_object=repo_object
                                     )
-                            else:
-                                config = Config()
-                                return CommitsChanges(
-                                    config=config,
-                                    logger=mock_logger,
-                                    repository_info=repo_info,
-                                    repository_object=repo_object
-                                )
 
 
 def test_commits_discover_changes_rev_list_empty():

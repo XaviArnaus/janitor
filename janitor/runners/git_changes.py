@@ -44,6 +44,9 @@ class GitChanges(RunnerProtocol):
                 # Bring the new updates
                 monitor.get_updates()
 
+                # Reset the Changes controller that we use
+                monitor.initialise_changes_instance()
+
                 # So get the values to compare
                 current_last_known = monitor.get_current_last_known()
                 new_last_known = monitor.get_new_last_known()

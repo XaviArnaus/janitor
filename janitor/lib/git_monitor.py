@@ -75,9 +75,13 @@ class BaseChanges(ChangesProtocol):
         self._changes_stack = None
 
         # Makes no sense to have this class without discovering the changes straight away
-        self._logger.debug(f"Initialised {type(self).__name__}. Getting the changes from {self.get_current_last_known()}.")
+        self._logger.debug(
+            f"Initialised {type(self).__name__}. " +
+            f"Getting the changes since {self.get_current_last_known()}."
+        )
         self.discover_changes()
-        self._logger.debug(f"Got {len(self._changes_stack)} changes")
+        changes = len(self._changes_stack) if self._changes_stack is not None else "None"
+        self._logger.debug(f"The Stack now has {changes} changes")
 
     def discover_changes(self, parameters: dict = None) -> None:
         raise NotImplementedError("The child class does not implement this method yet")
@@ -225,7 +229,6 @@ class CommitsChanges(BaseChanges):
 
     def discover_changes(self, parameters: dict = None) -> None:
         last_known_commit = self.get_current_last_known()
-        self._logger.debug(f"Last known commit is [{last_known_commit}]")
         if last_known_commit is None:
             self._logger.debug("Getting all commits since last gut pull")
             commits = list(self._repo_object.iter_commits())
@@ -300,32 +303,35 @@ class GitMonitor:
         origin = self.current_repository.remotes.origin
         origin.pull()
 
+    def initialise_changes_instance(self) -> None:
+        monitoring_method = self.repository_info.get(
+            "monitoring_method", DEFAULT_MONITORING_METHOD
+        )
+
+        if monitoring_method == "changelog":
+            self.changes_instance = ChangelogChanges(
+                config=self._config,
+                logger=self._logger,
+                repository_info=self.repository_info,
+                repository_object=self.current_repository
+            )
+        elif monitoring_method == "commits":
+            self.changes_instance = CommitsChanges(
+                config=self._config,
+                logger=self._logger,
+                repository_info=self.repository_info,
+                repository_object=self.current_repository
+            )
+        else:
+            raise RuntimeError(
+                f"The repository {self.repository_info.get('name')} does not have " +
+                "a valid monitoring set up."
+            )
+
     def get_changes_instance(self) -> ChangesProtocol:
 
         if self.changes_instance is None:
-            monitoring_method = self.repository_info.get(
-                "monitoring_method", DEFAULT_MONITORING_METHOD
-            )
-
-            if monitoring_method == "changelog":
-                self.changes_instance = ChangelogChanges(
-                    config=self._config,
-                    logger=self._logger,
-                    repository_info=self.repository_info,
-                    repository_object=self.current_repository
-                )
-            elif monitoring_method == "commits":
-                self.changes_instance = CommitsChanges(
-                    config=self._config,
-                    logger=self._logger,
-                    repository_info=self.repository_info,
-                    repository_object=self.current_repository
-                )
-            else:
-                raise RuntimeError(
-                    f"The repository {self.repository_info.get('name')} does not have " +
-                    "a valid monitoring set up."
-                )
+            self.initialise_changes_instance()
 
         return self.changes_instance
 

@@ -9,9 +9,9 @@
 - Git Monitor module now also monitors commits from repositories ([#33](https://github.com/XaviArnaus/janitor/pull/33))
 - The Publisher retries 3 times with a sleep of 10 seconds in between ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 - Re-queue the message in case of total failure while publishing ([#35](https://github.com/XaviArnaus/janitor/pull/35))
-- Support *publish only oldest in queue every iteration* feature, based on the [Mastodon Echo Bot](https://github.com/XaviArnaus/mastodon-echo-bot) ([#35](https://github.com/XaviArnaus/janitor/pull/35))
+- Support *publish only oldest in queue for every iteration* feature, based on the [Mastodon Echo Bot](https://github.com/XaviArnaus/mastodon-echo-bot) ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 - Add a set of Publisher's methods to improve internal code ([#35](https://github.com/XaviArnaus/janitor/pull/35))
-- Support for `publish_queue` for the Scheduler ([#35](https://github.com/XaviArnaus/janitor/pull/35))
+- Support for `publish_queue` in the Scheduler ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 
 ### Changed
 
@@ -23,6 +23,7 @@
 ### Fixed
 
 - Identification of changes in the CHANGELOG, regarding `Changed` vs. `Fixed`.
+- Fixed an issue in Log Rotation that will create several copies per day ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 
 ## [v0.5.1](https://github.com/XaviArnaus/janitor/releases/tag/v0.5.1)
 

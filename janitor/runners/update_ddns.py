@@ -61,6 +61,7 @@ class UpdateDdns(RunnerProtocol):
                         )
 
                 # Store the new external IP locally
+                self._logger.debug("Saving the currnet IP")
                 self._directnic.save_current_ip()
 
                 # Publish into Mastodon

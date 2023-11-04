@@ -26,10 +26,8 @@ class DirectnicDdns:
 
     def get_external_ip(self) -> str:
         if self.current_external_ip is None:
-            self._logger.debug("Getting external IP from service")
             # The class raises RuntimeError if could not succeed
             self.current_external_ip = Network.get_external_ipv4(self._logger)
-            self._logger.debug(f"External IP is {self.current_external_ip}")
 
         return self.current_external_ip
 

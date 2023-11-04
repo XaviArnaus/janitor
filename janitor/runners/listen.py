@@ -1,3 +1,4 @@
+from pyxavi.terminal_color import TerminalColor
 from pyxavi.config import Config
 from janitor.lib.system_info import SystemInfo
 from janitor.lib.system_info_templater import SystemInfoTemplater
@@ -61,7 +62,6 @@ class ListenSysInfo(Resource):
         self._parser.add_argument(
             'sys_data', type=dict, required=True, help='No sys_data provided', location='json'
         )
-        self._logger.info("Init SysInfo Listener")
 
         super(ListenSysInfo, self).__init__()
 
@@ -70,7 +70,9 @@ class ListenSysInfo(Resource):
         This is going to receive the POST request
         """
 
-        self._logger.info("Run SysInfo Listener app")
+        self._logger.info(
+            f"{TerminalColor.MAGENTA}System Info Listener{TerminalColor.END} received a request"
+        )
 
         # Get the data
         args = self._parser.parse_args()
@@ -83,19 +85,20 @@ class ListenSysInfo(Resource):
 
         # If there is no issue, just stop here.
         if not self._sys_info.crossed_thresholds(sys_data, ["hostname"]):
-            self._logger.info("No issues found. Ending here.")
+            self._logger.info(
+                f"{TerminalColor.CYAN}No issues found. Ending here.{TerminalColor.END}"
+            )
             return 200
 
         # Make it a message
         message = SystemInfoTemplater(self._config).process_report(sys_data)
 
         # Publish the message
-        self._logger.info("Publishing one message")
+        self._logger.debug("Publishing a report")
         Publisher(
             config=self._config, named_account=MASTODON_NAMED_ACCOUNT, base_path=ROOT_DIR
         ).publish_message(message=message)
 
-        self._logger.info("End.")
         return 200
 
 
@@ -136,7 +139,6 @@ class ListenMessage(Resource):
             # help = 'No message provided',
             location='form'
         )
-        self._logger.info("Init Message Listener Listener")
 
         super(ListenMessage, self).__init__()
 
@@ -145,7 +147,9 @@ class ListenMessage(Resource):
         This is going to receive the POST request
         """
 
-        self._logger.info("Run Message Listener app")
+        self._logger.info(
+            f"{TerminalColor.MAGENTA}Message Listener{TerminalColor.END} received a request"
+        )
 
         # Get the data
         args = self._parser.parse_args()
@@ -178,10 +182,8 @@ class ListenMessage(Resource):
             message = Message(summary=f"{icon} {hostname}:\n\n{summary}", text=f"{text}")
 
         # Publish the message
-        self._logger.info("Publishing one message")
+        self._logger.debug("Publishing a message")
         Publisher(
             config=self._config, named_account=MASTODON_NAMED_ACCOUNT, base_path=ROOT_DIR
         ).publish_message(message=message)
-
-        self._logger.info("End.")
         return 200

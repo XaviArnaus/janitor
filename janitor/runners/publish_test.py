@@ -1,3 +1,4 @@
+from pyxavi.terminal_color import TerminalColor
 from pyxavi.config import Config
 from janitor.lib.publisher import Publisher
 from janitor.runners.runner_protocol import RunnerProtocol
@@ -49,7 +50,10 @@ class PublishTest(RunnerProtocol):
         '''
         try:
             # Publish the message
-            self._logger.info("Publishing the test message")
+            self._logger.info(
+                f"{TerminalColor.MAGENTA}Publishing Test Message" +
+                f"{TerminalColor.END} to account {self._params['named_account']}"
+            )
             Publisher(
                 config=self._config,
                 named_account=self._params["named_account"],

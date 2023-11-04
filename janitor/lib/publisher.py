@@ -1,5 +1,6 @@
 from pyxavi.config import Config
 from pyxavi.media import Media
+from pyxavi.terminal_color import TerminalColor
 from janitor.objects.queue_item import QueueItem
 from janitor.objects.status_post import StatusPost
 from janitor.objects.message import Message, MessageType
@@ -138,7 +139,9 @@ class Publisher:
 
     def publish_all_from_queue(self) -> None:
         if self._queue.is_empty():
-            self._logger.info("The queue is empty, skipping.")
+            self._logger.info(
+                f"{TerminalColor.CYAN}The queue is empty, skipping.{TerminalColor.END}"
+            )
             return
 
         while not self._queue.is_empty():
@@ -149,7 +152,10 @@ class Publisher:
             # Do we want to publish only the oldest in every iteration?
             #   This means that the queue gets empty one item every run
             if self._only_oldest:
-                self._logger.info("We're meant to publish only the oldest. Finishing.")
+                self._logger.info(
+                    f"{TerminalColor.CYAN}We're meant to publish only the oldest." +
+                    f" Finishing.{TerminalColor.END}"
+                )
                 break
 
         if not self._is_dry_run:
@@ -183,8 +189,8 @@ class Publisher:
         while published is None:
             try:
                 self._logger.info(
-                    f"Publishing new post (retry: {retry}) for " +
-                    f"instance type {self._instance_type}"
+                    f"{TerminalColor.CYAN}Publishing new post (retry {retry}) for " +
+                    f"instance type {self._instance_type}{TerminalColor.END}"
                 )
                 published = self._do_status_publish(status_post=status_post)
                 return published
@@ -195,7 +201,8 @@ class Publisher:
                 retry += 1
                 if retry >= self.MAX_RETRIES:
                     self._logger.error(
-                        f"MAX RETRIES of {self.MAX_RETRIES} is reached. Stop trying."
+                        f"{TerminalColor.RED_BRIGHT}MAX RETRIES of {self.MAX_RETRIES}" +
+                        f" is reached. Stop trying.{TerminalColor.END}"
                     )
                     raise PublisherException(f"Could not publish the post: {e}")
 
@@ -259,7 +266,7 @@ class Publisher:
     def __slice_status_if_longer_than_defined(self, status: str) -> str:
         max_length = self._connection_params.status_params.max_length
         if len(status) > max_length:
-            self._logger.info(
+            self._logger.debug(
                 f"The status post is longer than the max length of {max_length}. Cutting..."
             )
             status = status[:max_length - 3] + "..."

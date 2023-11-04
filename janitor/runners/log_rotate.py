@@ -1,3 +1,4 @@
+from pyxavi.terminal_color import TerminalColor
 from pyxavi.config import Config
 from janitor.runners.runner_protocol import RunnerProtocol
 import logging
@@ -22,7 +23,7 @@ class LogRotate(RunnerProtocol):
         '''
         Reads the current log filename and moves it to a rotated one.
         '''
-        self._logger.debug("Rotating the logs")
+        self._logger.info(f"{TerminalColor.MAGENTA}Starting Log Rotate{TerminalColor.END}")
         # So the strategy is the following:
         #   1. Rename the current log file to f"{current_log_file.log}.old-{datetime}"
         #   2. The logging system will create automatically the new f"{current_log_file.log}"
@@ -36,4 +37,7 @@ class LogRotate(RunnerProtocol):
         new_log_file_name = f"{current_log_file}.old-{now}"
         self._logger.debug(f"Will rotate the log {current_log_file} to {new_log_file_name}")
         os.rename(current_log_file, new_log_file_name)
-        self._logger.info(f"Log rotate {current_log_file} to {new_log_file_name}")
+        self._logger.info(
+            f"{TerminalColor.CYAN}Log rotate {current_log_file} " +
+            f"to {new_log_file_name}{TerminalColor.END}"
+        )

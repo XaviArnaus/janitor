@@ -26,6 +26,9 @@ class Listen(RunnerProtocol):
         self._config = config
         self._logger = logger
 
+        # Make that Flask only logs from Warning on:
+        logging.getLogger('werkzeug').setLevel(logging.WARNING)
+
     def run(self):
         api.add_resource(
             ListenSysInfo,

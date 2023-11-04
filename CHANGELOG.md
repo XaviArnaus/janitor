@@ -20,6 +20,8 @@
 - Manage the `MastodonHelper` internally in the Publisher ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 - Manage the `MastodonConnectionParams` internally in the Publisher ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 - Reduced the amount of `info` logging to produce cleaner logs ([#38](https://github.com/XaviArnaus/janitor/pull/38))
+- Make Flask to log above WARNING ([#38](https://github.com/XaviArnaus/janitor/pull/38))
+- Show who is sending a request to the Listener ([#38](https://github.com/XaviArnaus/janitor/pull/38))
 
 ## [v0.5.1](https://github.com/XaviArnaus/janitor/releases/tag/v0.5.1)
 

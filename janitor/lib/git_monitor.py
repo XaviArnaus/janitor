@@ -223,11 +223,15 @@ class CommitsChanges(BaseChanges):
 
     def discover_changes(self, parameters: dict = None) -> None:
         last_known_commit = self.get_current_last_known()
+        self._logger.debug(f"Last known commit is [{last_known_commit}]")
         if last_known_commit is None:
+            self._logger.debug("Getting all commits since last gut pull")
             commits = list(self._repo_object.iter_commits())
         else:
+            self._logger.debug(f"Getting all commits since [{last_known_commit}]")
             git_rev_list_limits = f"{last_known_commit}..HEAD"
             commits = list(self._repo_object.iter_commits(rev=git_rev_list_limits))
+        self._logger.debug(f"Got {len(commits)} commits")
 
         self._changes_stack = {}
         for c in commits:

@@ -1,3 +1,4 @@
+from pyxavi.terminal_color import TerminalColor
 from pyxavi.config import Config
 from janitor.lib.publisher import Publisher
 from janitor.runners.runner_protocol import RunnerProtocol
@@ -30,7 +31,9 @@ class PublishQueue(RunnerProtocol):
                 base_path=ROOT_DIR,
                 only_oldest=True
             )
-            self._logger.info("Publishing the whole queue")
+            self._logger.info(
+                f"{TerminalColor.MAGENTA}Starting Publish Queue{TerminalColor.END}"
+            )
             publisher.publish_all_from_queue()
         except Exception as e:
             self._logger.exception(e)

@@ -1,3 +1,4 @@
+from pyxavi.terminal_color import TerminalColor
 from pyxavi.config import Config
 from ..objects.message import Message
 from janitor.objects.message import MessageType
@@ -111,16 +112,16 @@ class Formatter:
         mention = self._status_params.username_to_dm
 
         if is_dm and mention:
-            self._logger.info(f"It's a DM posting, applying mention to {mention}")
+            self._logger.debug(f"It's a DM posting, applying mention to {mention}")
             return Template(self._templates["merge_strategies"]["text_with_mention"])\
                 .substitute(mention=mention, text=text)
         else:
             if is_dm and not mention:
                 self._logger.error(
-                    "It's a DM posting, but there is no user mention! \
-                    Make sure the config has the parameter \
-                    [mastodon.status_post.username_to_dm]. \
-                    The post won't be actually visible to anybody!"
+                    f"{TerminalColor.RED_BRIGHT}It's a DM posting, but there is no user mention! \
+                    Make sure the named_account has the parameter \
+                    [username_to_dm]. \
+                    The post won't be actually visible to anybody!{TerminalColor.END}"
                 )
             else:
                 self._logger.debug("Not a DM posting, not adding a mention")

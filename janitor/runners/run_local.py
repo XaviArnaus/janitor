@@ -1,4 +1,5 @@
 from pyxavi.config import Config
+from pyxavi.terminal_color import TerminalColor
 from janitor.lib.system_info import SystemInfo
 from janitor.lib.system_info_templater import SystemInfoTemplater
 from janitor.lib.publisher import Publisher
@@ -18,17 +19,20 @@ class RunLocal(RunnerProtocol):
         self._config = config
         self._logger = logger
         self._sys_info = SystemInfo(self._config)
-        self._logger.info("Init Local Runner")
 
     def run(self):
-        self._logger.info("Run local app")
+        self._logger.info(
+            f"{TerminalColor.MAGENTA}Starting Local System Info{TerminalColor.END}"
+        )
 
         # Get the data
         sys_data = self._collect_data()
 
         # If there is no issue, just stop here.
         if not self._sys_info.crossed_thresholds(sys_data, ["hostname"]):
-            self._logger.info("No issues found. Ending here.")
+            self._logger.info(
+                f"{TerminalColor.CYAN}No issues found. Ending here.{TerminalColor.END}"
+            )
             return False
 
         # Make it a message
@@ -38,8 +42,6 @@ class RunLocal(RunnerProtocol):
         Publisher(
             config=self._config, named_account="default", base_path=ROOT_DIR
         ).publish_message(message=message)
-
-        self._logger.info("End.")
 
     def _collect_data(self) -> dict:
         return {

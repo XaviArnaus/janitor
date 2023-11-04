@@ -1,3 +1,4 @@
+from pyxavi.terminal_color import TerminalColor
 from pyxavi.config import Config
 from croniter import croniter
 from datetime import datetime

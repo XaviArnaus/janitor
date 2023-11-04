@@ -11,7 +11,8 @@
 - Re-queue the message in case of total failure while publishing ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 - Support *publish only oldest in queue for every iteration* feature, based on the [Mastodon Echo Bot](https://github.com/XaviArnaus/mastodon-echo-bot) ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 - Add a set of Publisher's methods to improve internal code ([#35](https://github.com/XaviArnaus/janitor/pull/35))
-- Support for `publish_queue` in the Scheduler ([#35](https://github.com/XaviArnaus/janitor/pull/35))
+- Support for `publish_queue` for the Scheduler ([#35](https://github.com/XaviArnaus/janitor/pull/35))
+- Added some colors into the logging to easy the reading ([#38](https://github.com/XaviArnaus/janitor/pull/38))
 
 ### Changed
 
@@ -19,6 +20,9 @@
 - Now the messages sent as DIRECT and PRIVATE must come with a mention and will appear private only ([#34](https://github.com/XaviArnaus/janitor/pull/34))
 - Manage the `MastodonHelper` internally in the Publisher ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 - Manage the `MastodonConnectionParams` internally in the Publisher ([#35](https://github.com/XaviArnaus/janitor/pull/35))
+- Reduced the amount of `info` logging to produce cleaner logs ([#38](https://github.com/XaviArnaus/janitor/pull/38))
+- Make Flask to log above WARNING ([#38](https://github.com/XaviArnaus/janitor/pull/38))
+- Show who is sending a request to the Listener ([#38](https://github.com/XaviArnaus/janitor/pull/38))
 
 ### Fixed
 

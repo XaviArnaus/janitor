@@ -139,7 +139,8 @@ def test_post_data_does_not_come_in_post():
     mocked_parse_args = Mock()
     mocked_parse_args.return_value = {"not_wanted": "parameter"}
     with patch.object(listener._parser, "parse_args", new=mocked_parse_args):
-        result, code = listener.post()
+        with listener._current_flask_app.test_request_context():
+            result, code = listener.post()
 
     mocked_parse_args.assert_called_once()
     assert result == {"error": "Expected dict under a \"sys_data\" variable was not present."}
@@ -157,7 +158,8 @@ def test_post_data_comes_in_post_no_crossed_thresholds(collected_data):
     mocked_crossed_thresholds.return_value = False
     with patch.object(listener._parser, "parse_args", new=mocked_parse_args):
         with patch.object(SystemInfo, "crossed_thresholds", new=mocked_crossed_thresholds):
-            code = listener.post()
+            with listener._current_flask_app.test_request_context():
+                code = listener.post()
 
     mocked_parse_args.assert_called_once()
     mocked_crossed_thresholds.assert_called_once_with(collected_data, ["hostname"])
@@ -188,7 +190,8 @@ def test_post_data_comes_in_post_crossed_thresholds(collected_data):
                 with patch.object(Publisher,
                                   "publish_message",
                                   new=mocked_publisher_publish_message):
-                    code = listener.post()
+                    with listener._current_flask_app.test_request_context():
+                        code = listener.post()
 
     mocked_parse_args.assert_called_once()
     mocked_crossed_thresholds.assert_called_once_with(collected_data, ["hostname"])
@@ -322,7 +325,8 @@ def test_post_optional_params_not_present(
                 with patch.object(Publisher,
                                   "publish_message",
                                   new=mocked_publisher_publish_message):
-                    result = listener.post()
+                    with listener._current_flask_app.test_request_context():
+                        result = listener.post()
 
     mocked_parse_args.assert_called_once()
     if expected_code == 200:

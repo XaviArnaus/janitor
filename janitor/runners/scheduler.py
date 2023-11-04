@@ -3,7 +3,6 @@ from pyxavi.config import Config
 from croniter import croniter
 from datetime import datetime
 from janitor.runners.runner_protocol import RunnerProtocol
-from pyxavi.terminal_color import TerminalColor
 import logging
 
 from janitor.runners.run_local import RunLocal

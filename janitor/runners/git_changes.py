@@ -40,6 +40,10 @@ class GitChanges(RunnerProtocol):
             published_projects = []
             for repository in repositories:
                 repo = Dictionary(repository)
+                self._logger.info(
+                    f"{TerminalColor.YELLOW}Processing repo " +
+                    f"{repo.get('name')}{TerminalColor.END}"
+                )
 
                 # Check if we already have the repo cloned
                 # If not, clone it localy
@@ -58,6 +62,10 @@ class GitChanges(RunnerProtocol):
                 # If we don't have a previous value, it is the first run.
                 #   Just save the new value but avoid messaging around.
                 if current_last_known is None:
+                    self._logger.info(
+                        f"{TerminalColor.BLUE}First run. Writting only." +
+                        f"{TerminalColor.END}"
+                    )
                     monitor.write_new_last_known(value=new_last_known)
                     continue
 

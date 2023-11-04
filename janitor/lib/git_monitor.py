@@ -75,7 +75,9 @@ class BaseChanges(ChangesProtocol):
         self._changes_stack = None
 
         # Makes no sense to have this class without discovering the changes straight away
+        self._logger.debug(f"Initialised {type(self).__name__}. Getting the changes from {self.get_current_last_known()}.")
         self.discover_changes()
+        self._logger.debug(f"Got {len(self._changes_stack)} changes")
 
     def discover_changes(self, parameters: dict = None) -> None:
         raise NotImplementedError("The child class does not implement this method yet")

@@ -23,6 +23,11 @@
 - Make Flask to log above WARNING ([#38](https://github.com/XaviArnaus/janitor/pull/38))
 - Show who is sending a request to the Listener ([#38](https://github.com/XaviArnaus/janitor/pull/38))
 
+### Fixed
+
+- Fix a wrong param name in `mastodon.yaml.dist` ([#39](https://github.com/XaviArnaus/janitor/pull/39))
+- Fix a bug that made fail the `bin/jan mastodon test` command ([#39](https://github.com/XaviArnaus/janitor/pull/39))
+
 ## [v0.5.1](https://github.com/XaviArnaus/janitor/releases/tag/v0.5.1)
 
 ### Added

@@ -31,7 +31,7 @@ class PublishTest(RunnerProtocol):
         for account in preferred_named_accounts:
             account_defined = self._config.get(f"mastodon.named_accounts.{account}", None)
             if account_defined is not None:
-                named_account = account_defined
+                named_account = account
                 break
 
         if named_account is None:
@@ -40,7 +40,7 @@ class PublishTest(RunnerProtocol):
                 preferred_named_accounts
             )
         else:
-            self._logger.debug(f"Will publish to {named_account['app_name']}")
+            self._logger.debug(f"Will publish to {named_account}")
             params["named_account"] = named_account
             self._params = params
 

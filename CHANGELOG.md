@@ -27,6 +27,7 @@
 
 - Fix a wrong param name in `mastodon.yaml.dist` ([#39](https://github.com/XaviArnaus/janitor/pull/39))
 - Fix a bug that made fail the `bin/jan mastodon test` command ([#39](https://github.com/XaviArnaus/janitor/pull/39))
+- The CLI did not use the identified hostname correctly ([#40](https://github.com/XaviArnaus/janitor/pull/40))
 
 ## [v0.5.1](https://github.com/XaviArnaus/janitor/releases/tag/v0.5.1)
 

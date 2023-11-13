@@ -13,13 +13,17 @@ class Queue:
     def __init__(self, config: Config, base_path: str = None) -> None:
         self._config = config
         self._logger = logging.getLogger(config.get("logger.name"))
-        file_name = config.get("queue_storage.file")
+        self.__storage_file = config.get("queue_storage.file", self.DEFAULT_STORAGE_FILE)
         if base_path is not None:
-            file_name = os.path.join(base_path, file_name)
-        self._queue_manager = Storage(filename=file_name)
+            self.__storage_file = os.path.join(base_path, self.__storage_file)
+        self.load()
+    
+    def load(self) -> int:
+        self._queue_manager = Storage(filename=self.__storage_file)
         self._queue = list(
             map(lambda x: QueueItem.from_dict(x), self._queue_manager.get("queue", []))
         )
+        return self.length()
 
     def append(self, item: QueueItem) -> None:
         self._queue.append(item)

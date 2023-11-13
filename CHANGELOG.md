@@ -28,6 +28,8 @@
 
 - Identification of changes in the CHANGELOG, regarding `Changed` vs. `Fixed`.
 - Fixed an issue in Log Rotation that will create several copies per day ([#35](https://github.com/XaviArnaus/janitor/pull/35))
+- Fix a wrong param name in `mastodon.yaml.dist` ([#39](https://github.com/XaviArnaus/janitor/pull/39))
+- Fix a bug that made fail the `bin/jan mastodon test` command ([#39](https://github.com/XaviArnaus/janitor/pull/39))
 
 ## [v0.5.1](https://github.com/XaviArnaus/janitor/releases/tag/v0.5.1)
 

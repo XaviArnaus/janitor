@@ -137,6 +137,14 @@ class Publisher:
         except Exception as e:
             self._logger.exception(e)
 
+    def reload_queue(self) -> int:
+        # Previous length
+        previous = self._queue.length()
+        self._queue.load()
+        new = self._queue.length()
+
+        return new - previous
+
     def publish_all_from_queue(self) -> None:
         if self._queue.is_empty():
             self._logger.info(

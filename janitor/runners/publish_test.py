@@ -29,8 +29,7 @@ class PublishTest(RunnerProtocol):
             if "named_account" in params and params["named_account"] is not None:
                 preferred_named_accounts = [params["named_account"]] + preferred_named_accounts
         for account in preferred_named_accounts:
-            account_defined = self._config.get(f"mastodon.named_accounts.{account}", None)
-            if account_defined is not None:
+            if self._config.key_exists(f"mastodon.named_accounts.{account}"):
                 named_account = account
                 break
 

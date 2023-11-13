@@ -9,6 +9,7 @@
 - Make a PyPI monitor
 - When the Listener starts, loop the status until it gets up and running.
 - Iterate the Scheduler, should not be defined so much manually. Also should be a CLI command to list Scheduleable tasks
+- Make scheduler to pick up what to do and then execute, to avoid long tasks delay the next and when checked they are not in the window time anymore
 - Make that the runner for Log rotate also publishes a toot when it's done, according to a new config param
 
 # Done
@@ -31,3 +32,4 @@
 ✅ A command to request for the external IP, reusing the logic we already have
 ✅ Rotate the logs
 ✅ The `formatter` has the the `MessageType` ignored when building the post
+✅ Iterate all log messages: Move innecessary infos to debug and introduce some color scheme

@@ -1,3 +1,4 @@
+from pyxavi.terminal_color import TerminalColor
 from pyxavi.config import Config
 from croniter import croniter
 from datetime import datetime
@@ -9,6 +10,7 @@ from janitor.runners.run_remote import RunRemote
 from janitor.runners.update_ddns import UpdateDdns
 from janitor.runners.git_changes import GitChanges
 from janitor.runners.log_rotate import LogRotate
+from janitor.runners.publish_queue import PublishQueue
 
 
 class Scheduler(RunnerProtocol):
@@ -32,7 +34,11 @@ class Scheduler(RunnerProtocol):
 
             for schedule in schedules:
                 if croniter.match(schedule["when"], now_dt):
-                    self._logger.debug("Running schedule " + schedule["name"])
+                    self._logger.info(
+                        f"{TerminalColor.YELLOW_BRIGHT}Running schedule" +
+                        f" {TerminalColor.ORANGE_BRIGHT}" + schedule["name"] +
+                        f"{TerminalColor.END}"
+                    )
                     self._execute_action(schedule["action"])
 
         except Exception as e:
@@ -50,4 +56,4 @@ class Scheduler(RunnerProtocol):
         elif action == "rotate_log":
             LogRotate(config=self._config, logger=self._logger).run()
         elif action == "publish_queue":
-            LogRotate(config=self._config, logger=self._logger).run()
+            PublishQueue(config=self._config, logger=self._logger).run()

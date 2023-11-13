@@ -98,7 +98,7 @@ class Formatter:
         #   if there is no text we just ignore, as we already used summary as text.
         if self._merge_summary_into_text and message.summary and message.text:
             summary = self._format_spoiler(message=message)
-            content = Template(self._templates["merge_strategies"]["text_with_mention"])\
+            content = Template(self._templates["merge_strategies"]["summary_into_text"])\
                 .substitute(
                     summary=summary,
                     text=content

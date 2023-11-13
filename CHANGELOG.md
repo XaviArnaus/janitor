@@ -6,12 +6,14 @@
 
 ### Added
 
+- Git Monitor module now also monitors commits from repositories ([#33](https://github.com/XaviArnaus/janitor/pull/33))
 - The Publisher retries 3 times with a sleep of 10 seconds in between ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 - Re-queue the message in case of total failure while publishing ([#35](https://github.com/XaviArnaus/janitor/pull/35))
-- Support *publish only oldest in queue every iteration* feature, based on the [Mastodon Echo Bot](https://github.com/XaviArnaus/mastodon-echo-bot) ([#35](https://github.com/XaviArnaus/janitor/pull/35))
+- Support *publish only oldest in queue for every iteration* feature, based on the [Mastodon Echo Bot](https://github.com/XaviArnaus/mastodon-echo-bot) ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 - Add a set of Publisher's methods to improve internal code ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 - Support for `publish_queue` for the Scheduler ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 - Added some colors into the logging to easy the reading ([#38](https://github.com/XaviArnaus/janitor/pull/38))
+- A *config migration tool* that migrates from previous v0.5.1 config structure to v0.5.2 ([#33](https://github.com/XaviArnaus/janitor/pull/33))
 
 ### Changed
 
@@ -25,6 +27,8 @@
 
 ### Fixed
 
+- Identification of changes in the CHANGELOG, regarding `Changed` vs. `Fixed`.
+- Fixed an issue in Log Rotation that will create several copies per day ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 - Fix a wrong param name in `mastodon.yaml.dist` ([#39](https://github.com/XaviArnaus/janitor/pull/39))
 - Fix a bug that made fail the `bin/jan mastodon test` command ([#39](https://github.com/XaviArnaus/janitor/pull/39))
 - The CLI did not use the identified hostname correctly ([#40](https://github.com/XaviArnaus/janitor/pull/40))
@@ -37,7 +41,7 @@
 - New CLI arguments to override logging config and print it to stdout ([#29](https://github.com/XaviArnaus/janitor/pull/29))
 - A new CLI and Scheduler command to rotate the log file ([#30](https://github.com/XaviArnaus/janitor/pull/30))
 
-### Changed
+### Fixed
 
 - Fix issue with the main runner in Raspberry ([#25](https://github.com/XaviArnaus/janitor/pull/25))
 - Fix issue with controlling the listener with the main runner ([#26](https://github.com/XaviArnaus/janitor/pull/26) & [#27](https://github.com/XaviArnaus/janitor/pull/27))

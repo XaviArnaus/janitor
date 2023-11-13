@@ -24,8 +24,12 @@ git_monitor:
       path: "storage/repos/my-great-project"
       # [String] The related named account in `mastodon.yaml` used to publish
       named_account: "updates"
-      # Parameters to parse the Changelog
-      changelog: 
+      # [String] Which monitoring method to use
+      #   Possible values are: "changelog" or "commits".
+      #   Defaults to "commits"
+      monitoring_method: "changelog"
+      # Parameters for monitoring
+      params:
         # [String] Which file contains the changelog
         #   It is expected to be a Markdown file with:
         #   - The title of each update is the version

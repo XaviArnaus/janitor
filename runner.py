@@ -89,7 +89,8 @@ SUBCOMMAND_MAP = {
         "stop": (IMPLEMENTED_IN_BASH_TOKEN, "Stops the listener.")
     },
     "migrate_config": {
-        "v0.5.0": (IMPLEMENTED_IN_BASH_TOKEN, "Migrates from v0.4.0 to v0.5.0")
+        "v0.5.0": (IMPLEMENTED_IN_BASH_TOKEN, "Migrates from v0.4.0 to v0.5.0"),
+        "v0.5.2": (IMPLEMENTED_IN_BASH_TOKEN, "Migrates from v0.5.1 to v0.5.2")
     }
 }
 

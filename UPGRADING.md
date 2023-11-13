@@ -5,13 +5,45 @@ Please keep in mind that steps are sequential, and to migrate from a 2 versions 
 
 This document lists the upgrading steps from the most newer version to the oldest version.
 
+
+## From version `v0.5.1` to `v0.5.2`
+
+- There is a minor change in the config structure, where the internal parameter `git_monitor.repositories.#.changelog` got renamed to `git_monitor.repositories.#.params`. There config migration tool should be able to bring the config up-to-date.
+- The lock file has been updated. A `poetry lock` and `make init` is needed.
+
+0. [optional] Backup your user data in any external location.
+    - Config files (by default in `config/*.yaml`)
+    - Client secret file (by default `client.secret`)
+    - User secret file (by default `user.secret`)
+    - Storages (by default, everything inside `storage/`)
+1. Fetch the changes from the original repository
+    ```bash
+    git fetch
+    ```
+2. Checkout to the version `0.5.2`
+    ```bash
+    git checkout v0.5.2
+    ```
+3. Migrate the `git_config.yaml` config file to the new structure. Do it manually now or use the tool like the following:
+    ```bash
+    bin/jan migrate_config v0.5.2
+    ```
+4. Most likely your *Poetry* would complain about the lock file being old. Reset the lock file with the following command
+    ```bash
+    poetry lock 
+    ```
+5. Install the dependencies
+    ```bash
+    make init 
+    ```
+
 ## From version `v0.5.0` to `v0.5.1`
 
 - There are no significant changes in the configuration files.
 - There are changes in the dependencies.
 
 0. [optional] Backup your user data in any external location.
-    - Config file (by default `config.yaml`)
+    - Config files (by default in `config/*.yaml`)
     - Client secret file (by default `client.secret`)
     - User secret file (by default `user.secret`)
     - Storages (by default, everything inside `storage/`)

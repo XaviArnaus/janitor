@@ -13,6 +13,7 @@
 - Add a set of Publisher's methods to improve internal code ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 - Support for `publish_queue` for the Scheduler ([#35](https://github.com/XaviArnaus/janitor/pull/35))
 - Added some colors into the logging to easy the reading ([#38](https://github.com/XaviArnaus/janitor/pull/38))
+- A *config migration tool* that migrates from previous v0.5.1 config structure to v0.5.2 ([#33](https://github.com/XaviArnaus/janitor/pull/33))
 
 ### Changed
 

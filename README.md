@@ -91,7 +91,7 @@ Janitor can discover the current external IP and monitor for changes, and then u
 
 ### 💻 Git repositories monitor
 
-Janitor can monitor changes to CHANGELOG files from given Git repositories and alert via a Mastodon-like API about the changes. This is a gret tool to automatically announce code changes and also to monitor external repositories to be on top of updates to fetch.
+Janitor can monitor commits or changes in the CHANGELOG files from given Git repositories and alert via a Mastodon-like API about the changes. This is a gret tool to automatically announce code changes and also to monitor external repositories to be on top of updates to fetch.
 
 - Read the [Git rempositories monitor](./docs/git_monitor.md) page
 

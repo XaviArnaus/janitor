@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "janitor"
-version = "0.5.1"
+version = "0.5.2"
 description = "Bot for performing common tasks and monitor the system."
 authors = ["Xavier Arnaus <xavi@arnaus.net>"]
 

@@ -136,7 +136,7 @@ class Publisher:
             )
         except Exception as e:
             self._logger.exception(e)
-    
+
     def reload_queue(self) -> int:
         # Previous length
         previous = self._queue.length()

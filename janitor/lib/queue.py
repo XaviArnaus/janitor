@@ -17,7 +17,7 @@ class Queue:
         if base_path is not None:
             self.__storage_file = os.path.join(base_path, self.__storage_file)
         self.load()
-    
+
     def load(self) -> int:
         self._queue_manager = Storage(filename=self.__storage_file)
         self._queue = list(
@@ -56,7 +56,7 @@ class Queue:
 
     def clean(self) -> None:
         self._queue = []
-    
+
     def length(self) -> int:
         return len(self._queue)
 
@@ -68,7 +68,7 @@ class Queue:
             self._queue = []
 
         self._queue = [item] + self._queue
-    
+
     def first(self) -> dict:
         return self._queue[0] if not self.is_empty() else None
 

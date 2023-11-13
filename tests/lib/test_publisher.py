@@ -524,6 +524,7 @@ def test_shortcut(content, summary, method, expected_message_type):
 def patch_queue_load(self):
     self._queue = []
 
+
 def test_reload_queue():
     publisher = get_instance()
 
@@ -535,4 +536,3 @@ def test_reload_queue():
     with patch.object(Queue, "load", new=patch_queue_load):
         assert publisher.reload_queue() == -2
     assert publisher._queue.length() == 0
-

@@ -7,6 +7,7 @@ import os
 
 class Queue:
 
+    DEFAULT_STORAGE_FILE = "storage/queue.yaml"
     _queue = []
 
     def __init__(self, config: Config, base_path: str = None) -> None:
@@ -51,15 +52,21 @@ class Queue:
 
     def clean(self) -> None:
         self._queue = []
+    
+    def length(self) -> int:
+        return len(self._queue)
 
     def pop(self) -> dict:
-        if not self.is_empty():
-            return self._queue.pop(0)
-        else:
-            return None
+        return self._queue.pop(0) if not self.is_empty() else None
 
     def unpop(self, item: QueueItem) -> None:
         if self.is_empty():
             self._queue = []
 
         self._queue = [item] + self._queue
+    
+    def first(self) -> dict:
+        return self._queue[0] if not self.is_empty() else None
+
+    def last(self) -> dict:
+        return self._queue[-1] if not self.is_empty() else None

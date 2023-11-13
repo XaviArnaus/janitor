@@ -265,3 +265,40 @@ def test_unpop(queue_item_1, queue_item_2, queue_item_3):
     assert stack[0] == queue_item_3
     assert stack[1] == queue_item_1
     assert stack[2] == queue_item_2
+
+
+def test_first(queue_item_1, queue_item_2, queue_item_3):
+    queue = get_instance()
+    queue.append(queue_item_1)
+    queue.append(queue_item_2)
+    queue.append(queue_item_3)
+
+    assert len(queue.get_all()), 3
+
+    queue_item = queue.first()
+
+    assert queue_item, queue_item_1
+    assert len(queue.get_all()), 3
+
+
+def test_last(queue_item_1, queue_item_2, queue_item_3):
+    queue = get_instance()
+    queue.append(queue_item_1)
+    queue.append(queue_item_2)
+    queue.append(queue_item_3)
+
+    assert len(queue.get_all()), 3
+
+    queue_item = queue.last()
+
+    assert queue_item, queue_item_3
+    assert len(queue.get_all()), 3
+
+
+def test_length(queue_item_1, queue_item_2, queue_item_3):
+    queue = get_instance()
+    queue.append(queue_item_1)
+    queue.append(queue_item_2)
+    queue.append(queue_item_3)
+
+    assert queue.length(), 3

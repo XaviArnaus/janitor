@@ -2,7 +2,7 @@
 
 ℹ️ If you're upgrading between versions, please see the document [Upgrading Guide](UPGRADING.md).
 
-## [Unreleased](https://github.com/XaviArnaus/janitor/)
+## [v0.5.2](https://github.com/XaviArnaus/janitor/releases/tag/v0.5.2)
 
 ### Added
 

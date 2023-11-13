@@ -206,7 +206,7 @@ def run():
             storage_object.write_file()
             print(
                 f"{TerminalColor.GREEN_BRIGHT}Config file {file}"
-                f" has been writen{TerminalColor.GREEN_BRIGHT}"
+                f" has been writen{TerminalColor.END}"
             )
     except Exception as e:
         print(f"{TerminalColor.RED_BRIGHT}{e}{TerminalColor.END}")

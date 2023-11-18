@@ -1,6 +1,6 @@
 from pyxavi.config import Config
 from pyxavi.terminal_color import TerminalColor
-from janitor.lib.mastodon_helper import MastodonHelper
+from pyxavi.mastodon_helper import MastodonHelper
 from janitor.runners.runner_protocol import RunnerProtocol
 from definitions import ROOT_DIR
 import logging

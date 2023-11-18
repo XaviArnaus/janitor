@@ -2,8 +2,7 @@ from pyxavi.terminal_color import TerminalColor
 from pyxavi.config import Config
 from ..objects.message import Message
 from janitor.objects.message import MessageType
-from janitor.objects.status_post import StatusPost, StatusPostVisibility
-from janitor.objects.mastodon_connection_params import MastodonStatusParams
+from pyxavi.mastodon_helper import StatusPost, StatusPostVisibility, MastodonStatusParams
 from string import Template
 import logging
 

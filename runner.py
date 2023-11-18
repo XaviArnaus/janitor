@@ -21,7 +21,6 @@ from janitor.runners.publish_test import PublishTest
 from janitor.runners.update_ddns import UpdateDdns
 from janitor.runners.git_changes import GitChanges
 from janitor.runners.whatismyip import WhatIsMyIp
-from janitor.runners.log_rotate import LogRotate
 
 PROGRAM_NAME = "janitor"
 CLI_NAME = "jan"
@@ -55,7 +54,6 @@ COMMAND_MAP = {
     ),
     "migrate_config": (SUBCOMMAND_TOKEN, "Migrates the configuration file(s) between versions"),
     "ip": (WhatIsMyIp, "Returns the current external IP"),
-    "rotate_log": (LogRotate, "Rotate the log file"),
 }
 
 SUBCOMMAND_MAP = {

@@ -10,5 +10,5 @@ schedules:
   - name: "Heartbeat"
     # crontab format: minute hour day-of-month month day-of-week
     when: "* * * * *"
-    # [String] possible values: "sysinfo_local" | "sysinfo_remote" | "update_ddns" | "git_changes" | "rotate_log"
+    # [String] possible values: "sysinfo_local" | "sysinfo_remote" | "update_ddns" | "git_changes"
     action: "sysinfo_local"

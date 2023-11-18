@@ -43,7 +43,9 @@ class Publisher:
         self._media_storage = self._config.get("publisher.media_storage")
 
         self._mastodon = MastodonHelper.get_instance(
-            connection_params=self._connection_params, base_path=base_path
+            connection_params=self._connection_params,
+            logger=self._logger,
+            base_path=base_path
         )
 
     def text(self, content: str, summary: str = None, requeue_if_fails: bool = False) -> dict:

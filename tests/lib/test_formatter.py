@@ -1,7 +1,8 @@
 from pyxavi.config import Config
 from janitor.lib.formatter import Formatter
 from janitor.objects.message import Message, MessageType
-from pyxavi.mastodon_helper import MastodonStatusParams, StatusPost, StatusPostContentType, StatusPostVisibility
+from pyxavi.mastodon_helper import MastodonStatusParams,\
+    StatusPost, StatusPostContentType, StatusPostVisibility
 from unittest.mock import patch, Mock
 import pytest
 from unittest import TestCase

@@ -6,10 +6,8 @@ from janitor.objects.queue_item import QueueItem
 from janitor.objects.message import Message, MessageType
 from .queue import Queue
 from .formatter import Formatter
-from mastodon import Mastodon
 import logging
 import time
-import os
 
 
 class Publisher:

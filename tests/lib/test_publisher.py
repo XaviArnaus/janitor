@@ -11,7 +11,6 @@ from unittest.mock import patch, Mock, call
 import pytest
 from logging import Logger
 from datetime import datetime
-import os
 
 CONFIG = {
     "logger.name": "logger_test",

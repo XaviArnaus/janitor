@@ -2,6 +2,12 @@
 
 ℹ️ If you're upgrading between versions, please see the document [Upgrading Guide](UPGRADING.md).
 
+## [Unreleased](https://github.com/XaviArnaus/janitor/)
+
+### Changed
+
+- Now the Mastodon related classes and objects are abstracted into `pyxavi` ([#42](https://github.com/XaviArnaus/janitor/pull/42))
+
 ## [v0.5.2](https://github.com/XaviArnaus/janitor/releases/tag/v0.5.2)
 
 ### Added

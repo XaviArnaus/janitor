@@ -65,12 +65,6 @@ Depending on how you'll want this bot instance to behave, there are some mandato
 make init
 ```
 
-### 7. Create the app
-For the publishing into the Mastodon-like servers we need first to log in and set up the credential files. This is only needed for the "single mode" and the "listener mode", as they are the only ones that publish to the Mastodon API.
-```
-bin/jan create_app
-```
-
 And now the app is ready to run!
 
 ## ⭐️ Features and configuration

@@ -3,11 +3,9 @@ from pyxavi.media import Media
 from janitor.lib.publisher import Publisher, PublisherException
 from janitor.lib.formatter import Formatter
 from janitor.lib.queue import Queue
-from janitor.lib.mastodon_helper import MastodonHelper
+from pyxavi.mastodon_helper import MastodonHelper, StatusPost, MastodonStatusParams
 from janitor.objects.message import Message, MessageType
 from janitor.objects.queue_item import QueueItem
-from janitor.objects.status_post import StatusPost
-from janitor.objects.mastodon_connection_params import MastodonStatusParams
 from mastodon import Mastodon
 from unittest.mock import patch, Mock, call
 import pytest
@@ -105,8 +103,8 @@ def get_instance(named_account: str = "mastodon") -> Publisher:
         with patch.object(Config, "get", new=patched_config_get):
             with patch.object(Queue, "__init__", new=_mocked_queue_instance):
                 with patch.object(Formatter, "__init__", new=patched_formatter_init):
-                    with patch.object(Publisher,
-                                      "_get_mastodon_instance",
+                    with patch.object(MastodonHelper,
+                                      "get_instance",
                                       new=mocked_get_mastodon_instance):
                         return Publisher(
                             config=Config(), named_account=named_account, base_path="bla"
@@ -453,48 +451,6 @@ def test_publish_all_from_queue_not_is_empty_no_dry_run_oldest(queue_item_1, que
     mocked_publish_queue_item.assert_called_once_with(queue_item_1)
     mocked_queue_save.assert_called_once()
     assert result is None
-
-
-def test_get_mastodon_instance_secret_exists():
-
-    publisher = get_instance()
-
-    mocked_path_exists = Mock()
-    mocked_path_exists.return_value = True
-    mocked_get_instance = Mock()
-    with patch.object(os.path, "exists", new=mocked_path_exists):
-        with patch.object(MastodonHelper, "get_instance", new=mocked_get_instance):
-            _ = publisher._get_mastodon_instance()
-
-    mocked_get_instance.assert_called_once_with(
-        config=publisher._config, connection_params=publisher._connection_params
-    )
-
-
-def test_get_mastodon_instance_secret_not_exists():
-
-    publisher = get_instance()
-
-    mocked_path_exists = Mock()
-    mocked_path_exists.return_value = False
-    mocked_create_app = Mock()
-    mocked_get_instance = Mock()
-    with patch.object(os.path, "exists", new=mocked_path_exists):
-        with patch.object(MastodonHelper, "create_app", new=mocked_create_app):
-            with patch.object(MastodonHelper, "get_instance", new=mocked_get_instance):
-                _ = publisher._get_mastodon_instance()
-
-    mocked_create_app.assert_called_once_with(
-        instance_type=publisher._connection_params.instance_type,
-        client_name=publisher._connection_params.app_name,
-        api_base_url=publisher._connection_params.api_base_url,
-        to_file=os.path.join(
-            publisher._base_path, publisher._connection_params.credentials.client_file
-        )
-    )
-    mocked_get_instance.assert_called_once_with(
-        config=publisher._config, connection_params=publisher._connection_params
-    )
 
 
 @pytest.mark.parametrize(

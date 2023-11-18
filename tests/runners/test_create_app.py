@@ -2,7 +2,7 @@ from pyxavi.config import Config
 from pyxavi.logger import Logger
 from janitor.runners.create_app import CreateApp
 from unittest.mock import patch, Mock, call
-from janitor.lib.mastodon_helper import MastodonHelper
+from pyxavi.mastodon_helper import MastodonHelper
 from logging import Logger as PythonLogger
 from definitions import ROOT_DIR
 import os

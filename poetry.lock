@@ -793,15 +793,14 @@ develop = false
 
 [package.dependencies]
 beautifulsoup4 = "^4.11"
-"Mastodon.py" = "1.8.0"
 pyyaml = "^6.0.1"
 requests = "^2.28.0"
 
 [package.source]
 type = "git"
 url = "https://github.com/XaviArnaus/pyxavi.git"
-reference = "feature/bring-mastodon-helper-from-janitor"
-resolved_reference = "00f4576a02effb91f9d826357b74baa9a63db89a"
+reference = "bugfix/real-life-old-config-bugfix"
+resolved_reference = "8a9e5b77f3130d451ae6056fbaedf8f686f19c97"
 
 [[package]]
 name = "pyyaml"
@@ -1040,4 +1039,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "935f86dc3c31e201ccfc4295e56a26b0d8894ca3515c1e657165a6a7bedad64a"
+content-hash = "5d5fc468c6d4faf6f2f948c25597a2e72cef57880024e87f14584b7bbd961e70"

@@ -4,9 +4,18 @@
 
 ## [Unreleased](https://github.com/XaviArnaus/janitor/)
 
+### Added
+
+- A *config migration tool* that migrates from previous v0.5.2 config structure to v0.5.3 ([#43](https://github.com/XaviArnaus/janitor/pull/43))
+
 ### Changed
 
 - Now the Mastodon related classes and objects are abstracted into `pyxavi` ([#42](https://github.com/XaviArnaus/janitor/pull/42))
+- Change the approach for Rotating Log, from manual to based on `TimedRotatingFileHandler` supported in `pyxavi` ([#43](https://github.com/XaviArnaus/janitor/pull/43))
+
+### Fixed
+
+- Bug that made the Listener to loose the log file handler when rotating the log ([#43](https://github.com/XaviArnaus/janitor/pull/43))
 
 ## [v0.5.2](https://github.com/XaviArnaus/janitor/releases/tag/v0.5.2)
 

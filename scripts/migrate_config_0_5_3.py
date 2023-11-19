@@ -175,9 +175,12 @@ def run():
                         )
 
                         # Do we have to initialise the parent?
-                        if target_storage[target_file].get_parent(param_name=target_param_name) is None:
+                        if target_storage[target_file].get_parent(param_name=target_param_name
+                                                                  ) is None:
                             log("The target does not have the parent. Initialising")
-                            target_storage[target_file].initialise_recursive(param_name=target_param_name)
+                            target_storage[target_file].initialise_recursive(
+                                param_name=target_param_name
+                            )
 
                         # Execute the copy
                         value = origin_storage.get(param_name=origin_param_name)
@@ -222,8 +225,7 @@ def run():
                                 f"({values_in_target_param_names} paths)"
                             )
                             assert values_in_origin_param_names == values_in_target_param_names
-                            log(f"Values are correct.")
-
+                            log("Values are correct.")
 
                     # Reaching here means that the copy was correct.
                     #   Now the deletion part of the rename.

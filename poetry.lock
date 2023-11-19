@@ -800,8 +800,8 @@ requests = "^2.28.0"
 [package.source]
 type = "git"
 url = "https://github.com/XaviArnaus/pyxavi.git"
-reference = "feature/bring-mastodon-helper-from-janitor"
-resolved_reference = "10983f3f54d6c2a5debcfc7c556e933cf6109713"
+reference = "main"
+resolved_reference = "9196c4957087e5df110e252d163d9b1f5c2ec1c1"
 
 [[package]]
 name = "pyyaml"
@@ -1040,4 +1040,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "935f86dc3c31e201ccfc4295e56a26b0d8894ca3515c1e657165a6a7bedad64a"
+content-hash = "838d0d51da65539145564366d7246a60bc081462ead93715db6c0f73a633d670"

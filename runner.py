@@ -88,7 +88,8 @@ SUBCOMMAND_MAP = {
     },
     "migrate_config": {
         "v0.5.0": (IMPLEMENTED_IN_BASH_TOKEN, "Migrates from v0.4.0 to v0.5.0"),
-        "v0.5.2": (IMPLEMENTED_IN_BASH_TOKEN, "Migrates from v0.5.1 to v0.5.2")
+        "v0.5.2": (IMPLEMENTED_IN_BASH_TOKEN, "Migrates from v0.5.1 to v0.5.2"),
+        "v0.5.3": (IMPLEMENTED_IN_BASH_TOKEN, "Migrates from v0.5.2 to v0.5.3")
     }
 }
 

@@ -50,6 +50,8 @@ elif [ $1 = "migrate_config" ]; then
             $POETRY_PATH run migrate_config_0_5_0
         elif [ $2 = "v0.5.2" ]; then
             $POETRY_PATH run migrate_config_0_5_2
+        elif [ $2 = "v0.5.3" ]; then
+            $POETRY_PATH run migrate_config_0_5_3
         else
             echo "ERROR: Version unknown"
         fi

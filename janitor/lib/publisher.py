@@ -1,13 +1,11 @@
 from pyxavi.config import Config
 from pyxavi.logger import Logger
-from pyxavi.media import Media
 from pyxavi.terminal_color import TerminalColor
 from pyxavi.mastodon_publisher import MastodonPublisher, MastodonPublisherException
 from janitor.objects.queue_item import QueueItem
 from janitor.objects.message import Message, MessageType
 from .queue import Queue
 from .formatter import Formatter
-import time
 
 
 class Publisher(MastodonPublisher):
@@ -27,7 +25,7 @@ class Publisher(MastodonPublisher):
         base_path: str = None,
         only_oldest: bool = None
     ) -> None:
-        
+
         super().__init__(
             config=config,
             logger=Logger(config=config).get_logger(),

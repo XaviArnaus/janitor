@@ -65,7 +65,9 @@ def patched_generic_init(self, config: Config):
 def patched_formatter_init(self, config: Config, status_params: MastodonStatusParams):
     pass
 
+
 # ----
+
 
 @pytest.fixture(autouse=True)
 def setup_function():
@@ -83,11 +85,14 @@ def setup_function():
 
     CONFIG = backup
 
+
 def patch_config_read_file(self):
     self._content = CONFIG
 
-def patch_mastodon_get_instance(connection_params, logger = None, base_path = None) -> Mastodon:
+
+def patch_mastodon_get_instance(connection_params, logger=None, base_path=None) -> Mastodon:
     return _mocked_mastodon_instance
+
 
 @patch.object(Config, "read_file", new=patch_config_read_file)
 @patch.object(MastodonHelper, "get_instance", new=patch_mastodon_get_instance)
@@ -95,9 +100,7 @@ def get_instance() -> Publisher:
     named_account = "test"
     with patch.object(Queue, "__init__", new=_mocked_queue_instance):
         with patch.object(Formatter, "__init__", new=patched_formatter_init):
-            return Publisher(
-                config=Config(), named_account=named_account, base_path="bla"
-            )
+            return Publisher(config=Config(), named_account=named_account, base_path="bla")
 
 
 def test_initialize():

@@ -1,16 +1,16 @@
 from pyxavi.config import Config
+from pyxavi.logger import Logger
 from pyxavi.media import Media
 from pyxavi.terminal_color import TerminalColor
-from pyxavi.mastodon_helper import MastodonHelper, StatusPost, MastodonConnectionParams
+from pyxavi.mastodon_publisher import MastodonPublisher, MastodonPublisherException
 from janitor.objects.queue_item import QueueItem
 from janitor.objects.message import Message, MessageType
 from .queue import Queue
 from .formatter import Formatter
-import logging
 import time
 
 
-class Publisher:
+class Publisher(MastodonPublisher):
     '''
     Publisher
 
@@ -27,26 +27,20 @@ class Publisher:
         base_path: str = None,
         only_oldest: bool = None
     ) -> None:
-        self._config = config
-        self._logger = logging.getLogger(config.get("logger.name"))
+        
+        super().__init__(
+            config=config,
+            logger=Logger(config=config).get_logger(),
+            named_account=named_account,
+            base_path=base_path
+        )
+
         self._queue = Queue(config, base_path=base_path)
-        self._connection_params = MastodonConnectionParams.from_dict(
-            config.get(f"mastodon.named_accounts.{named_account}")
-        )
         self._formatter = Formatter(config, self._connection_params.status_params)
-        self._instance_type = MastodonHelper.valid_or_raise(
-            self._connection_params.instance_type
-        )
+        # Janitor has the dry_run set up somewhere else. Overwriting.
         self._is_dry_run = config.get("app.run_control.dry_run", False)
         self._only_oldest = only_oldest if only_oldest is not None\
             else config.get("publisher.only_oldest_post_every_iteration", False)
-        self._media_storage = self._config.get("publisher.media_storage")
-
-        self._mastodon = MastodonHelper.get_instance(
-            connection_params=self._connection_params,
-            logger=self._logger,
-            base_path=base_path
-        )
 
     def text(self, content: str, summary: str = None, requeue_if_fails: bool = False) -> dict:
         """
@@ -118,7 +112,7 @@ class Publisher:
         status_post = self._formatter.build_status_post(message=message)
         try:
             return self.publish_status_post(status_post=status_post)
-        except PublisherException as e:
+        except MastodonPublisherException as e:
             self._logger.error(e)
 
             if requeue_if_fails:
@@ -126,15 +120,6 @@ class Publisher:
                 self._queue.unpop(queue_item)
                 if self._is_dry_run:
                     self._queue.save()
-
-    def _post_media(self, media_file: str, description: str) -> dict:
-        try:
-            downloaded = Media().download_from_url(media_file, self._media_storage)
-            return self._mastodon.media_post(
-                downloaded["file"], mime_type=downloaded["mime_type"], description=description
-            )
-        except Exception as e:
-            self._logger.exception(e)
 
     def reload_queue(self) -> int:
         # Previous length
@@ -167,119 +152,3 @@ class Publisher:
 
         if not self._is_dry_run:
             self._queue.save()
-
-    def publish_status_post(self, status_post: StatusPost) -> dict:
-        if self._is_dry_run:
-            self._logger.debug("It's a Dry Run, stopping here.")
-            return None
-
-        # posted_media = []
-        # if "media" in item and item["media"]:
-        #     self._logger.info("Publising first %s media items", len(item["media"]))
-        #     for item in item["media"]:
-        #         posted_result = self._post_media(
-        #             item["url"],
-        #             description=item["alt_text"] if "alt_text" in item else None
-        #         )
-        #         if posted_result:
-        #             posted_media.append(posted_result["id"])
-        #         else:
-        #             self._logger.info("Could not publish %s", item["url"])
-
-        # Let's ensure that it fits according to the params
-        status_post.status = self.__slice_status_if_longer_than_defined(
-            status=status_post.status
-        )
-
-        retry = 0
-        published = None
-        while published is None:
-            try:
-                self._logger.info(
-                    f"{TerminalColor.CYAN}Publishing new post (retry {retry}) for " +
-                    f"instance type {self._instance_type}{TerminalColor.END}"
-                )
-                published = self._do_status_publish(status_post=status_post)
-                return published
-            except Exception as e:
-                self._logger.exception(e)
-                self._logger.debug(f"sleeping {self.SLEEP_TIME} seconds")
-                time.sleep(self.SLEEP_TIME)
-                retry += 1
-                if retry >= self.MAX_RETRIES:
-                    self._logger.error(
-                        f"{TerminalColor.RED_BRIGHT}MAX RETRIES of {self.MAX_RETRIES}" +
-                        f" is reached. Stop trying.{TerminalColor.END}"
-                    )
-                    raise PublisherException(f"Could not publish the post: {e}")
-
-    def _do_status_publish(self, status_post: StatusPost) -> dict:
-        """
-        This is the method that executes the post of the status.
-
-        No checks, no validations, just the action.
-        """
-
-        if self._instance_type == MastodonHelper.TYPE_MASTODON:
-            published = self._mastodon.status_post(
-                status=status_post.status,
-                in_reply_to_id=status_post.in_reply_to_id,
-                media_ids=status_post.media_ids,
-                sensitive=status_post.sensitive,
-                visibility=status_post.visibility,
-                spoiler_text=status_post.spoiler_text,
-                language=status_post.language,
-                idempotency_key=status_post.idempotency_key,
-                scheduled_at=status_post.scheduled_at,
-                poll=status_post.poll,
-                # media_ids=posted_media if posted_media else None # yapf: disable
-            )
-        elif self._instance_type == MastodonHelper.TYPE_PLEROMA:
-            published = self._mastodon.status_post(
-                status=status_post.status,
-                in_reply_to_id=status_post.in_reply_to_id,
-                media_ids=status_post.media_ids,
-                sensitive=status_post.sensitive,
-                visibility=status_post.visibility,
-                spoiler_text=status_post.spoiler_text,
-                language=status_post.language,
-                idempotency_key=status_post.idempotency_key,
-                content_type=status_post.content_type,
-                scheduled_at=status_post.scheduled_at,
-                poll=status_post.poll,
-                quote_id=status_post.quote_id,
-                # media_ids=posted_media if posted_media else None # yapf: disable
-            )
-        elif self._instance_type == MastodonHelper.TYPE_FIREFISH:
-            published = self._mastodon.status_post(
-                status=status_post.status,
-                in_reply_to_id=status_post.in_reply_to_id,
-                media_ids=status_post.media_ids,
-                sensitive=status_post.sensitive,
-                visibility=status_post.visibility,
-                spoiler_text=status_post.spoiler_text,
-                language=status_post.language,
-                idempotency_key=status_post.idempotency_key,
-                content_type=status_post.content_type,
-                scheduled_at=status_post.scheduled_at,
-                poll=status_post.poll,
-                quote_id=status_post.quote_id,
-                # media_ids=posted_media if posted_media else None # yapf: disable
-            )
-        else:
-            raise RuntimeError(f"Unknown instance type {self._instance_type}")
-        return published
-
-    def __slice_status_if_longer_than_defined(self, status: str) -> str:
-        max_length = self._connection_params.status_params.max_length
-        if len(status) > max_length:
-            self._logger.debug(
-                f"The status post is longer than the max length of {max_length}. Cutting..."
-            )
-            status = status[:max_length - 3] + "..."
-
-        return status
-
-
-class PublisherException(BaseException):
-    pass

@@ -13,7 +13,7 @@ flask = "^2.2.3"
 flask-restful = "^0.3.9"
 croniter = "^1.3.8"
 gitpython = "^3.1.37"
-pyxavi = { git = "https://github.com/XaviArnaus/pyxavi.git", branch = "feature/bring-mastodon-helper-from-janitor" }
+pyxavi = { git = "https://github.com/XaviArnaus/pyxavi.git", branch = "feature/bring=mastodon-publisher-and-named-account-object" }
 python-slugify = "^7.0.0"
 
 [tool.poetry.scripts]

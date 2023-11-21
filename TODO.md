@@ -3,7 +3,6 @@
 - Simplify the messaging:
     - Merge `Message` and `QueueItem`.
     - Make `QueueItem` just a protocol
-- Move the Mastodon publish related classes to `pyxavi`
 - Make the `git_monitor` to monitor git tags and not only CHANGELOG changes.
 - Make a PyPI monitor
 - When the Listener starts, loop the status until it gets up and running.
@@ -11,10 +10,13 @@
 - Make scheduler to pick up what to do and then execute, to avoid long tasks delay the next and when checked they are not in the window time anymore
 - Make that the runner for Log rotate also publishes a toot when it's done, according to a new config param
 - Remove the deprecated set of Makefile targets
-- Migrar pyxavi logging from old config to new config
+- Migrate pyxavi logging from old config to new config
+- Migrate `dry_run` from `app.run_control` to `publisher`
+- Make a separated config for `publisher` 
 
 # Done
 
+✅ Move the Mastodon publish related classes to `pyxavi`
 ✅ Move `MastodonHelper` to `pyxavi`
 ✅ Iterate all log messages: Move innecessary infos to debug and introduce some color scheme
 ✅ The `formatter` has the the `MessageType` ignored when building the post

@@ -64,4 +64,3 @@ At the moment, the following actions are allowed:
 - `sysinfo_remote`: Gathers the local System Info and sends them to a listening server to be processed
 - `update_ddns`: Discovers the current external IP and updates the Directnic Dynamic DNS registers
 - `git_changes`: Discovers changes in the monitored Git repositories and publishes them
-- `rotate_log`: Renames the current log file to a timestamped filename so that a new one is created.

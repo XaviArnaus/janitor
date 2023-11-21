@@ -16,6 +16,7 @@
 ### Fixed
 
 - Bug that made the Listener to loose the log file handler when rotating the log ([#43](https://github.com/XaviArnaus/janitor/pull/43))
+- Now the Publish class is abstracted into `pyxavi` ([#44](https://github.com/XaviArnaus/janitor/pull/44))
 
 ## [v0.5.2](https://github.com/XaviArnaus/janitor/releases/tag/v0.5.2)
 

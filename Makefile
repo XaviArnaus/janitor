@@ -11,6 +11,11 @@ endif
 init:
 	$(POETRY) install
 
+.PHONY: update
+update:
+	$(POETRY) lock
+	$(POETRY) install
+
 .PHONY: yapf
 yapf:
 	$(POETRY) run yapf -r --diff .
@@ -62,6 +67,7 @@ coverage:
 #	listen						listen*
 #	scheduler					scheduler
 #	git_changes					publish_git_changes
+#	validate_config				validate_config
 #	
 #	Command (and subcommand)	Makefile target
 #	 /implemented in bash/

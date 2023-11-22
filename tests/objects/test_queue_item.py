@@ -3,7 +3,6 @@ from janitor.objects.queue_item import QueueItem
 from janitor.objects.message import Message, MessageMedia
 from freezegun import freeze_time
 from datetime import datetime
-from unittest.mock import patch
 
 
 def test_instantiate_minimal():

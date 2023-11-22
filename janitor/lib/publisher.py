@@ -27,20 +27,19 @@ class Publisher(MastodonPublisher):
         base_path: str = None,
         only_oldest: bool = None
     ) -> None:
-        
+
         logger = Logger(config=config).get_logger()
 
         super().__init__(
-            config=config,
-            logger=logger,
-            named_account=named_account,
-            base_path=base_path
+            config=config, logger=logger, named_account=named_account, base_path=base_path
         )
 
         queue_storage_file = config.get("queue_storage.file", self.DEFAULT_QUEUE_FILE)
         if base_path is not None:
-            queue_storage_file = os.path.join(base_path, queue_storage_file) 
-        self._queue = Queue(logger=logger, storage_file=queue_storage_file, queue_item_object=QueueItem)
+            queue_storage_file = os.path.join(base_path, queue_storage_file)
+        self._queue = Queue(
+            logger=logger, storage_file=queue_storage_file, queue_item_object=QueueItem
+        )
         self._formatter = Formatter(config, self._connection_params.status_params)
         # Janitor has the dry_run set up somewhere else. Overwriting.
         self._is_dry_run = config.get("app.run_control.dry_run", False)

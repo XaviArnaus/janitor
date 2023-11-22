@@ -1,7 +1,11 @@
+from pyxavi.item_queue import Queue
+from pyxavi.config import Config
+from pyxavi.storage import Storage
 from janitor.objects.queue_item import QueueItem
 from janitor.objects.message import Message, MessageMedia
 from freezegun import freeze_time
 from datetime import datetime
+from unittest.mock import patch
 
 
 def test_instantiate_minimal():
@@ -76,3 +80,61 @@ def test_from_dict():
     assert queue_item.message.text == message.text
     assert queue_item.media[0].url == media[0].url
     assert queue_item.published_at == published_at
+
+CONFIG = {
+    "logger": {
+        "name": "logger_test"
+    }
+}
+
+def patch_config_read_file(self):
+    self._content = CONFIG
+
+def patch_storage_read_file(self):
+    self._content = []
+
+@patch.object(Config, "read_file", new=patch_config_read_file)
+@patch.object(Storage, "read_file", new=patch_storage_read_file)
+def test_sorting_uses_published_at_field():
+    instance1 = QueueItem(published_at=datetime(2023, 3, 23))
+    instance2 = QueueItem(published_at=datetime(2023, 4, 23))
+    instance3 = QueueItem(published_at=datetime(2023, 5, 23))
+
+    queue = Queue(config=Config())
+
+    queue.append(instance3)
+    queue.append(instance1)
+    queue.append(instance2)
+    queue.sort()
+
+    items = queue.get_all()
+    assert items[0] == instance1
+    assert items[1] == instance2
+    assert items[2] == instance3
+
+@patch.object(Config, "read_file", new=patch_config_read_file)
+@patch.object(Storage, "read_file", new=patch_storage_read_file)
+def test_deduplication_uses_message_text_and_summary_field():
+    instance1 = QueueItem(Message(text="aa"))
+    instance2 = QueueItem(Message(text="aa", summary="bb"))
+    instance3 = QueueItem(Message(text="aa", summary="cc"))
+    instance4 = QueueItem(Message(text="aa", summary="bb"))
+    instance5 = QueueItem(Message(text="bb", summary="aa"))
+
+    queue = Queue(config=Config())
+
+    queue.append(instance1)
+    queue.append(instance2)
+    queue.append(instance3)
+    queue.append(instance4)
+    queue.append(instance5)
+    queue.deduplicate()
+
+    # dd(queue._queue, max_depth=3)
+
+    assert queue.length() == 4
+    items = queue.get_all()
+    assert items[0] == instance1
+    assert items[1] == instance2
+    assert items[2] == instance3
+    assert items[3] == instance5

@@ -439,8 +439,8 @@ requests = "^2.28.0"
 [package.source]
 type = "git"
 url = "https://github.com/XaviArnaus/pyxavi.git"
-reference = "main"
-resolved_reference = "b83e74bbee77c37dba680c08796aca530aeca3b7"
+reference = "feature/make-queue-able-to-work-non-stateful"
+resolved_reference = "0a59a0dd4abc3712ff7c975ace59c3ea23e2527b"
 
 [[package]]
 name = "pyyaml"
@@ -579,7 +579,7 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "838d0d51da65539145564366d7246a60bc081462ead93715db6c0f73a633d670"
+content-hash = "98368878309083834472e0b6c51837245d7725b3803bc9ad827375358963e384"
 
 [metadata.files]
 aniso8601 = [

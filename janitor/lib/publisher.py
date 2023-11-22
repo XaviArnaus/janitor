@@ -6,6 +6,7 @@ from pyxavi.item_queue import Queue
 from janitor.objects.queue_item import QueueItem
 from janitor.objects.message import Message, MessageType
 from .formatter import Formatter
+import os
 
 
 class Publisher(MastodonPublisher):
@@ -17,6 +18,7 @@ class Publisher(MastodonPublisher):
 
     MAX_RETRIES = 3
     SLEEP_TIME = 10
+    DEFAULT_QUEUE_FILE = "storage/queue.yaml"
 
     def __init__(
         self,
@@ -25,15 +27,20 @@ class Publisher(MastodonPublisher):
         base_path: str = None,
         only_oldest: bool = None
     ) -> None:
+        
+        logger = Logger(config=config).get_logger()
 
         super().__init__(
             config=config,
-            logger=Logger(config=config).get_logger(),
+            logger=logger,
             named_account=named_account,
             base_path=base_path
         )
 
-        self._queue = Queue(config, base_path=base_path, queue_item_object=QueueItem)
+        queue_storage_file = config.get("queue_storage.file", self.DEFAULT_QUEUE_FILE)
+        if base_path is not None:
+            queue_storage_file = os.path.join(base_path, queue_storage_file) 
+        self._queue = Queue(logger=logger, storage_file=queue_storage_file, queue_item_object=QueueItem)
         self._formatter = Formatter(config, self._connection_params.status_params)
         # Janitor has the dry_run set up somewhere else. Overwriting.
         self._is_dry_run = config.get("app.run_control.dry_run", False)

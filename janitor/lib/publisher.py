@@ -2,9 +2,9 @@ from pyxavi.config import Config
 from pyxavi.logger import Logger
 from pyxavi.terminal_color import TerminalColor
 from pyxavi.mastodon_publisher import MastodonPublisher, MastodonPublisherException
+from pyxavi.item_queue import Queue
 from janitor.objects.queue_item import QueueItem
 from janitor.objects.message import Message, MessageType
-from .queue import Queue
 from .formatter import Formatter
 
 
@@ -33,7 +33,7 @@ class Publisher(MastodonPublisher):
             base_path=base_path
         )
 
-        self._queue = Queue(config, base_path=base_path)
+        self._queue = Queue(config, base_path=base_path, queue_item_object=QueueItem)
         self._formatter = Formatter(config, self._connection_params.status_params)
         # Janitor has the dry_run set up somewhere else. Overwriting.
         self._is_dry_run = config.get("app.run_control.dry_run", False)

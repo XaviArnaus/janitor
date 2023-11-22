@@ -2,7 +2,7 @@ from pyxavi.config import Config
 from pyxavi.mastodon_publisher import MastodonPublisher, MastodonPublisherException
 from janitor.lib.publisher import Publisher
 from janitor.lib.formatter import Formatter
-from janitor.lib.queue import Queue
+from pyxavi.item_queue import Queue
 from pyxavi.mastodon_helper import MastodonHelper, StatusPost, MastodonStatusParams
 from janitor.objects.message import Message, MessageType
 from janitor.objects.queue_item import QueueItem

@@ -38,10 +38,10 @@ class QueueItem(QueueItemProtocol):
             datetime.fromtimestamp(queue_item_dict["published_at"])
             if "published_at" in queue_item_dict else None
         )
-    
+
     def sort_value(self, param: any = None) -> any:
         return self.published_at
-    
+
     def unique_value(self, param: any = None) -> any:
         result = f"s{self.message.summary}" if self.message.summary is not None else ""
         result += f"m{self.message.text}" if self.message.text is not None else ""

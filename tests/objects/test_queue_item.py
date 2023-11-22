@@ -81,17 +81,17 @@ def test_from_dict():
     assert queue_item.media[0].url == media[0].url
     assert queue_item.published_at == published_at
 
-CONFIG = {
-    "logger": {
-        "name": "logger_test"
-    }
-}
+
+CONFIG = {"logger": {"name": "logger_test"}}
+
 
 def patch_config_read_file(self):
     self._content = CONFIG
 
+
 def patch_storage_read_file(self):
     self._content = []
+
 
 @patch.object(Config, "read_file", new=patch_config_read_file)
 @patch.object(Storage, "read_file", new=patch_storage_read_file)
@@ -111,6 +111,7 @@ def test_sorting_uses_published_at_field():
     assert items[0] == instance1
     assert items[1] == instance2
     assert items[2] == instance3
+
 
 @patch.object(Config, "read_file", new=patch_config_read_file)
 @patch.object(Storage, "read_file", new=patch_storage_read_file)

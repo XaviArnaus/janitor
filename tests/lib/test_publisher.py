@@ -2,7 +2,7 @@ from pyxavi.config import Config
 from pyxavi.mastodon_publisher import MastodonPublisher, MastodonPublisherException
 from janitor.lib.publisher import Publisher
 from janitor.lib.formatter import Formatter
-from janitor.lib.queue import Queue
+from pyxavi.queue_stack import Queue
 from pyxavi.mastodon_helper import MastodonHelper, StatusPost, MastodonStatusParams
 from janitor.objects.message import Message, MessageType
 from janitor.objects.queue_item import QueueItem
@@ -50,23 +50,8 @@ CONFIG = {
 }
 
 
-def patched_config_init(self):
-    pass
-
-
-def patched_config_get(self, param: str, default=None) -> str:
-    return CONFIG[param]
-
-
-def patched_generic_init(self, config: Config):
-    pass
-
-
 def patched_formatter_init(self, config: Config, status_params: MastodonStatusParams):
     pass
-
-
-# ----
 
 
 @pytest.fixture(autouse=True)

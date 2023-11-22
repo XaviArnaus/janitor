@@ -12,6 +12,7 @@
 
 - Now the Mastodon related classes and objects are abstracted into `pyxavi` ([#42](https://github.com/XaviArnaus/janitor/pull/42))
 - Change the approach for Rotating Log, from manual to based on `TimedRotatingFileHandler` supported in `pyxavi` ([#43](https://github.com/XaviArnaus/janitor/pull/43))
+- Now the Queue class is abstracted into `pyxavi` ([#45](https://github.com/XaviArnaus/mastodon-echo-bot/pull/45))
 
 ### Fixed
 

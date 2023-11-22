@@ -2,7 +2,7 @@ from pyxavi.config import Config
 from pyxavi.logger import Logger
 from pyxavi.terminal_color import TerminalColor
 from pyxavi.mastodon_publisher import MastodonPublisher, MastodonPublisherException
-from pyxavi.item_queue import Queue
+from pyxavi.queue_stack import Queue
 from janitor.objects.queue_item import QueueItem
 from janitor.objects.message import Message, MessageType
 from .formatter import Formatter

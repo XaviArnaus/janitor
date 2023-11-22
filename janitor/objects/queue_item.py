@@ -1,5 +1,5 @@
 from __future__ import annotations
-from pyxavi.item_queue import QueueItemProtocol
+from pyxavi.queue_stack import QueueItemProtocol
 from .message import Message, MessageMedia
 from datetime import datetime
 

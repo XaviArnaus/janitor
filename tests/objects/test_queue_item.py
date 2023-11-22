@@ -1,4 +1,4 @@
-from pyxavi.item_queue import Queue
+from pyxavi.queue_stack import Queue
 from janitor.objects.queue_item import QueueItem
 from janitor.objects.message import Message, MessageMedia
 from freezegun import freeze_time
